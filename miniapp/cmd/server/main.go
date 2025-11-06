@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"iskra/miniapp/internal/handlers"
-	"iskra/shared/config"
+	"iskra/shared/internal/config"
 	"log"
 	"net/http"
 	"os"
