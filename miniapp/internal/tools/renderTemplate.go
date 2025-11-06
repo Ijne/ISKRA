@@ -3,13 +3,14 @@ package tools
 import (
 	"fmt"
 	"html/template"
+	"iskra/shared/config"
 	"net/http"
 )
 
-func RenderTemplate(w http.ResponseWriter, tmpl string, data interface{}) error {
+func RenderTemplate(w http.ResponseWriter, cfg *config.Config, tmpl string, data interface{}) error {
 	templates := template.Must(template.ParseFiles(
 		//"internal/templates/base.html",
-		"internal/templates/" + tmpl,
+		cfg.MiniApp.TemplatesPath + tmpl,
 	))
 
 	err := templates.ExecuteTemplate(w, tmpl, data)
