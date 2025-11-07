@@ -162,13 +162,6 @@ document.addEventListener('DOMContentLoaded', function() {
         animationId = requestAnimationFrame(animateElegantFire);
     }
 
-    function redirectToHomepage() {
-        // Замените '/' на нужный URL главной страницы
-        window.location.href = '/';
-        // Или используйте, если нужно:
-        // window.location.replace('/');
-    }
-
     sparkContainer.addEventListener('click', function() {
         if (isAnimating) return;
         isAnimating = true;
@@ -204,9 +197,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     mainContainer.style.display = 'block';
                     fireCanvas.classList.remove('active');
                     isAnimating = false;
-                    
-                    // Перенаправление на главную страницу после небольшой задержки
-                    setTimeout(redirectToHomepage, 1000);
                 }, 600);
             }
             loadingProgress.style.width = progress + '%';
