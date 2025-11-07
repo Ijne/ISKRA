@@ -19,24 +19,34 @@ func (r *UserRepo) CreateTable() error {
 	// const op = "postgres.user.create_table"
 
 	stmt := `
-		CREATE TABLE IF NOT EXISTS users (
-			chat_id INTEGER NOT NULL PRIMARY KEY,
-			username VARCHAR(255) NOT NULL,
-			nick VARCHAR(255) NOT NULL,
-			description TEXT,
-			icon VARCHAR(255)
-		)
+		CREATE TABLE IF NOT EXISTS public.users (
+			id int NOT NULL,
+			username varchar NOT NULL,
+			"name" varchar NOT NULL,
+			surname varchar NULL,
+			age int NOT NULL,
+			gender int NOT NULL,
+			preferred_gender int NULL,
+			career_type varchar NULL,
+			personality_type varchar NULL,
+			relationship_goal varchar NULL,
+			important_values varchar NULL,
+			city varchar NULL,
+			career_place varchar NULL,
+			CONSTRAINT users_pk PRIMARY KEY (id),
+			CONSTRAINT users_unique UNIQUE (username)
+		);
 	`
 
 	_, err := r.db.Exec(stmt)
 	return err
 }
 
-func (r *UserRepo) GetUser(chatID int64) (models.UserDB, error) {
+func (r *UserRepo) GetUser(ID int64) (models.UserDB, error) {
 	stmt, err := r.db.Prepare(`
-		SELECT chat_id, username, nick, description, icon
+		SELECT id, username, name, surname, age, gender, preferred_gender, career_type, personality_type, relationship_goal, important_values, city, career_place
 		FROM users
-		WHERE chat_id = $1
+		WHERE id = $1
 	`)
 
 	res := models.UserDB{}
@@ -44,25 +54,33 @@ func (r *UserRepo) GetUser(chatID int64) (models.UserDB, error) {
 		return res, err
 	}
 
-	err = stmt.QueryRow(chatID).Scan(&res.ChatID, &res.Username, &res.Nick, &res.Description, &res.Icon)
+	err = stmt.QueryRow(ID).Scan(&res.ID, &res.Username, &res.Name, &res.Surname, &res.Age, &res.Gender, &res.PreferredGender, &res.CareerType, &res.PersonalityType, &res.RelationshipGoal, &res.ImportantValues, &res.City, &res.CareerPlace)
 	return res, err
 }
 
 func (r *UserRepo) CreateUser(user models.UserCreate) error {
 	stmt, err := r.db.Prepare(`
 		INSERT INTO users (
-			chat_id,
+			id,
 			username,
-			nick,
-			description,
-			icon
+			name,
+			surname,
+			age,
+			gender,
+			preferred_gender,
+			career_type,
+			personality_type,
+			relationship_goal,
+			important_values,
+			city,
+			career_place
 		)
-		VALUES ($1, $2, $3, $4, $5)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
 	`)
 	if err != nil {
 		return err
 	}
 
-	_, err = stmt.Exec(user.ChatID, user.Username, user.Nick, user.Description, user.Icon)
+	_, err = stmt.Exec(user.ID, user.Username, user.Name, user.Surname, user.Age, user.Gender, user.PreferredGender, user.CareerType, user.PersonalityType, user.RelationshipGoal, user.ImportantValues, user.City, user.CareerPlace)
 	return err
 }

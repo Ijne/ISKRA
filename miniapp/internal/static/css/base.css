@@ -1,0 +1,130 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a0f00 100%);
+    color: #fff;
+    min-height: 100vh;
+    /* УБИРАЕМ overflow: hidden - он обрезает контент */
+}
+
+main {
+    min-height: calc(100vh - 80px); /* Высота минус навигация */
+    padding-bottom: 20px;
+    overflow-y: auto; /* Добавляем скролл только для main */
+}
+
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    padding: 0 20px;
+    background: rgba(10, 10, 10, 0.9);
+}
+
+.nav-container {
+    width: 100%;
+    max-width: 400px;
+    height: 60px;
+    background: rgba(20, 20, 20, 0.8);
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 0 20px;
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 170, 0, 0.1);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.nav-button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.5);
+    transition: all 0.3s ease;
+    position: relative;
+    width: 60px;
+    height: 60px;
+    cursor: pointer;
+    border: none;
+    background: none;
+}
+
+.nav-button.active {
+    color: #ffaa00;
+}
+
+.nav-icon {
+    font-size: 1.4rem;
+    margin-bottom: 4px;
+}
+
+.nav-label {
+    font-size: 0.7rem;
+    font-weight: 500;
+}
+
+.main-button {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ffaa00, #ff6600);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    top: -15px;
+    box-shadow: 
+        0 5px 15px rgba(255, 170, 0, 0.3),
+        0 0 0 4px rgba(255, 170, 0, 0.1);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: none;
+}
+
+.main-button:hover {
+    transform: scale(1.05);
+    box-shadow: 
+        0 8px 20px rgba(255, 170, 0, 0.4),
+        0 0 0 4px rgba(255, 170, 0, 0.2);
+}
+
+.main-icon {
+    color: white;
+    font-size: 1.6rem;
+}
+
+.main-button::after {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    right: -4px;
+    bottom: -4px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 170, 0, 0.3);
+    animation: pulseRing 3s ease-out infinite;
+}
+
+@keyframes pulseRing {
+    0% {
+        transform: scale(0.8);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1.5);
+        opacity: 0;
+    }
+}

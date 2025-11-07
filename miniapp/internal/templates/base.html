@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ISKRA</title>
+</head>
+<body>
+    <main>
+        {{ template "content" . }}
+    </main>
+
+    <div class="bottom-nav">
+        <div class="nav-container">
+            <button class="nav-button active">
+                <div class="nav-icon">👤</div>
+                <div class="nav-label">Профиль</div>
+            </button>
+            
+            <button class="main-button">
+                <div class="main-icon">🔥</div>
+            </button>
+            
+            <button class="nav-button">
+                <div class="nav-icon">🎯</div>
+                <div class="nav-label">Мероприятия</div>
+            </button>
+        </div>
+    </div>
+</body>
+<link rel="stylesheet" href="/static/css/base.css">
+<script src="/static/js/base.js"></script>
+</html>

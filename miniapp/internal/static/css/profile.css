@@ -1,0 +1,416 @@
+.profile-container {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 15px;
+    padding-bottom: 90px;
+}
+
+.profile-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.profile-title {
+    font-size: 2.2rem;
+    font-weight: 300;
+    margin-bottom: 8px;
+    background: linear-gradient(45deg, #ffffff, #ffaa00);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 2px;
+}
+
+.profile-subtitle {
+    font-size: 1rem;
+    opacity: 0.8;
+    margin-bottom: 15px;
+}
+
+.profile-board {
+    background: rgba(30, 30, 30, 0.6);
+    border-radius: 20px;
+    padding: 20px;
+    border: 1px solid rgba(255, 170, 0, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+/* Компактные поля ввода */
+.basic-info-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.compact-field {
+    background: rgba(255, 170, 0, 0.08);
+    border: 1px solid rgba(255, 170, 0, 0.2);
+    border-radius: 12px;
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.compact-field:hover {
+    border-color: #ffaa00;
+    background: rgba(255, 170, 0, 0.12);
+}
+
+.compact-field-label {
+    font-size: 0.7rem;
+    opacity: 0.7;
+    margin-bottom: 3px;
+}
+
+.compact-field-value {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #ffaa00;
+}
+
+.compact-edit-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.5;
+    font-size: 0.8rem;
+    transition: opacity 0.3s ease;
+}
+
+.compact-field:hover .compact-edit-icon {
+    opacity: 1;
+}
+
+/* Поле города отдельно (полная ширина) */
+.city-field {
+    grid-column: 1 / -1;
+    background: rgba(255, 170, 0, 0.08);
+    border: 1px solid rgba(255, 170, 0, 0.2);
+    border-radius: 12px;
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    margin-top: 5px;
+}
+
+.city-field:hover {
+    border-color: #ffaa00;
+    background: rgba(255, 170, 0, 0.12);
+}
+
+.city-field-label {
+    font-size: 0.7rem;
+    opacity: 0.7;
+    margin-bottom: 3px;
+}
+
+.city-field-value {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #ffaa00;
+}
+
+.city-edit-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.5;
+    font-size: 0.8rem;
+    transition: opacity 0.3s ease;
+}
+
+.city-field:hover .city-edit-icon {
+    opacity: 1;
+}
+
+.profile-section {
+    margin-bottom: 25px;
+}
+
+.profile-section-title {
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+    color: #ffaa00;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.profile-section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, #ffaa00, transparent);
+}
+
+.capsules-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 15px;
+    max-height: 120px;
+    overflow: hidden;
+    transition: max-height 0.4s ease;
+}
+
+.capsules-grid.expanded {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.capsules-grid::-webkit-scrollbar {
+    width: 4px;
+}
+
+.capsules-grid::-webkit-scrollbar-track {
+    background: rgba(255, 170, 0, 0.1);
+    border-radius: 2px;
+}
+
+.capsules-grid::-webkit-scrollbar-thumb {
+    background: rgba(255, 170, 0, 0.3);
+    border-radius: 2px;
+}
+
+.capsule {
+    background: rgba(255, 170, 0, 0.08);
+    border: 1px solid rgba(255, 170, 0, 0.2);
+    border-radius: 20px;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    position: relative;
+    overflow: hidden;
+}
+
+.capsule::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #ffaa00, transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.capsule:hover {
+    transform: translateY(-1px);
+    border-color: #ffaa00;
+    background: rgba(255, 170, 0, 0.15);
+}
+
+.capsule.selected {
+    background: rgba(255, 170, 0, 0.25);
+    border-color: #ffaa00;
+    box-shadow: 0 2px 8px rgba(255, 170, 0, 0.3);
+}
+
+.capsule.selected::before {
+    opacity: 1;
+}
+
+.expand-btn {
+    background: rgba(255, 170, 0, 0.1);
+    border: 1px solid rgba(255, 170, 0, 0.3);
+    border-radius: 15px;
+    padding: 8px 16px;
+    color: #ffaa00;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 0 auto;
+}
+
+.expand-btn:hover {
+    background: rgba(255, 170, 0, 0.2);
+    transform: translateY(-1px);
+}
+
+.expand-icon {
+    transition: transform 0.3s ease;
+}
+
+.expanded .expand-icon {
+    transform: rotate(180deg);
+}
+
+.avatar-section {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ffaa00, #ff6600);
+    margin: 0 auto 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: white;
+    border: 2px solid rgba(255, 170, 0, 0.5);
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.avatar:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 25px rgba(255, 170, 0, 0.4);
+}
+
+.selected-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 12px;
+    min-height: 30px;
+}
+
+.selected-tag {
+    background: rgba(255, 170, 0, 0.25);
+    border: 1px solid rgba(255, 170, 0, 0.4);
+    border-radius: 15px;
+    padding: 5px 10px;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.remove-tag {
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+    font-size: 1rem;
+    line-height: 1;
+}
+
+.remove-tag:hover {
+    opacity: 1;
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #ffaa00, #ff6600);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 15px;
+    position: relative;
+    overflow: hidden;
+}
+
+.submit-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.submit-btn:hover::before {
+    left: 100%;
+}
+
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 170, 0, 0.4);
+}
+
+.profile-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+}
+
+.profile-modal-content {
+    background: rgba(30, 30, 30, 0.95);
+    border-radius: 20px;
+    padding: 25px;
+    width: 90%;
+    max-width: 400px;
+    border: 1px solid rgba(255, 170, 0, 0.3);
+}
+
+.profile-modal-title {
+    color: #ffaa00;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.profile-modal-input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid rgba(255, 170, 0, 0.3);
+    border-radius: 12px;
+    background: rgba(20, 20, 20, 0.8);
+    color: white;
+    font-size: 1rem;
+    margin-bottom: 15px;
+}
+
+.profile-modal-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.profile-modal-btn {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.profile-modal-btn.primary {
+    background: linear-gradient(135deg, #ffaa00, #ff6600);
+    color: white;
+}
+
+.profile-modal-btn.secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
