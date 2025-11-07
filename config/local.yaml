@@ -1,0 +1,15 @@
+bot:
+  host: localhost
+  port: 8090
+
+mini-app:
+  host: localhost
+  port: 8080
+  static-path: "miniapp/internal/static/"
+  templates-path: "miniapp/internal/templates/"
+
+postgres:
+  host: localhost
+  port: 5432
+  database: postgres
+  ssl_mode: disable
