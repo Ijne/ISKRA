@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"log"
 	"os"
 
@@ -29,6 +30,10 @@ type Config struct {
 		Database string `yaml:"database" validate:"required"`
 		SSLMode  string `yaml:"ssl_mode" validate:"required"`
 	} `yaml:"postgres"`
+
+	Timepad struct {
+		Token string
+	}
 }
 
 func New(configPath string) (*Config, error) {
@@ -56,6 +61,11 @@ func New(configPath string) (*Config, error) {
 	cfg.Postgres.Password = os.Getenv("POSTGRES_PASSWORD")
 	if cfg.Postgres.Password == "" {
 		cfg.Postgres.Password = "postgres"
+	}
+	cfg.Timepad.Token = os.Getenv("TIMEPAD_TOKEN")
+	if cfg.Timepad.Token == "" {
+		cfg.Timepad.Token = "no token"
+		fmt.Println("cfg: no token for timepad")
 	}
 
 	return &cfg, nil

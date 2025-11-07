@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"iskra/miniapp/internal/handlers"
+	"iskra/miniapp/internal/handlers/events/get"
+	"iskra/miniapp/internal/tools/timepad"
 	"iskra/shared/config"
 	"log"
 	"net/http"
@@ -31,10 +33,14 @@ func main() {
 	staticDir := filepath.Join(workDir, cfg.MiniApp.StaticPath)
 	fs := http.FileServer(http.Dir(staticDir))
 
+	// timepad api
+	t := timepad.New(cfg)
+
 	// router
 	r := chi.NewRouter()
 	r.Handle("/static/*", http.StripPrefix("/static/", fs))
 	r.Handle("/", http.HandlerFunc(handlers.StartScreenHandler(cfg)))
+	r.Handle("/events", get.GetEventsHandler(t))
 
 	// server
 	log.Println("Start serving...")
