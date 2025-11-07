@@ -34,7 +34,9 @@ func main() {
 	// router
 	r := chi.NewRouter()
 	r.Handle("/static/*", http.StripPrefix("/static/", fs))
-	r.Handle("/", http.HandlerFunc(handlers.StartScreenHandler(cfg)))
+	r.Handle("/start", http.HandlerFunc(handlers.StartScreenHandler(cfg)))
+	r.Handle("/", http.HandlerFunc(handlers.HomepageScreenHandler(cfg)))
+	r.Handle("/profile", http.HandlerFunc(handlers.ProfileScreenHandler(cfg)))
 
 	// server
 	log.Println("Start serving...")

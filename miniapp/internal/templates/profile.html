@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Профиль - ИСКРА PREMIUM</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a0f00 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 15px;
+            padding-bottom: 90px;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .app-title {
+            font-size: 2.2rem;
+            font-weight: 300;
+            margin-bottom: 8px;
+            background: linear-gradient(45deg, #ffffff, #ffaa00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 2px;
+        }
+
+        .profile-subtitle {
+            font-size: 1rem;
+            opacity: 0.8;
+            margin-bottom: 20px;
+        }
+
+        .profile-board {
+            background: rgba(30, 30, 30, 0.6);
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid rgba(255, 170, 0, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .section {
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            color: #ffaa00;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, #ffaa00, transparent);
+        }
+
+        .capsules-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 15px;
+            max-height: 120px;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+        }
+
+        .capsules-grid.expanded {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .capsules-grid::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .capsules-grid::-webkit-scrollbar-track {
+            background: rgba(255, 170, 0, 0.1);
+            border-radius: 2px;
+        }
+
+        .capsules-grid::-webkit-scrollbar-thumb {
+            background: rgba(255, 170, 0, 0.3);
+            border-radius: 2px;
+        }
+
+        .capsule {
+            background: rgba(255, 170, 0, 0.08);
+            border: 1px solid rgba(255, 170, 0, 0.2);
+            border-radius: 20px;
+            padding: 8px 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .capsule::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #ffaa00, transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .capsule:hover {
+            transform: translateY(-1px);
+            border-color: #ffaa00;
+            background: rgba(255, 170, 0, 0.15);
+        }
+
+        .capsule.selected {
+            background: rgba(255, 170, 0, 0.25);
+            border-color: #ffaa00;
+            box-shadow: 0 2px 8px rgba(255, 170, 0, 0.3);
+        }
+
+        .capsule.selected::before {
+            opacity: 1;
+        }
+
+        .expand-btn {
+            background: rgba(255, 170, 0, 0.1);
+            border: 1px solid rgba(255, 170, 0, 0.3);
+            border-radius: 15px;
+            padding: 8px 16px;
+            color: #ffaa00;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin: 0 auto;
+        }
+
+        .expand-btn:hover {
+            background: rgba(255, 170, 0, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .expand-icon {
+            transition: transform 0.3s ease;
+        }
+
+        .expanded .expand-icon {
+            transform: rotate(180deg);
+        }
+
+        .editable-field {
+            background: rgba(255, 170, 0, 0.1);
+            border: 1px solid rgba(255, 170, 0, 0.3);
+            border-radius: 12px;
+            padding: 12px 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .editable-field:hover {
+            border-color: #ffaa00;
+            background: rgba(255, 170, 0, 0.15);
+        }
+
+        .field-label {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            margin-bottom: 5px;
+        }
+
+        .field-value {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #ffaa00;
+        }
+
+        .edit-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+
+        .editable-field:hover .edit-icon {
+            opacity: 1;
+        }
+
+        .avatar-section {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ffaa00, #ff6600);
+            margin: 0 auto 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            border: 2px solid rgba(255, 170, 0, 0.5);
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .avatar:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px rgba(255, 170, 0, 0.4);
+        }
+
+        .selected-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 12px;
+            min-height: 30px;
+        }
+
+        .selected-tag {
+            background: rgba(255, 170, 0, 0.25);
+            border: 1px solid rgba(255, 170, 0, 0.4);
+            border-radius: 15px;
+            padding: 5px 10px;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .remove-tag {
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+            font-size: 1rem;
+            line-height: 1;
+        }
+
+        .remove-tag:hover {
+            opacity: 1;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #ffaa00, #ff6600);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .submit-btn:hover::before {
+            left: 100%;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 170, 0, 0.4);
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 70px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 0 15px;
+            background: rgba(10, 10, 10, 0.95);
+        }
+
+        .nav-container {
+            width: 100%;
+            max-width: 400px;
+            height: 55px;
+            background: rgba(20, 20, 20, 0.9);
+            border-radius: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 0 15px;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 170, 0, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.5);
+            transition: all 0.3s ease;
+            position: relative;
+            width: 55px;
+            height: 55px;
+            cursor: pointer;
+            border: none;
+            background: none;
+        }
+
+        .nav-button.active {
+            color: #ffaa00;
+        }
+
+        .nav-icon {
+            font-size: 1.3rem;
+            margin-bottom: 3px;
+        }
+
+        .nav-label {
+            font-size: 0.65rem;
+            font-weight: 500;
+        }
+
+        .main-button {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ffaa00, #ff6600);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            top: -12px;
+            box-shadow: 0 4px 12px rgba(255, 170, 0, 0.3),
+                        0 0 0 3px rgba(255, 170, 0, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+        }
+
+        .main-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 18px rgba(255, 170, 0, 0.4),
+                        0 0 0 3px rgba(255, 170, 0, 0.2);
+        }
+
+        .main-icon {
+            color: white;
+            font-size: 1.4rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: rgba(30, 30, 30, 0.95);
+            border-radius: 20px;
+            padding: 25px;
+            width: 90%;
+            max-width: 400px;
+            border: 1px solid rgba(255, 170, 0, 0.3);
+        }
+
+        .modal-title {
+            color: #ffaa00;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid rgba(255, 170, 0, 0.3);
+            border-radius: 12px;
+            background: rgba(20, 20, 20, 0.8);
+            color: white;
+            font-size: 1rem;
+            margin-bottom: 15px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-btn.primary {
+            background: linear-gradient(135deg, #ffaa00, #ff6600);
+            color: white;
+        }
+
+        .modal-btn.secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="app-title">ИСКРА</h1>
+            <p class="profile-subtitle">Настройте ваш профиль</p>
+        </div>
+
+        <div class="profile-board">
+            <!-- Аватар -->
+            <div class="avatar-section">
+                <div class="avatar">
+                    А
+                </div>
+            </div>
+
+            <!-- Редактируемые поля -->
+            <div class="editable-field" onclick="openModal('name')">
+                <div class="field-label">Имя</div>
+                <div class="field-value" id="nameValue">Александр</div>
+                <div class="edit-icon">✎</div>
+            </div>
+
+            <div class="editable-field" onclick="openModal('age')">
+                <div class="field-label">Возраст</div>
+                <div class="field-value" id="ageValue">28 лет</div>
+                <div class="edit-icon">✎</div>
+            </div>
+
+            <div class="editable-field" onclick="openModal('city')">
+                <div class="field-label">Город</div>
+                <div class="field-value" id="cityValue">Москва</div>
+                <div class="edit-icon">✎</div>
+            </div>
+
+            <!-- Сфера деятельности -->
+            <div class="section">
+                <div class="section-title">Сфера деятельности</div>
+                <div class="capsules-grid" id="careerGrid">
+                    <!-- Капсулы будут добавлены через JS -->
+                </div>
+                <button class="expand-btn" onclick="toggleExpand('careerGrid', this)">
+                    <span>Показать все</span>
+                    <span class="expand-icon">▼</span>
+                </button>
+                <div class="selected-tags" id="careerTags"></div>
+            </div>
+
+            <!-- Тип личности -->
+            <div class="section">
+                <div class="section-title">Тип личности</div>
+                <div class="capsules-grid" id="personalityGrid">
+                    <!-- Капсулы будут добавлены через JS -->
+                </div>
+                <button class="expand-btn" onclick="toggleExpand('personalityGrid', this)">
+                    <span>Показать все</span>
+                    <span class="expand-icon">▼</span>
+                </button>
+                <div class="selected-tags" id="personalityTags"></div>
+            </div>
+
+            <!-- Цель отношений -->
+            <div class="section">
+                <div class="section-title">Цель отношений</div>
+                <div class="capsules-grid" id="relationshipGrid">
+                    <!-- Капсулы будут добавлены через JS -->
+                </div>
+                <button class="expand-btn" onclick="toggleExpand('relationshipGrid', this)">
+                    <span>Показать все</span>
+                    <span class="expand-icon">▼</span>
+                </button>
+                <div class="selected-tags" id="relationshipTags"></div>
+            </div>
+
+            <!-- Жизненные ценности -->
+            <div class="section">
+                <div class="section-title">Жизненные ценности</div>
+                <div class="capsules-grid" id="valuesGrid">
+                    <!-- Капсулы будут добавлены через JS -->
+                </div>
+                <button class="expand-btn" onclick="toggleExpand('valuesGrid', this)">
+                    <span>Показать все</span>
+                    <span class="expand-icon">▼</span>
+                </button>
+                <div class="selected-tags" id="valuesTags"></div>
+            </div>
+
+            <button class="submit-btn" onclick="saveProfile()">Сохранить профиль</button>
+        </div>
+    </div>
+
+    <!-- Модальное окно редактирования -->
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <h3 class="modal-title" id="modalTitle">Редактирование</h3>
+            <input type="text" class="modal-input" id="modalInput" placeholder="Введите значение">
+            <div class="modal-buttons">
+                <button class="modal-btn secondary" onclick="closeModal()">Отмена</button>
+                <button class="modal-btn primary" onclick="saveField()">Сохранить</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <div class="nav-container">
+            <button class="nav-button active">
+                <div class="nav-icon">👤</div>
+                <div class="nav-label">Профиль</div>
+            </button>
+            
+            <button class="main-button">
+                <div class="main-icon">🔥</div>
+            </button>
+            
+            <button class="nav-button">
+                <div class="nav-icon">🎯</div>
+                <div class="nav-label">Мероприятия</div>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Богатые наборы данных для капсул
+        const capsuleData = {
+            career: [
+                'IT и технологии', 'Дизайн и UX', 'Медицина и здоровье', 'Образование и наука',
+                'Бизнес и предпринимательство', 'Финансы и инвестиции', 'Маркетинг и реклама',
+                'Искусство и творчество', 'Музыка и звук', 'Кино и видео', 'Фотография',
+                'Архитектура и дизайн', 'Инженерия и техника', 'Строительство и недвижимость',
+                'Юриспруденция и право', 'Психология и коучинг', 'Консалтинг и аналитика',
+                'HR и рекрутинг', 'Продажи и переговоры', 'Логистика и снабжение',
+                'Туризм и гостиничный бизнес', 'Ресторанный бизнес', 'Фитнес и спорт',
+                'Мода и стиль', 'Красота и уход', 'Журналистика и медиа', 'Писательство',
+                'Экология и устойчивое развитие', 'Некоммерческий сектор', 'Государственная служба'
+            ],
+            personality: [
+                'Экстраверт', 'Интроверт', 'Амбиверт', 'Аналитический склад ума',
+                'Творческая личность', 'Прагматик', 'Романтик', 'Реалист',
+                'Оптимист', 'Пессимист', 'Реалист', 'Мечтатель', 'Лидер',
+                'Исполнитель', 'Новатор', 'Традиционалист', 'Спонтанный',
+                'Планировщик', 'Эмпат', 'Логик', 'Энергичный', 'Спокойный',
+                'Целеустремленный', 'Гибкий', 'Настойчивый', 'Командный игрок'
+            ],
+            relationship: [
+                'Серьезные отношения', 'Дружба и общение', 'Несерьезные отношения',
+                'Создание семьи', 'Поиск партнера для жизни', 'Романтические отношения',
+                'Деловое партнерство', 'Творческое сотрудничество', 'Путешествия вместе',
+                'Совместные проекты', 'Духовное развитие', 'Карьерный рост вместе',
+                'Спортивные увлечения', 'Интеллектуальное общение', 'Культурный обмен',
+                'Взаимное развитие', 'Эмоциональная поддержка', 'Финансовое партнерство'
+            ],
+            values: [
+                'Любовь и забота', 'Семейные ценности', 'Карьерный рост', 'Финансовая стабильность',
+                'Духовное развитие', 'Здоровый образ жизни', 'Образование и знания', 'Творчество',
+                'Свобода и независимость', 'Приключения и путешествия', 'Стабильность и безопасность',
+                'Социальная ответственность', 'Экологичность', 'Технологический прогресс',
+                'Традиции и культура', 'Инновации и изменения', 'Гармония и баланс',
+                'Успех и достижения', 'Слава и признание', 'Скромность и простота',
+                'Щедрость и благотворительность', 'Справедливость и равенство', 'Честность и прозрачность'
+            ]
+        };
+
+        let currentField = '';
+        const selectedItems = {
+            career: [],
+            personality: [],
+            relationship: [],
+            values: []
+        };
+
+        // Переключение раскрытия/скрытия
+        function toggleExpand(gridId, button) {
+            const grid = document.getElementById(gridId);
+            const isExpanded = grid.classList.contains('expanded');
+            
+            if (isExpanded) {
+                grid.classList.remove('expanded');
+                button.innerHTML = '<span>Показать все</span><span class="expand-icon">▼</span>';
+            } else {
+                grid.classList.add('expanded');
+                button.innerHTML = '<span>Скрыть</span><span class="expand-icon">▼</span>';
+            }
+        }
+
+        // Инициализация капсул
+        function initCapsules() {
+            Object.keys(capsuleData).forEach(category => {
+                const grid = document.getElementById(`${category}Grid`);
+                const tagsContainer = document.getElementById(`${category}Tags`);
+                
+                // Перемешиваем массив для случайного порядка
+                const shuffledItems = [...capsuleData[category]].sort(() => Math.random() - 0.5);
+                
+                shuffledItems.forEach(item => {
+                    const capsule = document.createElement('div');
+                    capsule.className = 'capsule';
+                    capsule.textContent = item;
+                    
+                    capsule.addEventListener('click', () => toggleCapsule(category, item, capsule, tagsContainer));
+                    grid.appendChild(capsule);
+                });
+            });
+        }
+
+        // Переключение капсулы
+        function toggleCapsule(category, text, capsule, tagsContainer) {
+            const index = selectedItems[category].indexOf(text);
+            const isSingleSelect = category !== 'values' && category !== 'career';
+            
+            if (index === -1) {
+                if (isSingleSelect) {
+                    // Снимаем выделение со всех капсул в этой категории
+                    document.querySelectorAll(`#${category}Grid .capsule`).forEach(c => {
+                        c.classList.remove('selected');
+                    });
+                    selectedItems[category] = [text];
+                } else {
+                    selectedItems[category].push(text);
+                }
+                capsule.classList.add('selected');
+                addTag(category, text, tagsContainer);
+            } else {
+                selectedItems[category].splice(index, 1);
+                capsule.classList.remove('selected');
+                removeTag(category, text, tagsContainer);
+            }
+        }
+
+        // Добавление тега
+        function addTag(category, text, container) {
+            const tag = document.createElement('div');
+            tag.className = 'selected-tag';
+            tag.innerHTML = `
+                ${text}
+                <span class="remove-tag" onclick="removeTagByElement('${category}', this.parentElement)">×</span>
+            `;
+            container.appendChild(tag);
+        }
+
+        // Удаление тега по элементу
+        function removeTagByElement(category, tagElement) {
+            const text = tagElement.textContent.replace('×', '').trim();
+            selectedItems[category] = selectedItems[category].filter(item => item !== text);
+            
+            // Снимаем выделение с соответствующей капсулы
+            const capsules = document.querySelectorAll(`#${category}Grid .capsule`);
+            capsules.forEach(capsule => {
+                if (capsule.textContent === text) {
+                    capsule.classList.remove('selected');
+                }
+            });
+            
+            tagElement.remove();
+        }
+
+        // Удаление тега
+        function removeTag(category, text, container) {
+            const tags = container.querySelectorAll('.selected-tag');
+            tags.forEach(tag => {
+                if (tag.textContent.replace('×', '').trim() === text) {
+                    tag.remove();
+                }
+            });
+        }
+
+        // Модальное окно
+        function openModal(field) {
+            currentField = field;
+            const modal = document.getElementById('editModal');
+            const title = document.getElementById('modalTitle');
+            const input = document.getElementById('modalInput');
+            
+            const fieldTitles = {
+                name: 'Имя',
+                age: 'Возраст',
+                city: 'Город'
+            };
+            
+            title.textContent = `Редактирование ${fieldTitles[field]}`;
+            input.value = document.getElementById(`${field}Value`).textContent.replace(' лет', '');
+            input.placeholder = `Введите ${fieldTitles[field].toLowerCase()}`;
+            
+            modal.style.display = 'flex';
+            setTimeout(() => input.focus(), 100);
+        }
+
+        function closeModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+
+        function saveField() {
+            const value = document.getElementById('modalInput').value;
+            const valueElement = document.getElementById(`${currentField}Value`);
+            
+            if (currentField === 'age') {
+                valueElement.textContent = value + ' лет';
+            } else {
+                valueElement.textContent = value;
+            }
+            
+            closeModal();
+        }
+
+        function saveProfile() {
+            const profileData = {
+                name: document.getElementById('nameValue').textContent,
+                age: document.getElementById('ageValue').textContent,
+                city: document.getElementById('cityValue').textContent,
+                ...selectedItems
+            };
+            
+            console.log('Сохраненные данные:', profileData);
+            alert('Профиль успешно сохранен! 🎉');
+        }
+
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', initCapsules);
+    </script>
+</body>
+</html>
