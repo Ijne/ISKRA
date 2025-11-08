@@ -12,19 +12,19 @@ function setupNavigation() {
     // Добавляем обработчики событий
     if (profileButton) {
         profileButton.addEventListener('click', function() {
-            window.location.href = '/profile'; // Редирект на страницу профиля
+            window.location.href = 'profile.html'; // Редирект на страницу профиля
         });
     }
     
     if (mainButton) {
         mainButton.addEventListener('click', function() {
-            window.location.href = '/'; // Редирект на главную страницу
+            window.location.href = 'index.html'; // Редирект на главную страницу
         });
     }
     
     if (eventsButton) {
         eventsButton.addEventListener('click', function() {
-            window.location.href = '/events'; // Редирект на страницу мероприятий
+            window.location.href = 'events.html'; // Редирект на страницу мероприятий
         });
     }
 }

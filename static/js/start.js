@@ -164,7 +164,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function redirectToHomepage() {
         // Замените '/' на нужный URL главной страницы
-        window.location.href = '/';
+        window.location.href = 'base.html';
         // Или используйте, если нужно:
         // window.location.replace('/');
     }

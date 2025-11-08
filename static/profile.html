@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./css/profile.css">
+    <link rel="stylesheet" href="./css/base.css">
+    <title>ISKRA</title>
+</head>
+<body>
+    <main>
+        
+        <div class="profile-container">
+            <div class="profile-header">
+                <h1 class="profile-title">ИСКРА</h1>
+                <p class="profile-subtitle">Настройте ваш профиль</p>
+            </div>
+
+            <div class="profile-board">
+                <!-- Аватар -->
+                <div class="avatar-section">
+                    <div class="avatar">
+                        А
+                    </div>
+                </div>
+
+                <!-- Редактируемые поля -->
+                <div class="basic-info-fields">
+                    <div class="compact-field" onclick="openModal('name')">
+                        <div class="compact-field-label">Имя</div>
+                        <div class="compact-field-value" id="nameValue">Александр</div>
+                        <div class="compact-edit-icon">✎</div>
+                    </div>
+
+                    <div class="compact-field" onclick="openModal('age')">
+                        <div class="compact-field-label">Возраст</div>
+                        <div class="compact-field-value" id="ageValue">28 лет</div>
+                        <div class="compact-edit-icon">✎</div>
+                    </div>
+
+                    <div class="city-field" onclick="openModal('city')">
+                        <div class="city-field-label">Город</div>
+                        <div class="city-field-value" id="cityValue">Москва</div>
+                        <div class="city-edit-icon">✎</div>
+                    </div>
+                </div>
+
+                <!-- Сфера деятельности -->
+                <div class="profile-section">
+                    <div class="profile-section-title">Сфера деятельности</div>
+                    <div class="capsules-grid" id="careerGrid"></div>
+                    <button class="expand-btn" onclick="toggleExpand('careerGrid', this)">
+                        <span>Показать все</span>
+                        <span class="expand-icon">▼</span>
+                    </button>
+                    <div class="selected-tags" id="careerTags"></div>
+                </div>
+
+                <!-- Тип личности -->
+                <div class="profile-section">
+                    <div class="profile-section-title">Тип личности</div>
+                    <div class="capsules-grid" id="personalityGrid"></div>
+                    <button class="expand-btn" onclick="toggleExpand('personalityGrid', this)">
+                        <span>Показать все</span>
+                        <span class="expand-icon">▼</span>
+                    </button>
+                    <div class="selected-tags" id="personalityTags"></div>
+                </div>
+
+                <!-- Цель отношений -->
+                <div class="profile-section">
+                    <div class="profile-section-title">Цель отношений</div>
+                    <div class="capsules-grid" id="relationshipGrid"></div>
+                    <button class="expand-btn" onclick="toggleExpand('relationshipGrid', this)">
+                        <span>Показать все</span>
+                        <span class="expand-icon">▼</span>
+                    </button>
+                    <div class="selected-tags" id="relationshipTags"></div>
+                </div>
+
+                <!-- Жизненные ценности -->
+                <div class="profile-section">
+                    <div class="profile-section-title">Жизненные ценности</div>
+                    <div class="capsules-grid" id="valuesGrid"></div>
+                    <button class="expand-btn" onclick="toggleExpand('valuesGrid', this)">
+                        <span>Показать все</span>
+                        <span class="expand-icon">▼</span>
+                    </button>
+                    <div class="selected-tags" id="valuesTags"></div>
+                </div>
+
+                <button class="submit-btn" onclick="saveProfile()">Сохранить профиль</button>
+            </div>
+        </div>
+
+        <!-- Модальное окно редактирования -->
+        <div class="profile-modal" id="editModal">
+            <div class="profile-modal-content">
+                <h3 class="profile-modal-title" id="modalTitle">Редактирование</h3>
+                <input type="text" class="profile-modal-input" id="modalInput" placeholder="Введите значение">
+                <div class="profile-modal-buttons">
+                    <button class="profile-modal-btn secondary" onclick="closeModal()">Отмена</button>
+                    <button class="profile-modal-btn primary" onclick="saveField()">Сохранить</button>
+                </div>
+            </div>
+        </div>
+
+        
+        <script src="./js/profile.js"></script>
+
+    </main>
+
+    <div class="bottom-nav">
+        <div class="nav-container">
+            <button class="nav-button active">
+                <div class="nav-icon">👤</div>
+                <div class="nav-label">Профиль</div>
+            </button>
+            
+            <button class="main-button">
+                <div class="main-icon">🔥</div>
+            </button>
+            
+            <button class="nav-button">
+                <div class="nav-icon">🎯</div>
+                <div class="nav-label">Мероприятия</div>
+            </button>
+        </div>
+    </div>
+</body>
+
+<script src="./js/base.js"></script>
+</html>
