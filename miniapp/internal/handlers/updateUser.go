@@ -3,13 +3,13 @@ package handlers
 import (
 	"encoding/json"
 	"iskra/shared/config"
+	"iskra/shared/models"
 	"iskra/shared/storage/postgres"
 	"log"
 	"net/http"
-	"strconv"
 )
 
-func ProfileScreenHandler(cfg *config.Config) http.HandlerFunc {
+func UpdateUserHandler(cfg *config.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:5500")
 		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
@@ -18,9 +18,9 @@ func ProfileScreenHandler(cfg *config.Config) http.HandlerFunc {
 		switch r.Method {
 		case http.MethodOptions:
 			w.WriteHeader(http.StatusOK)
-		case http.MethodGet:
-			id, err := strconv.ParseInt(r.URL.Query().Get("id"), 10, 64)
-			if err != nil {
+		case http.MethodPost:
+			var user models.UserDB
+			if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
 				log.Println(err)
 			}
 
@@ -28,15 +28,9 @@ func ProfileScreenHandler(cfg *config.Config) http.HandlerFunc {
 			if err != nil {
 				log.Println(err)
 			}
-			user, err := container.UserRepo.GetUser(id)
-			if err != nil {
+			if err := container.UserRepo.UpdateUser(user); err != nil {
 				log.Println(err)
 			}
-
-			if err := json.NewEncoder(w).Encode(user); err != nil {
-				log.Println(err)
-			}
-
 		default:
 			// Дописать
 		}

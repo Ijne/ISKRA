@@ -45,6 +45,8 @@ func main() {
 	r.Handle("/start", http.HandlerFunc(handlers.StartScreenHandler(cfg)))
 	r.Handle("/", http.HandlerFunc(handlers.HomepageScreenHandler(cfg)))
 	r.Handle("/profile", http.HandlerFunc(handlers.ProfileScreenHandler(cfg)))
+	r.Handle("/createuser", http.HandlerFunc(handlers.CreateUserHandler(cfg)))
+	r.Handle("/updateuser", http.HandlerFunc(handlers.UpdateUserHandler(cfg)))
 	r.Handle("/events", get.GetEventsHandler(t))
 
 	// server

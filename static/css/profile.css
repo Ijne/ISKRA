@@ -133,7 +133,7 @@
 
 .profile-section-title {
     font-size: 1.1rem;
-    margin-bottom: 15px;
+    margin-bottom: 8px;
     color: #ffaa00;
     font-weight: 500;
     display: flex;
@@ -146,6 +146,14 @@
     flex: 1;
     height: 1px;
     background: linear-gradient(90deg, #ffaa00, transparent);
+}
+
+.selection-info {
+    font-size: 0.75rem;
+    opacity: 0.7;
+    margin-bottom: 10px;
+    color: #ffaa00;
+    font-style: italic;
 }
 
 .capsules-grid {
@@ -216,6 +224,12 @@
 
 .capsule.selected::before {
     opacity: 1;
+}
+
+.capsule.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: rgba(255, 170, 0, 0.05);
 }
 
 .expand-btn {
@@ -293,6 +307,19 @@
     animation: slideUp 0.3s ease;
 }
 
+.selected-tag .remove-tag {
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+    font-size: 0.9rem;
+    line-height: 1;
+    margin-left: 4px;
+}
+
+.selected-tag .remove-tag:hover {
+    opacity: 1;
+}
+
 @keyframes slideUp {
     from {
         opacity: 0;
@@ -302,18 +329,6 @@
         opacity: 1;
         transform: translateY(0);
     }
-}
-
-.remove-tag {
-    cursor: pointer;
-    opacity: 0.7;
-    transition: opacity 0.3s ease;
-    font-size: 1rem;
-    line-height: 1;
-}
-
-.remove-tag:hover {
-    opacity: 1;
 }
 
 .submit-btn {
@@ -413,4 +428,83 @@
 .profile-modal-btn.secondary {
     background: rgba(255, 255, 255, 0.1);
     color: white;
+}
+
+/* Стили для выбора пола */
+.gender-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.gender-option {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    border: 1px solid rgba(255, 170, 0, 0.3);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: rgba(255, 170, 0, 0.05);
+}
+
+.gender-option:hover {
+    background: rgba(255, 170, 0, 0.1);
+    border-color: #ffaa00;
+    transform: translateY(-2px);
+}
+
+.gender-option.selected {
+    background: rgba(255, 170, 0, 0.2);
+    border-color: #ffaa00;
+    box-shadow: 0 4px 12px rgba(255, 170, 0, 0.3);
+}
+
+.gender-icon {
+    font-size: 1.5rem;
+    width: 40px;
+    text-align: center;
+}
+
+.gender-label {
+    font-size: 1rem;
+    font-weight: 500;
+    color: white;
+}
+
+/* Адаптация компактных полей для 5 элементов */
+.basic-info-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 480px) {
+    .basic-info-fields {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Специфические стили для поля города */
+.city-field {
+    grid-column: 1 / -1;
+    background: rgba(255, 170, 0, 0.08);
+    border: 1px solid rgba(255, 170, 0, 0.2);
+    border-radius: 12px;
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    margin-top: 0;
+}
+
+.readonly-field {
+    pointer-events: none;
+    opacity: 0.7;
+    cursor: default;
+    background: rgba(255, 170, 0, 0.08);
+    border: 1px solid rgba(255, 170, 0, 0.2);
 }

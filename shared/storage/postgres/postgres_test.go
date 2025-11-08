@@ -12,7 +12,7 @@ func TestUserRepo(t *testing.T) {
 	cfg, err := config.New("./../../../config/local.yaml")
 	assert.Nil(t, err)
 
-	s, err := New(cfg)
+	s, err := NewStorage(cfg)
 	assert.Nil(t, err)
 
 	t.Run("Basic test", func(t *testing.T) {

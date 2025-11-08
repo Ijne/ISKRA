@@ -1,0 +1,626 @@
+/* Стили для анкеты */
+.onboarding-screen {
+    display: none;
+    opacity: 0;
+    transform: translateX(50px);
+    transition: all 0.4s ease;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #0c0c0c 0%, #1a1a1a 100%);
+    z-index: 1000;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.onboarding-screen.active {
+    display: block;
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.onboarding-container {
+    max-width: 500px;
+    margin: 0 auto;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.onboarding-progress {
+    height: 4px;
+    background: rgba(255, 170, 0, 0.2);
+    border-radius: 2px;
+    margin-bottom: 30px;
+    flex-shrink: 0;
+}
+
+.onboarding-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ffaa00, #ff6600);
+    border-radius: 2px;
+    transition: width 0.6s ease;
+}
+
+.onboarding-header {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.onboarding-title {
+    font-size: 2.2rem;
+    font-weight: 300;
+    margin-bottom: 8px;
+    background: linear-gradient(45deg, #ffffff, #ffaa00);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 2px;
+}
+
+.onboarding-subtitle {
+    font-size: 1rem;
+    opacity: 0.8;
+    margin-bottom: 5px;
+    line-height: 1.4;
+}
+
+.onboarding-board {
+    background: rgba(30, 30, 30, 0.6);
+    border-radius: 20px;
+    padding: 25px;
+    border: 1px solid rgba(255, 170, 0, 0.2);
+    backdrop-filter: blur(10px);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Капсулы */
+.onboarding-capsules-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+    max-height: 60vh;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.onboarding-capsules-grid::-webkit-scrollbar {
+    width: 6px;
+}
+
+.onboarding-capsules-grid::-webkit-scrollbar-track {
+    background: rgba(255, 170, 0, 0.1);
+    border-radius: 3px;
+}
+
+.onboarding-capsules-grid::-webkit-scrollbar-thumb {
+    background: rgba(255, 170, 0, 0.3);
+    border-radius: 3px;
+}
+
+.onboarding-capsules-grid::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 170, 0, 0.5);
+}
+
+.onboarding-capsule {
+    background: rgba(255, 170, 0, 0.08);
+    border: 1px solid rgba(255, 170, 0, 0.2);
+    border-radius: 20px;
+    padding: 15px 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    position: relative;
+    overflow: hidden;
+    color: rgba(255, 255, 255, 0.9);
+    flex: 1 1 calc(50% - 8px);
+    min-width: calc(50% - 8px);
+    text-align: center;
+}
+
+.onboarding-capsule:hover {
+    transform: translateY(-2px);
+    border-color: #ffaa00;
+    background: rgba(255, 170, 0, 0.15);
+}
+
+.onboarding-capsule.selected {
+    background: rgba(255, 170, 0, 0.25);
+    border-color: #ffaa00;
+    box-shadow: 0 4px 12px rgba(255, 170, 0, 0.3);
+    color: #ffaa00;
+}
+
+/* Кнопка продолжить */
+.onboarding-btn {
+    width: 100%;
+    padding: 16px;
+    background: rgba(255, 170, 0, 0.3);
+    border: none;
+    border-radius: 12px;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: not-allowed;
+    transition: all 0.3s ease;
+    margin-top: auto;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.onboarding-btn.active {
+    background: linear-gradient(135deg, #ffaa00, #ff6600);
+    color: white;
+    cursor: pointer;
+}
+
+.onboarding-btn.active::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.onboarding-btn.active:hover::before {
+    left: 100%;
+}
+
+.onboarding-btn.active:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 170, 0, 0.4);
+}
+
+/* Выбранные теги */
+.onboarding-selected-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 15px 0;
+    min-height: 50px;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.onboarding-selected-tag {
+    background: rgba(255, 170, 0, 0.25);
+    border: 1px solid rgba(255, 170, 0, 0.4);
+    border-radius: 15px;
+    padding: 10px 18px;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    animation: slideUp 0.3s ease;
+    color: #ffaa00;
+    font-weight: 500;
+}
+
+/* Сообщение о необходимости выбора */
+.selection-required {
+    text-align: center;
+    color: rgba(255, 170, 0, 0.7);
+    font-size: 0.9rem;
+    margin: 10px 0;
+    min-height: 20px;
+    flex-shrink: 0;
+}
+
+/* Аватар */
+.onboarding-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ffaa00, #ff6600);
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    border: 2px solid rgba(255, 170, 0, 0.5);
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.onboarding-avatar:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 25px rgba(255, 170, 0, 0.4);
+}
+
+/* Стильные поля ввода */
+.onboarding-input-group {
+    margin-bottom: 20px;
+}
+
+.onboarding-input-compact {
+    background: rgba(255, 170, 0, 0.08);
+    border: 1px solid rgba(255, 170, 0, 0.2);
+    border-radius: 12px;
+    padding: 12px 15px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    width: 100%;
+}
+
+.onboarding-input-compact:hover {
+    border-color: #ffaa00;
+    background: rgba(255, 170, 0, 0.12);
+}
+
+.onboarding-input-label {
+    font-size: 0.7rem;
+    opacity: 0.7;
+    margin-bottom: 3px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.onboarding-input-field {
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: #ffaa00;
+    font-size: 0.9rem;
+    font-weight: 500;
+    outline: none;
+    padding: 0;
+    cursor: text;
+}
+
+.onboarding-input-field:focus {
+    color: #ffaa00;
+}
+
+.onboarding-input-field::placeholder {
+    color: rgba(255, 170, 0, 0.4);
+}
+
+.onboarding-input-edit {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.5;
+    font-size: 0.8rem;
+    transition: opacity 0.3s ease;
+    color: #ffaa00;
+}
+
+.onboarding-input-compact:hover .onboarding-input-edit {
+    opacity: 1;
+}
+
+.onboarding-input-compact:focus-within .onboarding-input-edit {
+    opacity: 0;
+}
+
+/* Грид для полей ввода */
+.onboarding-fields-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+/* Основной контент */
+.main-app {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 15px;
+    padding-bottom: 90px;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0c0c0c 0%, #1a1a1a 100%);
+}
+
+.profile-container {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 15px;
+    padding-bottom: 90px;
+}
+
+.profile-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.profile-title {
+    font-size: 2.2rem;
+    font-weight: 300;
+    margin-bottom: 8px;
+    background: linear-gradient(45deg, #ffffff, #ffaa00);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 2px;
+}
+
+.profile-subtitle {
+    font-size: 1rem;
+    opacity: 0.8;
+    margin-bottom: 15px;
+}
+
+.profile-board {
+    background: rgba(30, 30, 30, 0.6);
+    border-radius: 20px;
+    padding: 20px;
+    border: 1px solid rgba(255, 170, 0, 0.2);
+    backdrop-filter: blur(10px);
+}
+
+.basic-info-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.compact-field {
+    background: rgba(255, 170, 0, 0.08);
+    border: 1px solid rgba(255, 170, 0, 0.2);
+    border-radius: 12px;
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.compact-field:hover {
+    border-color: #ffaa00;
+    background: rgba(255, 170, 0, 0.12);
+}
+
+.compact-field-label {
+    font-size: 0.7rem;
+    opacity: 0.7;
+    margin-bottom: 3px;
+}
+
+.compact-field-value {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #ffaa00;
+}
+
+.compact-edit-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.5;
+    font-size: 0.8rem;
+    transition: opacity 0.3s ease;
+}
+
+.compact-field:hover .compact-edit-icon {
+    opacity: 1;
+}
+
+.city-field {
+    grid-column: 1 / -1;
+    background: rgba(255, 170, 0, 0.08);
+    border: 1px solid rgba(255, 170, 0, 0.2);
+    border-radius: 12px;
+    padding: 10px 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    margin-top: 5px;
+}
+
+.city-field:hover {
+    border-color: #ffaa00;
+    background: rgba(255, 170, 0, 0.12);
+}
+
+.city-field-label {
+    font-size: 0.7rem;
+    opacity: 0.7;
+    margin-bottom: 3px;
+}
+
+.city-field-value {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #ffaa00;
+}
+
+.city-edit-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    opacity: 0.5;
+    font-size: 0.8rem;
+    transition: opacity 0.3s ease;
+}
+
+.city-field:hover .city-edit-icon {
+    opacity: 1;
+}
+
+.profile-section {
+    margin-bottom: 25px;
+}
+
+.profile-section-title {
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+    color: #ffaa00;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.profile-section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, #ffaa00, transparent);
+}
+
+.selected-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 12px;
+    min-height: 30px;
+}
+
+.selected-tag {
+    background: rgba(255, 170, 0, 0.25);
+    border: 1px solid rgba(255, 170, 0, 0.4);
+    border-radius: 15px;
+    padding: 5px 10px;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    animation: slideUp 0.3s ease;
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #ffaa00, #ff6600);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 15px;
+    position: relative;
+    overflow: hidden;
+}
+
+.submit-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.submit-btn:hover::before {
+    left: 100%;
+}
+
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 170, 0, 0.4);
+}
+
+/* Скрываем навигацию во время анкеты */
+.onboarding-mode .bottom-nav {
+    display: none;
+}
+
+/* Анимации */
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Адаптивность */
+@media (max-width: 480px) {
+    .onboarding-screen {
+        padding: 15px;
+    }
+    
+    .onboarding-capsule {
+        flex: 1 1 100%;
+        min-width: 100%;
+        padding: 12px 10px;
+    }
+    
+    .onboarding-capsules-grid {
+        max-height: 55vh;
+    }
+    
+    .profile-container,
+    .main-app {
+        padding: 10px;
+        padding-bottom: 80px;
+    }
+    
+    .onboarding-fields-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+}
+
+/* Стили для множественного выбора */
+.onboarding-capsule.multiple {
+    flex: 1 1 calc(33.333% - 8px);
+    min-width: calc(33.333% - 8px);
+}
+
+.onboarding-capsule.multiple.selected {
+    background: rgba(255, 170, 0, 0.25);
+    border-color: #ffaa00;
+    box-shadow: 0 4px 12px rgba(255, 170, 0, 0.3);
+    color: #ffaa00;
+    position: relative;
+}
+
+.onboarding-capsule.multiple.selected::after {
+    content: '✓';
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: #ffaa00;
+    color: white;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    font-size: 12px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.selection-counter {
+    text-align: center;
+    color: rgba(255, 170, 0, 0.7);
+    font-size: 0.8rem;
+    margin: 5px 0;
+    min-height: 15px;
+}
+
+/* Адаптивность для множественного выбора */
+@media (max-width: 480px) {
+    .onboarding-capsule.multiple {
+        flex: 1 1 calc(50% - 8px);
+        min-width: calc(50% - 8px);
+    }
+}
+
+@media (max-width: 360px) {
+    .onboarding-capsule.multiple {
+        flex: 1 1 100%;
+        min-width: 100%;
+    }
+}

@@ -1,3 +1,7 @@
+function getCurrentUser() {
+    return 2;
+}
+
 // Богатые наборы данных для капсул
 const capsuleData = {
     career: [
@@ -35,16 +39,254 @@ const capsuleData = {
         'Традиции и культура', 'Инновации и изменения', 'Гармония и баланс',
         'Успех и достижения', 'Слава и признание', 'Скромность и простота',
         'Щедрость и благотворительность', 'Справедливость и равенство', 'Честность и прозрачность'
+    ],
+    music: [
+        'Рок', 'Поп', 'Хип-хоп', 'Электронная', 'Джаз', 'Классическая',
+        'Альтернативная', 'Инди', 'R&B', 'Фолк', 'Кантри', 'Регги',
+        'Метал', 'Панк', 'Блюз', 'Соул', 'Фанк', 'Диско',
+        'Хаус', 'Техно', 'Транс', 'Драм-н-бейс', 'Лоу-фай', 'Эмбиент'
+    ],
+    hobbies: [
+        'Путешествия', 'Фотография', 'Кулинария', 'Спорт', 'Йога', 'Танцы',
+        'Рисование', 'Пение', 'Игра на гитаре', 'Программирование', 'Чтение',
+        'Писательство', 'Садоводство', 'Рыбалка', 'Охота', 'Велоспорт',
+        'Скалолазание', 'Серфинг', 'Горные лыжи', 'Шахматы', 'Настольные игры',
+        'Коллекционирование', 'Астрология', 'Медитация', 'Бег', 'Плавание'
+    ],
+    movies: [
+        'Комедии', 'Драмы', 'Триллеры', 'Ужасы', 'Фантастика', 'Фэнтези',
+        'Боевики', 'Приключения', 'Мелодрамы', 'Детективы', 'Криминал',
+        'Исторические', 'Биографии', 'Документальные', 'Аниме', 'Мультфильмы',
+        'Арт-хаус', 'Нуар', 'Вестерны', 'Мюзиклы', 'Романтические',
+        'Мистика', 'Катастрофы', 'Военные', 'Спортивные'
+    ],
+    events: [
+        'Концерты', 'Фестивали', 'Выставки', 'Театры', 'Кино', 'Вечеринки',
+        'Спортивные события', 'Конференции', 'Воркшопы', 'Мастер-классы',
+        'Гастрономические туры', 'Винные дегустации', 'Квесты', 'Караоке',
+        'Настольные игры', 'Пикники', 'Походы', 'Кемпинг', 'Пляжные вечеринки',
+        'Боулинг', 'Бильярд', 'Картинг', 'Каток', 'Йога на природе',
+        'Благотворительные мероприятия', 'Косплей-фесты', 'Книжные клубы'
     ]
 };
 
 let currentField = '';
+let currentUserId = null;
 const selectedItems = {
     career: [],
     personality: [],
     relationship: [],
-    values: []
+    values: [],
+    music: [],
+    hobbies: [],
+    movies: [],
+    events: []
 };
+
+// Данные о поле и предпочтительном поле
+let userGender = 0; // 0 - мужской, 1 - женский
+let preferredGender = 1; // 0 - мужчин, 1 - женщин, 2 - всех
+
+// Максимальное количество выборов для каждой категории
+const maxSelections = {
+    career: 1,
+    personality: 1,
+    relationship: 1,
+    values: 1,
+    music: 3,
+    hobbies: 3,
+    movies: 3,
+    events: 3
+};
+
+// Базовый URL API
+const API_BASE_URL = 'http://localhost:8080/profile?id=';
+
+// Функции для работы с API
+async function fetchUserProfile() {
+    try {
+        const response = await fetch(API_BASE_URL + getCurrentUser(), {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error('Ошибка при загрузке профиля');
+        }
+        
+        const userData = await response.json();
+        currentUserId = userData.id;
+        return userData;
+    } catch (error) {
+        console.error('Ошибка загрузки профиля:', error);
+        return null;
+    }
+}
+
+async function updateUserProfile(profileData) {
+    try {
+        const response = await fetch(`http://localhost:8080/updateuser?id=`+getCurrentUser(), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(profileData)
+        });
+        
+        if (!response.ok) {
+            throw new Error('Ошибка при обновлении профиля');
+        }
+        
+        return await response.json();
+    } catch (error) {
+        console.error('Ошибка обновления профиля:', error);
+        throw error;
+    }
+}
+
+// Преобразование данных из формата сервера в формат клиента
+function parseServerData(userData) {
+    // Преобразуем строки с разделителями в массивы
+    const parseArray = (str) => str ? str.split(',').map(item => item.trim()).filter(item => item) : [];
+    
+    selectedItems.career = parseArray(userData.career_type).slice(0, maxSelections.career);
+    selectedItems.personality = parseArray(userData.personality_type).slice(0, maxSelections.personality);
+    selectedItems.relationship = parseArray(userData.relationship_goal).slice(0, maxSelections.relationship);
+    selectedItems.values = parseArray(userData.important_values).slice(0, maxSelections.values);
+    selectedItems.music = parseArray(userData.music).slice(0, maxSelections.music);
+    selectedItems.hobbies = parseArray(userData.hobbies).slice(0, maxSelections.hobbies);
+    selectedItems.movies = parseArray(userData.films).slice(0, maxSelections.movies);
+    selectedItems.events = parseArray(userData.event_preferences).slice(0, maxSelections.events);
+    
+    // Обрабатываем пол и предпочтительный пол
+    userGender = userData.gender || 0;
+    preferredGender = userData.preferred_gender !== undefined ? userData.preferred_gender : 1;
+    
+    return {
+        name: userData.name || '',
+        surname: userData.surname || '',
+        age: userData.age || '',
+        city: userData.city || '',
+        careerPlace: userData.career_place || ''
+    };
+}
+
+// Преобразование данных из формата клиента в формат сервера
+function prepareDataForServer(profileData) {
+    return {
+        id: currentUserId,
+        name: profileData.name,
+        surname: profileData.surname || '',
+        age: parseInt(profileData.age) || 0,
+        city: profileData.city,
+        gender: userGender,
+        preferred_gender: preferredGender,
+        career_place: profileData.careerPlace || '',
+        career_type: profileData.career.join(', '),
+        personality_type: profileData.personality.join(', '),
+        relationship_goal: profileData.relationship.join(', '),
+        important_values: profileData.values.join(', '),
+        music: profileData.music.join(', '),
+        hobbies: profileData.hobbies.join(', '),
+        films: profileData.movies.join(', '),
+        event_preferences: profileData.events.join(', ')
+    };
+}
+
+// Загрузка данных профиля с сервера
+async function loadProfileData() {
+    const userData = await fetchUserProfile();
+    if (userData) {
+        const parsedData = parseServerData(userData);
+        
+        // Обновляем интерфейс
+        document.getElementById('nameValue').textContent = parsedData.name;
+        document.getElementById('ageValue').textContent = parsedData.age ? parsedData.age + ' лет' : '';
+        document.getElementById('cityValue').textContent = parsedData.city;
+        
+        // Обновляем отображение пола
+        updateGenderDisplay();
+        updatePreferredGenderDisplay();
+        
+        // Обновляем выбранные капсулы для всех категорий
+        updateAllSelectedCapsules();
+    }
+}
+
+// Обновление отображения пола
+function updateGenderDisplay() {
+    const genderValue = document.getElementById('genderValue');
+    if (genderValue) {
+        genderValue.textContent = userGender === 0 ? 'Мужской' : 'Женский';
+    }
+}
+
+// Обновление отображения предпочтительного пола
+function updatePreferredGenderDisplay() {
+    const preferredGenderValue = document.getElementById('preferredGenderValue');
+    if (preferredGenderValue) {
+        switch(preferredGender) {
+            case 0:
+                preferredGenderValue.textContent = 'Мужчин';
+                break;
+            case 1:
+                preferredGenderValue.textContent = 'Женщин';
+                break;
+            case 2:
+                preferredGenderValue.textContent = 'Всех';
+                break;
+            default:
+                preferredGenderValue.textContent = 'Женщин';
+        }
+    }
+}
+
+// Обновление ВСЕХ выбранных капсул в интерфейсе (только при загрузке)
+function updateAllSelectedCapsules() {
+    Object.keys(selectedItems).forEach(category => {
+        updateSelectedCapsulesForCategory(category);
+    });
+}
+
+// Обновление выбранных капсул для КОНКРЕТНОЙ категории
+function updateSelectedCapsulesForCategory(category) {
+    const grid = document.getElementById(`${category}Grid`);
+    const tagsContainer = document.getElementById(`${category}Tags`);
+    
+    if (!grid || !tagsContainer) return;
+    
+    // Очищаем контейнер тегов
+    tagsContainer.innerHTML = '';
+    
+    // Добавляем теги для выбранных элементов
+    selectedItems[category].forEach(item => {
+        addTag(category, item, tagsContainer);
+    });
+    
+    // Обновляем состояние капсул
+    const capsules = grid.querySelectorAll('.capsule');
+    capsules.forEach(capsule => {
+        const capsuleText = capsule.textContent;
+        
+        // Сбрасываем класс selected
+        capsule.classList.remove('selected');
+        
+        // Добавляем класс selected только если элемент выбран
+        if (selectedItems[category].includes(capsuleText)) {
+            capsule.classList.add('selected');
+        }
+        
+        // Для категорий с ограничением показываем, если достигнут лимит
+        if (selectedItems[category].length >= maxSelections[category] && 
+            !selectedItems[category].includes(capsuleText)) {
+            capsule.classList.add('disabled');
+        } else {
+            capsule.classList.remove('disabled');
+        }
+    });
+}
 
 // Переключение раскрытия/скрытия
 function toggleExpand(gridId, button) {
@@ -87,80 +329,148 @@ function initCapsules() {
             grid.appendChild(capsule);
         });
     });
+    
+    // Загружаем данные профиля после инициализации капсул
+    loadProfileData();
+    
+    // Делаем имя и город неизменяемыми
+    makeFieldsReadonly();
 }
 
-// Переключение капсулы
-function toggleCapsule(category, text, capsule, tagsContainer) {
-    const index = selectedItems[category].indexOf(text);
-    const isSingleSelect = category !== 'values' && category !== 'career';
+// Делаем поля имя и город неизменяемыми
+function makeFieldsReadonly() {
+    const nameField = document.querySelector('[onclick="openModal(\'name\')"]');
+    const cityField = document.querySelector('[onclick="openModal(\'city\')"]');
     
-    if (index === -1) {
-        if (isSingleSelect) {
-            // Снимаем выделение со всех капсул в этой категории
-            document.querySelectorAll(`#${category}Grid .capsule`).forEach(c => {
-                c.classList.remove('selected');
-            });
-            selectedItems[category] = [text];
-        } else {
-            selectedItems[category].push(text);
-        }
-        capsule.classList.add('selected');
-        addTag(category, text, tagsContainer);
-    } else {
-        selectedItems[category].splice(index, 1);
-        capsule.classList.remove('selected');
-        removeTag(category, text, tagsContainer);
+    if (nameField) {
+        nameField.style.pointerEvents = 'none';
+        nameField.style.opacity = '0.7';
+        nameField.style.cursor = 'default';
+        nameField.title = 'Имя нельзя изменить';
+    }
+    
+    if (cityField) {
+        cityField.style.pointerEvents = 'none';
+        cityField.style.opacity = '0.7';
+        cityField.style.cursor = 'default';
+        cityField.title = 'Город нельзя изменить';
     }
 }
 
-// Добавление тега
+// Переключение капсулы - с учетом ограничений
+function toggleCapsule(category, text, capsule, tagsContainer) {
+    const maxSelect = maxSelections[category];
+    const currentSelected = selectedItems[category];
+    
+    // Если уже выбран этот элемент - убираем его
+    if (currentSelected.includes(text)) {
+        selectedItems[category] = currentSelected.filter(item => item !== text);
+    } 
+    // Если можно добавить еще элементы
+    else if (currentSelected.length < maxSelect) {
+        // Для категорий с одним выбором заменяем, для нескольких добавляем
+        if (maxSelect === 1) {
+            selectedItems[category] = [text];
+        } else {
+            selectedItems[category] = [...currentSelected, text];
+        }
+    }
+    // Если достигнут лимит - ничего не делаем
+    else {
+        return;
+    }
+    
+    // Обновляем отображение ТОЛЬКО для этой категории
+    updateSelectedCapsulesForCategory(category);
+}
+
+// Добавление тега с возможностью удаления
 function addTag(category, text, container) {
     const tag = document.createElement('div');
     tag.className = 'selected-tag';
     tag.innerHTML = `
         ${text}
-        <span class="remove-tag" onclick="removeTagByElement('${category}', this.parentElement)">×</span>
+        <span class="remove-tag" onclick="removeTag('${category}', '${text}')">×</span>
     `;
     container.appendChild(tag);
 }
 
-// Удаление тега по элементу
-function removeTagByElement(category, tagElement) {
-    const text = tagElement.textContent.replace('×', '').trim();
-    selectedItems[category] = selectedItems[category].filter(item => item !== text);
-    
-    // Снимаем выделение с соответствующей капсулы
-    const capsules = document.querySelectorAll(`#${category}Grid .capsule`);
-    capsules.forEach(capsule => {
-        if (capsule.textContent === text) {
-            capsule.classList.remove('selected');
-        }
-    });
-    
-    tagElement.remove();
-}
-
 // Удаление тега
-function removeTag(category, text, container) {
-    const tags = container.querySelectorAll('.selected-tag');
-    tags.forEach(tag => {
-        if (tag.textContent.replace('×', '').trim() === text) {
-            tag.remove();
-        }
-    });
+function removeTag(category, text) {
+    selectedItems[category] = selectedItems[category].filter(item => item !== text);
+    updateSelectedCapsulesForCategory(category);
 }
 
-// Модальное окно
+// Функции для работы с модальными окнами пола
+function openGenderModal() {
+    const modal = document.getElementById('genderModal');
+    if (modal) {
+        modal.style.display = 'flex';
+        
+        // Подсвечиваем текущий выбор
+        const options = modal.querySelectorAll('.gender-option');
+        options.forEach(option => option.classList.remove('selected'));
+        
+        if (userGender === 0) {
+            options[0].classList.add('selected');
+        } else {
+            options[1].classList.add('selected');
+        }
+    }
+}
+
+function closeGenderModal() {
+    const modal = document.getElementById('genderModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+function selectGender(gender, label) {
+    userGender = gender;
+    updateGenderDisplay();
+    closeGenderModal();
+}
+
+function openPreferredGenderModal() {
+    const modal = document.getElementById('preferredGenderModal');
+    if (modal) {
+        modal.style.display = 'flex';
+        
+        // Подсвечиваем текущий выбор
+        const options = modal.querySelectorAll('.gender-option');
+        options.forEach(option => option.classList.remove('selected'));
+        options[preferredGender].classList.add('selected');
+    }
+}
+
+function closePreferredGenderModal() {
+    const modal = document.getElementById('preferredGenderModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+function selectPreferredGender(gender, label) {
+    preferredGender = gender;
+    updatePreferredGenderDisplay();
+    closePreferredGenderModal();
+}
+
+// Модальное окно - только для возраста
 function openModal(field) {
+    // Блокируем открытие модального окна для имени и города
+    if (field === 'name' || field === 'city') {
+        return;
+    }
+    
     currentField = field;
     const modal = document.getElementById('editModal');
     const title = document.getElementById('modalTitle');
     const input = document.getElementById('modalInput');
     
     const fieldTitles = {
-        name: 'Имя',
-        age: 'Возраст',
-        city: 'Город'
+        age: 'Возраст'
     };
     
     if (!modal || !title || !input) {
@@ -199,23 +509,37 @@ function saveField() {
     
     if (currentField === 'age') {
         valueElement.textContent = value + ' лет';
-    } else {
-        valueElement.textContent = value;
     }
     
     closeModal();
 }
 
-function saveProfile() {
-    const profileData = {
-        name: document.getElementById('nameValue')?.textContent || '',
-        age: document.getElementById('ageValue')?.textContent || '',
-        city: document.getElementById('cityValue')?.textContent || '',
-        ...selectedItems
-    };
-    
-    console.log('Сохраненные данные:', profileData);
-    alert('Профиль успешно сохранен! 🎉');
+async function saveProfile() {
+    try {
+        const profileData = {
+            name: document.getElementById('nameValue')?.textContent || '',
+            age: document.getElementById('ageValue')?.textContent.replace(' лет', '') || '',
+            city: document.getElementById('cityValue')?.textContent || '',
+            careerPlace: '',
+            career: selectedItems.career,
+            personality: selectedItems.personality,
+            relationship: selectedItems.relationship,
+            values: selectedItems.values,
+            music: selectedItems.music,
+            hobbies: selectedItems.hobbies,
+            movies: selectedItems.movies,
+            events: selectedItems.events
+        };
+        
+        const serverData = prepareDataForServer(profileData);
+        
+        await updateUserProfile(serverData);
+        
+        //alert('Профиль успешно сохранен!');
+    } catch (error) {
+        //console.error('Ошибка при сохранении профиля:', error);
+        //alert('Ошибка при сохранении профиля. Попробуйте еще раз.');
+    }
 }
 
 // Инициализация при загрузке DOM

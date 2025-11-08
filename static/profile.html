@@ -28,7 +28,6 @@
                     <div class="compact-field" onclick="openModal('name')">
                         <div class="compact-field-label">Имя</div>
                         <div class="compact-field-value" id="nameValue">Александр</div>
-                        <div class="compact-edit-icon">✎</div>
                     </div>
 
                     <div class="compact-field" onclick="openModal('age')">
@@ -37,10 +36,20 @@
                         <div class="compact-edit-icon">✎</div>
                     </div>
 
+                    <div class="compact-field readonly-field">
+                        <div class="compact-field-label">Пол</div>
+                        <div class="compact-field-value" id="genderValue">Мужской</div>
+                    </div>
+
+                    <div class="compact-field" onclick="openPreferredGenderModal()">
+                        <div class="compact-field-label">Ищу</div>
+                        <div class="compact-field-value" id="preferredGenderValue">Женский</div>
+                        <div class="compact-edit-icon">✎</div>
+                    </div>
+
                     <div class="city-field" onclick="openModal('city')">
                         <div class="city-field-label">Город</div>
                         <div class="city-field-value" id="cityValue">Москва</div>
-                        <div class="city-edit-icon">✎</div>
                     </div>
                 </div>
 
@@ -88,6 +97,54 @@
                     <div class="selected-tags" id="valuesTags"></div>
                 </div>
 
+                <!-- Музыкальные предпочтения -->
+                <div class="profile-section">
+                    <div class="profile-section-title">Музыкальные предпочтения</div>
+                    <div class="selection-info">Можно выбрать до 3 вариантов</div>
+                    <div class="capsules-grid" id="musicGrid"></div>
+                    <button class="expand-btn" onclick="toggleExpand('musicGrid', this)">
+                        <span>Показать все</span>
+                        <span class="expand-icon">▼</span>
+                    </button>
+                    <div class="selected-tags" id="musicTags"></div>
+                </div>
+
+                <!-- Хобби и увлечения -->
+                <div class="profile-section">
+                    <div class="profile-section-title">Хобби и увлечения</div>
+                    <div class="selection-info">Можно выбрать до 3 вариантов</div>
+                    <div class="capsules-grid" id="hobbiesGrid"></div>
+                    <button class="expand-btn" onclick="toggleExpand('hobbiesGrid', this)">
+                        <span>Показать все</span>
+                        <span class="expand-icon">▼</span>
+                    </button>
+                    <div class="selected-tags" id="hobbiesTags"></div>
+                </div>
+
+                <!-- Любимые фильмы и сериалы -->
+                <div class="profile-section">
+                    <div class="profile-section-title">Фильмы и сериалы</div>
+                    <div class="selection-info">Можно выбрать до 3 вариантов</div>
+                    <div class="capsules-grid" id="moviesGrid"></div>
+                    <button class="expand-btn" onclick="toggleExpand('moviesGrid', this)">
+                        <span>Показать все</span>
+                        <span class="expand-icon">▼</span>
+                    </button>
+                    <div class="selected-tags" id="moviesTags"></div>
+                </div>
+
+                <!-- Предпочтения в мероприятиях -->
+                <div class="profile-section">
+                    <div class="profile-section-title">Мероприятия</div>
+                    <div class="selection-info">Можно выбрать до 3 вариантов</div>
+                    <div class="capsules-grid" id="eventsGrid"></div>
+                    <button class="expand-btn" onclick="toggleExpand('eventsGrid', this)">
+                        <span>Показать все</span>
+                        <span class="expand-icon">▼</span>
+                    </button>
+                    <div class="selected-tags" id="eventsTags"></div>
+                </div>
+
                 <button class="submit-btn" onclick="saveProfile()">Сохранить профиль</button>
             </div>
         </div>
@@ -100,6 +157,50 @@
                 <div class="profile-modal-buttons">
                     <button class="profile-modal-btn secondary" onclick="closeModal()">Отмена</button>
                     <button class="profile-modal-btn primary" onclick="saveField()">Сохранить</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Модальное окно выбора пола -->
+        <div class="profile-modal" id="genderModal">
+            <div class="profile-modal-content">
+                <h3 class="profile-modal-title">Ваш пол</h3>
+                <div class="gender-options">
+                    <div class="gender-option" onclick="selectGender(0, 'Мужской')">
+                        <div class="gender-icon">👨</div>
+                        <div class="gender-label">Мужской</div>
+                    </div>
+                    <div class="gender-option" onclick="selectGender(1, 'Женский')">
+                        <div class="gender-icon">👩</div>
+                        <div class="gender-label">Женский</div>
+                    </div>
+                </div>
+                <div class="profile-modal-buttons">
+                    <button class="profile-modal-btn secondary" onclick="closeGenderModal()">Отмена</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Модальное окно выбора предпочтительного пола -->
+        <div class="profile-modal" id="preferredGenderModal">
+            <div class="profile-modal-content">
+                <h3 class="profile-modal-title">Кого ищете?</h3>
+                <div class="gender-options">
+                    <div class="gender-option" onclick="selectPreferredGender(0, 'Мужчин')">
+                        <div class="gender-icon">👨</div>
+                        <div class="gender-label">Мужчин</div>
+                    </div>
+                    <div class="gender-option" onclick="selectPreferredGender(1, 'Женщин')">
+                        <div class="gender-icon">👩</div>
+                        <div class="gender-label">Женщин</div>
+                    </div>
+                    <div class="gender-option" onclick="selectPreferredGender(2, 'Всех')">
+                        <div class="gender-icon">👥</div>
+                        <div class="gender-label">Всех</div>
+                    </div>
+                </div>
+                <div class="profile-modal-buttons">
+                    <button class="profile-modal-btn secondary" onclick="closePreferredGenderModal()">Отмена</button>
                 </div>
             </div>
         </div>

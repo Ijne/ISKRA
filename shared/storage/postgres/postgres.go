@@ -15,7 +15,7 @@ type Storage struct {
 	UserRepo repos.UserRepo
 }
 
-func New(cfg *config.Config) (*Storage, error) {
+func NewStorage(cfg *config.Config) (*Storage, error) {
 	db, err := sql.Open("postgres", getDSN(cfg))
 	if err != nil {
 		return nil, err

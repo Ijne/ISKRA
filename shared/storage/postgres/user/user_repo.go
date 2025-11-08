@@ -37,6 +37,7 @@ func (r *UserRepo) CreateTable() error {
 			CONSTRAINT users_unique UNIQUE (username)
 		);
 	`
+	// Дописать недостающее ^^^^^^
 
 	_, err := r.db.Exec(stmt)
 	return err
@@ -44,7 +45,7 @@ func (r *UserRepo) CreateTable() error {
 
 func (r *UserRepo) GetUser(ID int64) (models.UserDB, error) {
 	stmt, err := r.db.Prepare(`
-		SELECT id, username, name, surname, age, gender, preferred_gender, career_type, personality_type, relationship_goal, important_values, city, career_place
+		SELECT id, username, name, surname, age, gender, preferred_gender, career_type, personality_type, relationship_goal, important_values, city, career_place, music, films, hobbies, event_preferences
 		FROM users
 		WHERE id = $1
 	`)
@@ -54,7 +55,7 @@ func (r *UserRepo) GetUser(ID int64) (models.UserDB, error) {
 		return res, err
 	}
 
-	err = stmt.QueryRow(ID).Scan(&res.ID, &res.Username, &res.Name, &res.Surname, &res.Age, &res.Gender, &res.PreferredGender, &res.CareerType, &res.PersonalityType, &res.RelationshipGoal, &res.ImportantValues, &res.City, &res.CareerPlace)
+	err = stmt.QueryRow(ID).Scan(&res.ID, &res.Username, &res.Name, &res.Surname, &res.Age, &res.Gender, &res.PreferredGender, &res.CareerType, &res.PersonalityType, &res.RelationshipGoal, &res.ImportantValues, &res.City, &res.CareerPlace, &res.Music, &res.Films, &res.Hobbies, &res.EventPreferences)
 	return res, err
 }
 
@@ -73,14 +74,58 @@ func (r *UserRepo) CreateUser(user models.UserCreate) error {
 			relationship_goal,
 			important_values,
 			city,
-			career_place
+			career_place,
+			music,
+			films,
+			hobbies,
+			event_preferences
 		)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
 	`)
 	if err != nil {
 		return err
 	}
 
-	_, err = stmt.Exec(user.ID, user.Username, user.Name, user.Surname, user.Age, user.Gender, user.PreferredGender, user.CareerType, user.PersonalityType, user.RelationshipGoal, user.ImportantValues, user.City, user.CareerPlace)
+	_, err = stmt.Exec(user.ID, user.Username, user.Name, user.Surname, user.Age, user.Gender, user.PreferredGender, user.CareerType, user.PersonalityType, user.RelationshipGoal, user.ImportantValues, user.City, user.CareerPlace, user.Music, user.Films, user.Hobbies, user.EventPreferences)
+	return err
+}
+
+func (r *UserRepo) UpdateUser(user models.UserDB) error {
+	stmt, err := r.db.Prepare(`
+        UPDATE users 
+        SET age = $1,  
+            preferred_gender = $2, 
+            career_type = $3, 
+            personality_type = $4, 
+            relationship_goal = $5, 
+            important_values = $6, 
+            city = $7, 
+            career_place = $8, 
+            music = $9, 
+            films = $10, 
+            hobbies = $11, 
+            event_preferences = $12
+        WHERE id = $13
+    `)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(
+		user.Age,
+		user.PreferredGender,
+		user.CareerType,
+		user.PersonalityType,
+		user.RelationshipGoal,
+		user.ImportantValues,
+		user.City,
+		user.CareerPlace,
+		user.Music,
+		user.Films,
+		user.Hobbies,
+		user.EventPreferences,
+		user.ID,
+	)
 	return err
 }
