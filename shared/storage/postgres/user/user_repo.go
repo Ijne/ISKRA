@@ -63,6 +63,28 @@ func (r *UserRepo) GetUser(ID int64) (models.UserDB, error) {
 	return res, err
 }
 
+func (r *UserRepo) GetAll() ([]models.UserDB, error) {
+	stmt := `
+		SELECT id, username, name, surname, age, gender, preferred_gender, career_type, personality_type, relationship_goal, important_values, city, career_place, music, films, hobbies, event_preferences
+		FROM users
+	`
+
+	res := make([]models.UserDB, 0)
+
+	rows, err := r.db.Query(stmt)
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		var curr models.UserDB
+		rows.Scan(&curr.ID, &curr.Username, &curr.Name, &curr.Surname, &curr.Age, &curr.Gender, &curr.PreferredGender, &curr.CareerType, &curr.PersonalityType, &curr.RelationshipGoal, &curr.ImportantValues, &curr.City, &curr.CareerPlace, &curr.Music, &curr.Films, &curr.Hobbies, &curr.EventPreferences)
+		res = append(res, curr)
+	}
+
+	return res, nil
+}
+
 func (r *UserRepo) CreateUser(user models.UserCreate) error {
 	stmt, err := r.db.Prepare(`
 		INSERT INTO users (

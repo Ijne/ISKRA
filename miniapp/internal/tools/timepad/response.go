@@ -16,12 +16,13 @@ type Category struct {
 }
 
 type Event struct {
-	StartsAt     string       `json:"starts_at"`
-	Name         string       `json:"name"`
-	URL          string       `json:"url"`
-	PosterImage  PosterImage  `json:"poster_image"`
-	Organization Organization `json:"organization"`
-	Categories   []Category   `json:"categories"`
+	ID          int64       `json:"id"`
+	Name        string      `json:"name"`
+	StartsAt    string      `json:"starts_at"`
+	URL         string      `json:"url"`
+	PosterImage PosterImage `json:"poster_image"`
+	// Organization Organization `json:"organization"`
+	Categories []Category `json:"categories"`
 }
 
 type Response struct {

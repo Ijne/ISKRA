@@ -13,3 +13,6 @@ postgres:
   port: 5432
   database: postgres
   ssl_mode: disable
+
+jwt:
+  token_ttl_seconds: 86400

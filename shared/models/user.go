@@ -41,7 +41,8 @@ type UserCreate struct {
 	EventPreferences string `json:"event_preferences,omitempty" db:"event_preferences"`
 }
 
-type UserResponse struct {
+type ManyUserResponse struct {
+	Users []UserDB `json:"users"`
 }
 
 type UserRequest struct {
@@ -62,4 +63,8 @@ type UserRequest struct {
 	Films            string `json:"films,omitempty" db:"films"`
 	Hobbies          string `json:"hobbies,omitempty" db:"hobbies"`
 	EventPreferences string `json:"event_preferences,omitempty" db:"event_preferences"`
+}
+
+type UserGetRequest struct {
+	ID int `json:"id"`
 }

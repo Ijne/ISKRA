@@ -3,9 +3,10 @@ package timepad
 import (
 	"fmt"
 	"iskra/shared/config"
-	"log"
+	"iskra/shared/models"
 	"net/http"
 	"net/url"
+	"strconv"
 	"time"
 
 	"github.com/go-chi/render"
@@ -34,11 +35,43 @@ func (t *TimepadPoller) GetEvents() ([]Event, error) {
 
 	params.Add("starts_at_min", time.Now().Format("2006-01-02T15:04:05-0700"))
 	params.Add("starts_at_max", time.Now().Add(time.Duration(30)*time.Hour*24).Format("2006-01-02T15:04:05-0700"))
-	params.Add("cities", "Москва")
+	// params.Add("cities", "Москва")
 	params.Add("limit", "10")
 
 	fullURL := baseURL + "?" + params.Encode()
-	log.Println("Full url: " + fullURL)
+	// log.Println("Full url: " + fullURL)
+	req, err := http.NewRequest("GET", fullURL, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Authorization", "Bearer "+t.token)
+	resp, err := t.client.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("error in request to timepad: %w", err)
+	}
+
+	var response Response
+	err = render.DecodeJSON(resp.Body, &response)
+	if err != nil {
+		return nil, fmt.Errorf("error while unmarshaling timepad json: %w\n%v", err, resp.Body)
+	}
+
+	return response.Values, nil
+}
+
+func (t *TimepadPoller) GetFilteredEvents(filter models.FilteredEventsRequest) ([]Event, error) {
+	baseURL := t.timepadUrl + "events.json"
+	params := url.Values{}
+
+	params.Add("starts_at_min", time.Now().Format("2006-01-02T15:04:05-0700"))
+	params.Add("starts_at_max", time.Now().Add(time.Duration(30)*time.Hour*24).Format("2006-01-02T15:04:05-0700"))
+	params.Add("cities", filter.City)
+	params.Add("limit", strconv.Itoa(filter.Limit))
+	params.Add("skip", strconv.Itoa(filter.Skip))
+
+	fullURL := baseURL + "?" + params.Encode()
+	// log.Println("Full url: " + fullURL)
 	req, err := http.NewRequest("GET", fullURL, nil)
 	if err != nil {
 		return nil, err

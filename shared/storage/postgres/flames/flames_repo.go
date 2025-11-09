@@ -183,6 +183,34 @@ func (r *FlamesRepo) GetByEvent(eventID int64) ([]models.FlameDB, error) {
 	return res, nil
 }
 
+func (r *FlamesRepo) GetByEventJoinUsers(eventID int64) ([]models.FlameWithUserDB, error) {
+	stmt, err := r.db.Prepare(`
+		SELECT event_id, user_id, description, username, name, surname, age, gender, preferred_gender, career_type, personality_type, relationship_goal, important_values, city, career_place, music, films, hobbies, event_preferences
+		FROM flames
+		LEFT JOIN users
+		ON user_id = id
+		WHERE event_id = $1
+	`)
+	if err != nil {
+		return nil, err
+	}
+
+	res := make([]models.FlameWithUserDB, 0)
+
+	rows, err := stmt.Query(eventID)
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		var curr models.FlameWithUserDB
+		rows.Scan(&curr.EventID, &curr.UserID, &curr.Description, &curr.Username, &curr.Name, &curr.Surname, &curr.Age, &curr.Gender, &curr.PreferredGender, &curr.CareerType, &curr.PersonalityType, &curr.RelationshipGoal, &curr.ImportantValues, &curr.City, &curr.CareerPlace, &curr.Music, &curr.Films, &curr.Hobbies, &curr.EventPreferences)
+		res = append(res, curr)
+	}
+
+	return res, nil
+}
+
 func (r *FlamesRepo) GetByUser(userID int64) ([]models.FlameDB, error) {
 	stmt, err := r.db.Prepare(`
 		SELECT event_id, user_id, description

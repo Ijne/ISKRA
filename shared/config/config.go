@@ -34,6 +34,11 @@ type Config struct {
 	Timepad struct {
 		Token string
 	}
+
+	JWT struct {
+		SecretKey       []byte
+		TokenTTLSeconds int `yaml:"token_ttl_seconds" validate:"required"`
+	} `yaml:"jwt"`
 }
 
 func New(configPath string) (*Config, error) {
@@ -66,6 +71,10 @@ func New(configPath string) (*Config, error) {
 	if cfg.Timepad.Token == "" {
 		cfg.Timepad.Token = "no token"
 		fmt.Println("cfg: no token for timepad")
+	}
+	cfg.JWT.SecretKey = []byte(os.Getenv("JWT_TOKEN"))
+	if len(cfg.JWT.SecretKey) == 0 {
+		cfg.JWT.SecretKey = []byte("secret_key")
 	}
 
 	return &cfg, nil
