@@ -33,6 +33,10 @@ func (r *UserRepo) CreateTable() error {
 			important_values varchar NULL,
 			city varchar NULL,
 			career_place varchar NULL,
+			music varchar NULL,
+			films varchar NULL,
+			hobbies varchar NULL,
+			event_preferences varchar NULL,
 			CONSTRAINT users_pk PRIMARY KEY (id),
 			CONSTRAINT users_unique UNIQUE (username)
 		);

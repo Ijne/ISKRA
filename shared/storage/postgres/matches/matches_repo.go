@@ -21,7 +21,7 @@ func (r *MatchesRepo) CreateTable() error {
 	stmt := `
 		CREATE TABLE IF NOT EXISTS public.matches (
 			moth_id int NOT NULL,
-			flame_id int NOT NULL
+			light_id int NOT NULL
 		)
 	`
 
@@ -29,11 +29,11 @@ func (r *MatchesRepo) CreateTable() error {
 	return err
 }
 
-func (r *MatchesRepo) Exists(mothID int64, flameID int64) bool {
+func (r *MatchesRepo) Exists(mothID int64, lightID int64) bool {
 	stmt, err := r.db.Prepare(`
 		SELECT 1
 		FROM matches
-		WHERE moth_id = $1 AND flame_id = $2
+		WHERE moth_id = $1 AND light_id = $2
 	`)
 	if err != nil {
 		return false
@@ -46,26 +46,26 @@ func (r *MatchesRepo) Exists(mothID int64, flameID int64) bool {
 
 func (r *MatchesRepo) Create(match models.MatchDB) error {
 	stmt, err := r.db.Prepare(`
-		INSERT INTO matches (moth_id, flame_id)
+		INSERT INTO matches (moth_id, light_id)
 		VALUES ($1, $2)
 	`)
 	if err != nil {
 		return err
 	}
 
-	_, err = stmt.Exec(match.MothID, match.FlameID)
+	_, err = stmt.Exec(match.MothID, match.LightID)
 	return err
 }
 
-func (r *MatchesRepo) Delete(mothID int64) error {
+func (r *MatchesRepo) Delete(mothID int64, lightID int64) error {
 	stmt, err := r.db.Prepare(`
-		DELETE FROM TABLE matches
-		WHERE moth_id = $1
+		DELETE FROM matches
+		WHERE moth_id = $1 AND light_id = $2
 	`)
 	if err != nil {
 		return err
 	}
 
-	_, err = stmt.Exec(mothID)
+	_, err = stmt.Exec(mothID, lightID)
 	return err
 }

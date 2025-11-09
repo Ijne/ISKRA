@@ -36,16 +36,23 @@
     - event_id (возможно стоит получать всю сопутствующую информацию через запрос с этим id)
     - chat_id
     - description (дополнительное описание от пользователя)
-    - сомнительные поля:
+- saved_events
+    - id
     - starts_at
     - name
 	- url
 	- photo
 	- organization
-	- categories
+- saved_events_categories
+    - event_id
+    - category_id
+- events_categories
+    - id
+    - name
+
 - matches (временно хранить, кто кого лайкнул)
     - moth_id (чат лайкнувшего)
-    - flame_id (чат лайкнутого)
+    - light_id (чат лайкнутого)
 
 - refresh_tokens
 
