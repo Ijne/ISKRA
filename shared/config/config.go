@@ -11,8 +11,9 @@ import (
 
 type Config struct {
 	Bot struct {
-		Host string `yaml:"host" validate:"required"`
-		Port string `yaml:"port" validate:"required"`
+		Host  string `yaml:"host" validate:"required"`
+		Port  string `yaml:"port" validate:"required"`
+		Token string
 	} `yaml:"bot"`
 
 	MiniApp struct {
@@ -75,6 +76,11 @@ func New(configPath string) (*Config, error) {
 	cfg.JWT.SecretKey = []byte(os.Getenv("JWT_TOKEN"))
 	if len(cfg.JWT.SecretKey) == 0 {
 		cfg.JWT.SecretKey = []byte("secret_key")
+	}
+	cfg.Bot.Token = os.Getenv("BOT_TOKEN")
+	if len(cfg.Bot.Token) == 0 {
+		cfg.Bot.Token = "no token"
+		fmt.Println("cfg: no token for bot")
 	}
 
 	return &cfg, nil
