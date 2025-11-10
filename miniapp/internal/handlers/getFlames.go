@@ -24,12 +24,17 @@ func GetFlamesHandler(s *postgres.Storage) http.HandlerFunc {
 			return
 		}
 
+		resp := make([]models.FlameWithUserResponse, len(res))
+		for i, flame := range res {
+			resp[i] = models.FlameWithUserDBToResponse(flame)
+		}
+
 		render.JSON(w, r, struct {
 			response.Response
 			models.ManyFlamesResponse
 		}{
 			response.Ok(),
-			models.ManyFlamesResponse{Flames: res},
+			models.ManyFlamesResponse{Flames: resp},
 		})
 	}
 }

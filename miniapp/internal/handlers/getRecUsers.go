@@ -17,12 +17,18 @@ func GetRecUsersHandler(s *postgres.Storage) http.HandlerFunc {
 			render.JSON(w, r, response.Error("Server error"))
 			return
 		}
+
+		resp := make([]models.UserResponse, len(users))
+		for i, user := range users {
+			resp[i] = models.UserDBToUser(user)
+		}
+
 		render.JSON(w, r, struct {
 			response.Response
 			models.ManyUserResponse
 		}{
 			response.Ok(),
-			models.ManyUserResponse{Users: users},
+			models.ManyUserResponse{Users: resp},
 		})
 	}
 }

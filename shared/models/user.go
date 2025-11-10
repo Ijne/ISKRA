@@ -1,6 +1,8 @@
 package models
 
-import "database/sql"
+import (
+	"database/sql"
+)
 
 // что будет возвращаться из postgres
 type UserDB struct {
@@ -44,7 +46,7 @@ type UserCreate struct {
 }
 
 type ManyUserResponse struct {
-	Users []UserDB `json:"users"`
+	Users []UserResponse `json:"users"`
 }
 
 type UserRequest struct {
@@ -89,4 +91,26 @@ type UserResponse struct {
 
 type UserGetRequest struct {
 	ID int `json:"id"`
+}
+
+func UserDBToUser(a UserDB) UserResponse {
+	return UserResponse{
+		ID:               a.ID,
+		Username:         a.Username,
+		Name:             a.Name,
+		Surname:          a.Surname,
+		Age:              a.Age,
+		Gender:           a.Gender,
+		PreferredGender:  a.PreferredGender,
+		CareerType:       a.CareerType.String,
+		PersonalityType:  a.PersonalityType.String,
+		RelationshipGoal: a.RelationshipGoal.String,
+		ImportantValues:  a.ImportantValues.String,
+		City:             a.City.String,
+		CareerPlace:      a.CareerPlace.String,
+		Music:            a.Music.String,
+		Films:            a.Films.String,
+		Hobbies:          a.Hobbies.String,
+		EventPreferences: a.EventPreferences.String,
+	}
 }
