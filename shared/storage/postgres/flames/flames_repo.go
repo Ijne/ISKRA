@@ -139,6 +139,25 @@ func (r *FlamesRepo) GetEvents() ([]models.EventDB, error) {
 	return res, nil
 }
 
+func (r *FlamesRepo) EventSaved(eventID int64) bool {
+	stmt, err := r.db.Prepare(`
+		SELECT EXISTS(
+			SELECT 1 FROM saved_events
+			WHERE id = $1
+		)
+	`)
+	if err != nil {
+		return false
+	}
+
+	var val bool
+	err = stmt.QueryRow(eventID).Scan(&val)
+	if err != nil {
+		return false
+	}
+	return val
+}
+
 func (r *FlamesRepo) FillCategories(categories []models.EventCategory) error {
 	for _, cat := range categories {
 		stmt, err := r.db.Prepare(`

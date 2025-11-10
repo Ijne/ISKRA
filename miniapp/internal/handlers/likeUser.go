@@ -21,7 +21,7 @@ func LikeUserHandler(s *postgres.Storage) http.HandlerFunc {
 
 		userID, ok := middleware.GetUserIDFromContext(r.Context())
 		if !ok {
-			render.JSON(w, r, response.Error("Wrong authorization"))
+			render.JSON(w, r, response.Error("Server error"))
 			return
 		}
 
@@ -29,6 +29,9 @@ func LikeUserHandler(s *postgres.Storage) http.HandlerFunc {
 		haveMatch := s.MatchesRepo.Exists(req.LightID, userID)
 		if haveMatch {
 			// TODO: с помощью бота рассылаем ники
+
+			s.MatchesRepo.Delete(req.LightID, userID)
+			s.MatchesRepo.Delete(userID, req.LightID)
 
 			render.JSON(w, r, response.Ok())
 			return

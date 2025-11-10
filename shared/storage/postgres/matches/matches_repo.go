@@ -31,17 +31,21 @@ func (r *MatchesRepo) CreateTable() error {
 
 func (r *MatchesRepo) Exists(mothID int64, lightID int64) bool {
 	stmt, err := r.db.Prepare(`
-		SELECT 1
-		FROM matches
-		WHERE moth_id = $1 AND light_id = $2
+		SELECT EXISTS(
+			SELECT 1 FROM matches
+			WHERE moth_id = $1 AND light_id = $2 LIMIT 1
+		)
 	`)
 	if err != nil {
 		return false
 	}
 
-	var val int
-	err = stmt.QueryRow().Scan(&val)
-	return err != nil
+	var val bool
+	err = stmt.QueryRow(mothID, lightID).Scan(&val)
+	if err != nil {
+		return false
+	}
+	return val
 }
 
 func (r *MatchesRepo) Create(match models.MatchDB) error {

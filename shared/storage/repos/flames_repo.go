@@ -12,6 +12,7 @@ type FlamesRepo interface {
 	Delete(eventID int64, userID int64) error
 
 	CreateEvent(event models.EventDB) error
+	EventSaved(eventID int64) bool
 	GetEvents() ([]models.EventDB, error)
 	FillCategories(categories []models.EventCategory) error
 }

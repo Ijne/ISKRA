@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"iskra/miniapp/internal/handlers"
-	"iskra/miniapp/internal/middleware"
 	"iskra/miniapp/internal/tools/timepad"
 	"iskra/shared/config"
 	"iskra/shared/storage/postgres"
@@ -39,13 +38,13 @@ func main() {
 	r := chi.NewRouter()
 
 	// new routes
-	r.Use(middleware.JWTAuthMiddleware(cfg))
+	// r.Use(middleware.JWTAuthMiddleware(cfg))
 
 	r.Get("/rec-users", handlers.GetRecUsersHandler(s))
 	r.Post("/like-user", handlers.LikeUserHandler(s))
 	r.Handle("/events", handlers.GetEventsHandler(s, t))
 	r.Post("/flames", handlers.GetFlamesHandler(s))
-	r.Post("/flame", handlers.CreateFlameHandler(s))
+	r.Post("/flame", handlers.CreateFlameHandler(s, t))
 	r.Put("/flame", handlers.UpdateFlameHandler(s))
 	r.Delete("/flame", handlers.DeleteFlameHandler(s))
 	r.Get("/user", handlers.GetProfileHandler(s)) // later change to "/profile"

@@ -1,16 +1,19 @@
 package handlers
 
 import (
+	"fmt"
 	"iskra/miniapp/internal/middleware"
 	"iskra/miniapp/internal/tools/response"
+	"iskra/miniapp/internal/tools/timepad"
 	"iskra/shared/models"
 	"iskra/shared/storage/postgres"
 	"net/http"
+	"time"
 
 	"github.com/go-chi/render"
 )
 
-func CreateFlameHandler(s *postgres.Storage) http.HandlerFunc {
+func CreateFlameHandler(s *postgres.Storage, t *timepad.TimepadPoller) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		userID, ok := middleware.GetUserIDFromContext(r.Context())
 		if !ok {
@@ -19,10 +22,36 @@ func CreateFlameHandler(s *postgres.Storage) http.HandlerFunc {
 		}
 
 		var req models.FlameCreate
-		err := render.DecodeJSON(r.Body, req)
+		err := render.DecodeJSON(r.Body, &req)
 		if err != nil {
 			render.JSON(w, r, response.Error("Wrong json"))
 			return
+		}
+
+		// save event if there is no in db
+		saved := s.FlamesRepo.EventSaved(req.EventID)
+		if !saved {
+			event, err := t.GetEventByID(req.EventID)
+			if err != nil {
+				render.JSON(w, r, response.Error("Wrong event id"))
+				return
+			}
+			fmt.Printf("%v\n", event)
+			date, err := time.Parse("2006-01-02T15:04:05-0700", event.StartsAt)
+			if err != nil {
+				fmt.Println("wrong date")
+				render.JSON(w, r, response.Error("Server error"))
+				return
+			}
+
+			// TODO: smth wrong with photo (empty)
+			s.FlamesRepo.CreateEvent(models.EventDB{
+				ID:       event.ID,
+				StartsAt: date,
+				Name:     event.Name,
+				Url:      event.URL,
+				Photo:    event.PosterImage.DefaultURL,
+			})
 		}
 
 		err = s.FlamesRepo.Create(models.FlameDB{

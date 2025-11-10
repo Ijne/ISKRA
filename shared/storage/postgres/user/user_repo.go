@@ -26,7 +26,7 @@ func (r *UserRepo) CreateTable() error {
 			surname varchar NULL,
 			age int NOT NULL,
 			gender int NOT NULL,
-			preferred_gender int NULL,
+			preferred_gender int DEFAULT 0,
 			career_type varchar NULL,
 			personality_type varchar NULL,
 			relationship_goal varchar NULL,

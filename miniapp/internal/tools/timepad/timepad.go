@@ -66,9 +66,15 @@ func (t *TimepadPoller) GetFilteredEvents(filter models.FilteredEventsRequest) (
 
 	params.Add("starts_at_min", time.Now().Format("2006-01-02T15:04:05-0700"))
 	params.Add("starts_at_max", time.Now().Add(time.Duration(30)*time.Hour*24).Format("2006-01-02T15:04:05-0700"))
-	params.Add("cities", filter.City)
-	params.Add("limit", strconv.Itoa(filter.Limit))
-	params.Add("skip", strconv.Itoa(filter.Skip))
+	if len(filter.City) != 0 {
+		params.Add("cities", filter.City)
+	}
+	if filter.Limit != 0 {
+		params.Add("limit", strconv.Itoa(filter.Limit))
+	}
+	if filter.Skip != 0 {
+		params.Add("skip", strconv.Itoa(filter.Skip))
+	}
 
 	fullURL := baseURL + "?" + params.Encode()
 	// log.Println("Full url: " + fullURL)
@@ -90,6 +96,30 @@ func (t *TimepadPoller) GetFilteredEvents(filter models.FilteredEventsRequest) (
 	}
 
 	return response.Values, nil
+}
+
+func (t *TimepadPoller) GetEventByID(eventID int64) (Event, error) {
+	fullURL := t.timepadUrl + "events/" + strconv.Itoa(int(eventID))
+
+	fmt.Println("Full url: " + fullURL)
+	req, err := http.NewRequest("GET", fullURL, nil)
+	if err != nil {
+		return Event{}, err
+	}
+
+	req.Header.Add("Authorization", "Bearer "+t.token)
+	resp, err := t.client.Do(req)
+	if err != nil {
+		return Event{}, fmt.Errorf("error in request to timepad: %w", err)
+	}
+
+	var response Event
+	err = render.DecodeJSON(resp.Body, &response)
+	if err != nil {
+		return Event{}, fmt.Errorf("error while unmarshaling timepad json: %w\n%v", err, resp.Body)
+	}
+
+	return response, nil
 }
 
 /*

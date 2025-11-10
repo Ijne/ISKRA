@@ -19,7 +19,7 @@ func DeleteFlameHandler(s *postgres.Storage) http.HandlerFunc {
 		}
 
 		var req models.FlameDelete
-		err := render.DecodeJSON(r.Body, req)
+		err := render.DecodeJSON(r.Body, &req)
 		if err != nil {
 			render.JSON(w, r, response.Error("Wrong json"))
 			return
