@@ -6,5 +6,5 @@ type MatchDB struct {
 }
 
 type MatchRequest struct {
-	LightID int64
+	LightID int64 `json:"light_id"`
 }

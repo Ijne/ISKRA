@@ -6,6 +6,7 @@ import (
 	"iskra/miniapp/internal/tools/response"
 	"iskra/shared/models"
 	"iskra/shared/storage/postgres"
+	"log"
 	"net/http"
 
 	"github.com/go-chi/render"
@@ -19,6 +20,8 @@ func LikeUserHandler(s *postgres.Storage, b *bot.Bot) http.HandlerFunc {
 			render.JSON(w, r, response.Error("Wrong json"))
 			return
 		}
+
+		log.Printf("light_id: %d", req.LightID)
 
 		userID, ok := middleware.GetUserIDFromContext(r.Context())
 		if !ok {

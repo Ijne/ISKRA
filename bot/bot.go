@@ -65,6 +65,7 @@ func (b *Bot) SendMessage(chatID int64, msg string) error {
 }
 
 func (b *Bot) SendNick(chatID int64, nick string) {
+	fmt.Println("send nick")
 	msg := "ℹ️ Вас лайкнул(а): " + nick + "."
 	b.SendMessage(chatID, msg)
 }
