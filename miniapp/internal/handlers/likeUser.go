@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"iskra/bot"
 	"iskra/miniapp/internal/middleware"
 	"iskra/miniapp/internal/tools/response"
 	"iskra/shared/models"
@@ -10,7 +11,7 @@ import (
 	"github.com/go-chi/render"
 )
 
-func LikeUserHandler(s *postgres.Storage) http.HandlerFunc {
+func LikeUserHandler(s *postgres.Storage, b *bot.Bot) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req models.MatchRequest
 		err := render.DecodeJSON(r.Body, &req)
@@ -28,7 +29,22 @@ func LikeUserHandler(s *postgres.Storage) http.HandlerFunc {
 		// произошёл ли match
 		haveMatch := s.MatchesRepo.Exists(req.LightID, userID)
 		if haveMatch {
-			// TODO: с помощью бота рассылаем ники
+			// с помощью бота рассылаем ники
+			if b != nil {
+				user1, err := s.UserRepo.GetUser(userID)
+				if err != nil {
+					render.JSON(w, r, response.Error("Server error"))
+					return
+				}
+				user2, err := s.UserRepo.GetUser(req.LightID)
+				if err != nil {
+					render.JSON(w, r, response.Error("Server error"))
+					return
+				}
+
+				b.SendNick(user1.ID, user2.Username)
+				b.SendNick(user2.ID, user1.Username)
+			}
 
 			s.MatchesRepo.Delete(req.LightID, userID)
 			s.MatchesRepo.Delete(userID, req.LightID)

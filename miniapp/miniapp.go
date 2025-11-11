@@ -1,7 +1,9 @@
-package main
+package miniapp
 
 import (
+	"context"
 	"fmt"
+	"iskra/bot"
 	"iskra/miniapp/internal/handlers"
 	"iskra/miniapp/internal/tools/timepad"
 	"iskra/shared/config"
@@ -12,26 +14,19 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-func main() {
-	// config
-	cfg, err := config.New("./config/local.yaml")
-	if err != nil {
-		panic(err)
-	}
+type Miniapp struct {
+	router  http.Handler
+	bot     *bot.Bot
+	cfg     *config.Config
+	storage *postgres.Storage
+	timepad *timepad.TimepadPoller
+	ctx     context.Context
+}
 
-	// storage
-	s, err := postgres.NewStorage(cfg)
-	if err != nil {
-		panic(err)
-	}
+func New(cfg *config.Config, s *postgres.Storage, bot *bot.Bot) *Miniapp {
+	ctx, _ := context.WithCancel(context.Background())
 
-	// static
-	// workDir, _ := os.Getwd()
-	// log.Printf("WD for loading static: %s\n", workDir)
-	// staticDir := filepath.Join(workDir, cfg.MiniApp.StaticPath)
-	// fs := http.FileServer(http.Dir(staticDir))
-
-	// timepad api
+	// timepad
 	t := timepad.New(cfg)
 
 	// router
@@ -41,7 +36,7 @@ func main() {
 	// r.Use(middleware.JWTAuthMiddleware(cfg))
 
 	r.Get("/rec-users", handlers.GetRecUsersHandler(s))
-	r.Post("/like-user", handlers.LikeUserHandler(s, nil))
+	r.Post("/like-user", handlers.LikeUserHandler(s, bot))
 	r.Handle("/events", handlers.GetEventsHandler(s, t))
 	r.Post("/flames", handlers.GetFlamesHandler(s))
 	r.Post("/flame", handlers.CreateFlameHandler(s, t))
@@ -60,11 +55,26 @@ func main() {
 	r.Handle("/createuser", http.HandlerFunc(handlers.CreateUserHandler(cfg)))
 	r.Handle("/updateuser", http.HandlerFunc(handlers.UpdateUserHandler(cfg)))
 
-	// server
-	log.Println("Start serving...")
-	if err := http.ListenAndServe(fmt.Sprintf("%s:%s", cfg.MiniApp.Host, cfg.MiniApp.Port), r); err != nil {
-		log.Println(err)
-	} else {
-		log.Printf("Server started on %s:%s\n", cfg.MiniApp.Host, cfg.MiniApp.Port)
+	miniapp := Miniapp{
+		router:  r,
+		bot:     bot,
+		cfg:     cfg,
+		storage: s,
+		timepad: t,
+		ctx:     ctx,
 	}
+
+	return &miniapp
+}
+
+func (m *Miniapp) Listen() chan bool {
+	done := make(chan bool)
+	go func() {
+		log.Println("Start serving...")
+		if err := http.ListenAndServe(fmt.Sprintf("%s:%s", m.cfg.MiniApp.Host, m.cfg.MiniApp.Port), m.router); err != nil {
+			log.Println(err)
+		}
+		done <- true
+	}()
+	return done
 }

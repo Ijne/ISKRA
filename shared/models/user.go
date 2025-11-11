@@ -6,7 +6,7 @@ import (
 
 // что будет возвращаться из postgres
 type UserDB struct {
-	ID               int            `json:"id" db:"id"`
+	ID               int64          `json:"id" db:"id"`
 	Username         string         `json:"username" db:"username"`
 	Name             string         `json:"name" db:"name"`
 	Surname          string         `json:"surname,omitempty" db:"surname"`
@@ -26,7 +26,7 @@ type UserDB struct {
 }
 
 type UserCreate struct {
-	ID               int    `json:"id" db:"id"`
+	ID               int64  `json:"id" db:"id"`
 	Username         string `json:"username" db:"username"`
 	Name             string `json:"name" db:"name"`
 	Surname          string `json:"surname,omitempty" db:"surname"`
@@ -50,7 +50,7 @@ type ManyUserResponse struct {
 }
 
 type UserRequest struct {
-	ID               int    `json:"id" db:"id"`
+	ID               int64  `json:"id" db:"id"`
 	Username         string `json:"username" db:"username"`
 	Name             string `json:"name" db:"name"`
 	Surname          string `json:"surname,omitempty" db:"surname"`
@@ -70,7 +70,7 @@ type UserRequest struct {
 }
 
 type UserResponse struct {
-	ID               int    `json:"id" db:"id"`
+	ID               int64  `json:"id" db:"id"`
 	Username         string `json:"username" db:"username"`
 	Name             string `json:"name" db:"name"`
 	Surname          string `json:"surname,omitempty" db:"surname"`
