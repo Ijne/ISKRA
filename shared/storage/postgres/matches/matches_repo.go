@@ -20,9 +20,11 @@ func (r *MatchesRepo) CreateTable() error {
 
 	stmt := `
 		CREATE TABLE IF NOT EXISTS public.matches (
-			moth_id int NOT NULL,
-			light_id int NOT NULL
-		)
+			id int GENERATED ALWAYS AS IDENTITY NOT NULL,
+			user1 int NOT NULL,
+			user2 int NOT NULL,
+			CONSTRAINT matches_pk PRIMARY KEY (id)
+		);
 	`
 
 	_, err := r.db.Exec(stmt)
@@ -50,7 +52,7 @@ func (r *MatchesRepo) Exists(mothID int64, lightID int64) bool {
 
 func (r *MatchesRepo) Create(match models.MatchDB) error {
 	stmt, err := r.db.Prepare(`
-		INSERT INTO matches (moth_id, light_id)
+		INSERT INTO matches (user1, user2)
 		VALUES ($1, $2)
 	`)
 	if err != nil {
@@ -64,7 +66,7 @@ func (r *MatchesRepo) Create(match models.MatchDB) error {
 func (r *MatchesRepo) Delete(mothID int64, lightID int64) error {
 	stmt, err := r.db.Prepare(`
 		DELETE FROM matches
-		WHERE moth_id = $1 AND light_id = $2
+		WHERE user1 = $1 AND user2 = $2
 	`)
 	if err != nil {
 		return err

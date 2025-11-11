@@ -29,10 +29,11 @@ func GetProfileHandler(s *postgres.Storage) http.HandlerFunc {
 
 		render.JSON(w, r, struct {
 			response.Response
-			models.UserResponse
+			models.UserDB
 		}{
 			response.Ok(),
-			models.UserDBToUser(user),
+			//models.UserDBToUser(user),
+			user,
 		})
 	}
 }

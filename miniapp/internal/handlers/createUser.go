@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"iskra/shared/config"
 	"iskra/shared/models"
+	"iskra/shared/storage/memgraph"
 	"iskra/shared/storage/postgres"
 	"log"
 	"net/http"
@@ -24,13 +25,22 @@ func CreateUserHandler(cfg *config.Config) http.HandlerFunc {
 				log.Println(err)
 			}
 
-			container, err := postgres.NewStorage(cfg)
+			postgresContainer, err := postgres.NewStorage(cfg)
 			if err != nil {
 				log.Println(err)
 			}
-			if err := container.UserRepo.CreateUser(user); err != nil {
+			if err := postgresContainer.UserRepo.CreateUser(user); err != nil {
 				log.Println(err)
 			}
+
+			memgraphContainer, err := memgraph.NewStorage(cfg)
+			if err != nil {
+				log.Println(err)
+			}
+			if err := memgraphContainer.SocialWebRepo.CreateUser(user); err != nil {
+				log.Println(err)
+			}
+
 		default:
 			// Дописать
 		}

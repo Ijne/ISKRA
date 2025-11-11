@@ -14,5 +14,10 @@ postgres:
   database: postgres
   ssl_mode: disable
 
+memgraph:
+  protocol: bolt
+  host: localhost
+  port: 7687
+
 jwt:
   token_ttl_seconds: 86400

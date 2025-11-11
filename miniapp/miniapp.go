@@ -35,7 +35,7 @@ func New(cfg *config.Config, s *postgres.Storage, bot *bot.Bot) *Miniapp {
 	// new routes
 	// r.Use(middleware.JWTAuthMiddleware(cfg))
 
-	r.Get("/rec-users", handlers.GetRecUsersHandler(s))
+	//r.Get("/rec-users", handlers.GetRecUsersHandler(s))
 	r.Post("/like-user", handlers.LikeUserHandler(s, bot))
 	r.Handle("/events", handlers.GetEventsHandler(s, t))
 	r.Post("/flames", handlers.GetFlamesHandler(s))

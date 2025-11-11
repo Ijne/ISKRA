@@ -1,5 +1,5 @@
 function getCurrentUser() {
-    return 2;
+    return 2517;
 }
 
 // Глобальные переменные
@@ -18,6 +18,13 @@ let userBasicInfo = {
     age: '',
     city: ''
 };
+
+// Данные пользователей (будут загружаться с сервера)
+let recommendedUsers = [];
+let currentUserIndex = 0;
+let startX = 0;
+let currentX = 0;
+let isDragging = false;
 
 // Проверка авторизации
 async function checkUserAuthorization() {
@@ -42,6 +49,28 @@ async function checkUserAuthorization() {
     } catch (error) {
         console.error('Ошибка при проверке авторизации:', error);
         return { authorized: false, userData: null };
+    }
+}
+
+// Загрузка рекомендаций с сервера
+async function loadRecommendations() {
+    try {
+        const userId = getCurrentUser();
+        console.log('Загрузка рекомендаций для пользователя:', userId);
+        
+        const response = await fetch(`http://localhost:8080/recommendations?id=${userId}`);
+        
+        if (!response.ok) {
+            throw new Error('Ошибка HTTP: ' + response.status);
+        }
+        
+        const users = await response.json();
+        console.log('Получены рекомендации:', users);
+        
+        return users;
+    } catch (error) {
+        console.error('Ошибка при загрузке рекомендаций:', error);
+        return [];
     }
 }
 
@@ -290,18 +319,391 @@ function loadOnboarding() {
     initOnboarding();
 }
 
-// Загрузка основного контента
-function loadMainContent(userData) {
+// Функция для разделения строки по запятым
+function splitStringByCommas(str) {
+    if (!str) return [];
+    return str.split(',').map(item => item.trim()).filter(item => item !== '');
+}
+
+// Загрузка основного контента (карточки пользователей)
+async function loadMainContent(userData) {
     console.log('Загрузка основного контента:', userData);
     
     const mainContent = document.getElementById('mainContent');
     const body = document.body;
     
     body.classList.remove('onboarding-mode');
+    currentUserIndex = 0;
 
+    // Показываем загрузку
     mainContent.innerHTML = `
-
+        <div class="main-app">
+            <div class="cards-container">
+                <div class="loading-message">
+                    <div class="loading-spinner"></div>
+                    <p>Ищем подходящие анкеты...</p>
+                </div>
+            </div>
+        </div>
     `;
+
+    // Загружаем рекомендации
+    recommendedUsers = await loadRecommendations();
+    
+    if (recommendedUsers.length === 0) {
+        // Если рекомендаций нет, показываем сообщение
+        mainContent.innerHTML = `
+            <div class="main-app">
+                <div class="cards-container">
+                    <div class="no-users-message">
+                        <div class="message-icon">🔍</div>
+                        <h3>Пока нет рекомендаций</h3>
+                        <p>Попробуйте обновить позже или измените параметры поиска</p>
+                    </div>
+                </div>
+            </div>
+        `;
+        return;
+    }
+
+    // Показываем карточки
+    mainContent.innerHTML = `
+        <div class="main-app">
+            <div class="cards-container">
+                <div class="no-users-message" id="noUsersMessage" style="display: none;">
+                    <div class="message-icon">💫</div>
+                    <h3>Анкеты закончились</h3>
+                    <p>Возвращайтесь позже, чтобы увидеть новые рекомендации</p>
+                </div>
+                
+                <div class="user-card" id="userCard">
+                    <div class="card-background"></div>
+                    <div class="swipe-overlay swipe-like"></div>
+                    <div class="swipe-overlay swipe-dislike"></div>
+                    <div class="card-content">
+                        <div class="card-main-info">
+                            <h2 class="user-name" id="userName">Имя</h2>
+                            <div class="user-age-city" id="userAgeCity">Возраст • Город</div>
+                            <div class="user-events-tags" id="userEventsTags"></div>
+                        </div>
+                        
+                        <button class="show-more-btn" onclick="toggleUserDetails()">
+                            Показать больше
+                            <span class="arrow">▼</span>
+                        </button>
+                        
+                        <div class="user-details" id="userDetails">
+                            <div class="details-section">
+                                <h4>О себе</h4>
+                                <div class="detail-item">
+                                    <span class="detail-label">Карьера:</span>
+                                    <span class="detail-value" id="detailCareer">-</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Характер:</span>
+                                    <span class="detail-value" id="detailPersonality">-</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Цели отношений:</span>
+                                    <span class="detail-value" id="detailRelationship">-</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Ценности:</span>
+                                    <span class="detail-value" id="detailValues">-</span>
+                                </div>
+                            </div>
+                            
+                            <div class="details-section">
+                                <h4>Интересы</h4>
+                                <div class="detail-item">
+                                    <span class="detail-label">Музыка:</span>
+                                    <span class="detail-value tags-container" id="detailMusic"></span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Фильмы:</span>
+                                    <span class="detail-value tags-container" id="detailMovies"></span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Хобби:</span>
+                                    <span class="detail-value tags-container" id="detailHobbies"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    loadNextUser();
+    initSwipeHandlers();
+}
+
+// Загрузка следующего пользователя
+function loadNextUser() {
+    if (currentUserIndex >= recommendedUsers.length) {
+        document.getElementById('noUsersMessage').style.display = 'flex';
+        document.getElementById('userCard').style.display = 'none';
+        return;
+    }
+    
+    const user = recommendedUsers[currentUserIndex];
+    const userCard = document.getElementById('userCard');
+    
+    // Анимация появления
+    userCard.style.opacity = '0';
+    userCard.style.transform = 'translateY(20px)';
+    
+    setTimeout(() => {
+        // Обновляем данные из структуры UserDB
+        document.getElementById('userName').textContent = user.name || 'Не указано';
+        document.getElementById('userAgeCity').textContent = `${user.age || '?'} • ${user.city || 'Не указан'}`;
+        
+        // Обрабатываем мероприятия как теги
+        const eventsTagsContainer = document.getElementById('userEventsTags');
+        eventsTagsContainer.innerHTML = '';
+        const events = splitStringByCommas(user.event_preferences);
+        if (events.length > 0) {
+            events.forEach(event => {
+                const tag = document.createElement('span');
+                tag.className = 'event-tag';
+                tag.textContent = event;
+                eventsTagsContainer.appendChild(tag);
+            });
+        } else {
+            eventsTagsContainer.innerHTML = '<span class="no-data">Не указаны</span>';
+        }
+        
+        // Детальная информация
+        document.getElementById('detailCareer').textContent = user.career_type || 'Не указана';
+        document.getElementById('detailPersonality').textContent = user.personality_type || 'Не указан';
+        document.getElementById('detailRelationship').textContent = user.relationship_goal || 'Не указаны';
+        document.getElementById('detailValues').textContent = user.important_values || 'Не указаны';
+        
+        // Обрабатываем интересы как теги
+        updateTagsContainer('detailMusic', user.music);
+        updateTagsContainer('detailMovies', user.films);
+        updateTagsContainer('detailHobbies', user.hobbies);
+        
+        // Сбрасываем детали и подсветку
+        document.getElementById('userDetails').classList.remove('active');
+        resetSwipeOverlay();
+        
+        // Анимация появления
+        userCard.style.opacity = '1';
+        userCard.style.transform = 'translateY(0)';
+    }, 200);
+}
+
+// Обновление контейнера с тегами
+function updateTagsContainer(containerId, data) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = '';
+    
+    const tags = splitStringByCommas(data);
+    if (tags.length > 0) {
+        tags.forEach(tag => {
+            const tagElement = document.createElement('span');
+            tagElement.className = 'interest-tag';
+            tagElement.textContent = tag;
+            container.appendChild(tagElement);
+        });
+    } else {
+        container.innerHTML = '<span class="no-data">Не указаны</span>';
+    }
+}
+
+// Переключение детальной информации
+function toggleUserDetails() {
+    const details = document.getElementById('userDetails');
+    const arrow = document.querySelector('.arrow');
+    
+    details.classList.toggle('active');
+    arrow.style.transform = details.classList.contains('active') ? 'rotate(180deg)' : 'rotate(0)';
+}
+
+// Отправка лайка/дизлайка на сервер
+async function sendInteraction(targetUserId, isLike) {
+    try {
+        const currentUserId = getCurrentUser();
+        const interactionType = isLike ? 'like' : 'dislike';
+        
+        console.log(`Отправка взаимодействия: ${interactionType} для пользователя ${targetUserId}`);
+        
+        const response = await fetch('http://localhost:8080/interaction', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                user_id: currentUserId,
+                target_user_id: targetUserId,
+                interaction_type: interactionType
+            })
+        });
+        
+        if (response.ok) {
+            console.log('Взаимодействие успешно отправлено');
+        } else {
+            console.error('Ошибка при отправке взаимодействия:', response.status);
+        }
+    } catch (error) {
+        console.error('Ошибка при отправке взаимодействия:', error);
+    }
+}
+
+// Инициализация свайпов
+function initSwipeHandlers() {
+    const card = document.getElementById('userCard');
+    
+    card.addEventListener('touchstart', handleTouchStart, { passive: false });
+    card.addEventListener('touchmove', handleTouchMove, { passive: false });
+    card.addEventListener('touchend', handleTouchEnd);
+    
+    card.addEventListener('mousedown', handleMouseDown);
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+}
+
+// Обработчики для тач-событий
+function handleTouchStart(e) {
+    if (e.touches.length > 1) return;
+    
+    const touch = e.touches[0];
+    startX = touch.clientX;
+    currentX = startX;
+    isDragging = true;
+    
+    const card = document.getElementById('userCard');
+    card.style.transition = 'none';
+    resetSwipeOverlay();
+}
+
+function handleTouchMove(e) {
+    if (!isDragging || e.touches.length > 1) return;
+    
+    e.preventDefault();
+    const touch = e.touches[0];
+    currentX = touch.clientX;
+    updateCardPosition();
+    updateSwipeOverlay();
+}
+
+function handleTouchEnd() {
+    if (!isDragging) return;
+    
+    isDragging = false;
+    handleSwipeEnd();
+}
+
+// Обработчики для мыши
+function handleMouseDown(e) {
+    startX = e.clientX;
+    currentX = startX;
+    isDragging = true;
+    
+    const card = document.getElementById('userCard');
+    card.style.transition = 'none';
+    resetSwipeOverlay();
+}
+
+function handleMouseMove(e) {
+    if (!isDragging) return;
+    
+    currentX = e.clientX;
+    updateCardPosition();
+    updateSwipeOverlay();
+}
+
+function handleMouseUp() {
+    if (!isDragging) return;
+    
+    isDragging = false;
+    handleSwipeEnd();
+}
+
+// Обновление позиции карточки
+function updateCardPosition() {
+    const card = document.getElementById('userCard');
+    const deltaX = currentX - startX;
+    const rotation = deltaX * 0.1;
+    
+    card.style.transform = `translateX(${deltaX}px) rotate(${rotation}deg)`;
+}
+
+// Обновление подсветки свайпа
+function updateSwipeOverlay() {
+    const deltaX = currentX - startX;
+    const swipeThreshold = 50;
+    
+    const likeOverlay = document.querySelector('.swipe-like');
+    const dislikeOverlay = document.querySelector('.swipe-dislike');
+    
+    // Сбрасываем все подсветки
+    likeOverlay.style.opacity = '0';
+    dislikeOverlay.style.opacity = '0';
+    
+    if (deltaX > swipeThreshold) {
+        // Свайп вправо - лайк (зеленая подсветка)
+        likeOverlay.style.opacity = Math.min((deltaX - swipeThreshold) / 100, 0.3).toString();
+    } else if (deltaX < -swipeThreshold) {
+        // Свайп влево - дизлайк (красная подсветка)
+        dislikeOverlay.style.opacity = Math.min(Math.abs(deltaX + swipeThreshold) / 100, 0.3).toString();
+    }
+}
+
+// Сброс подсветки свайпа
+function resetSwipeOverlay() {
+    const likeOverlay = document.querySelector('.swipe-like');
+    const dislikeOverlay = document.querySelector('.swipe-dislike');
+    
+    likeOverlay.style.opacity = '0';
+    dislikeOverlay.style.opacity = '0';
+}
+
+// Обработка завершения свайпа
+function handleSwipeEnd() {
+    const card = document.getElementById('userCard');
+    const deltaX = currentX - startX;
+    const swipeThreshold = 100;
+    
+    card.style.transition = 'all 0.5s ease';
+    
+    if (Math.abs(deltaX) > swipeThreshold) {
+        // Свайп влево (дизлайк) или вправо (лайк)
+        const direction = deltaX > 0 ? 1 : -1;
+        const isLike = deltaX > 0;
+        
+        card.style.transform = `translateX(${direction * 500}px) rotate(${direction * 30}deg)`;
+        card.style.opacity = '0';
+        
+        // Отправляем взаимодействие на сервер
+        const currentUser = recommendedUsers[currentUserIndex];
+        if (currentUser) {
+            sendInteraction(currentUser.id, isLike);
+        }
+        
+        setTimeout(() => {
+            currentUserIndex++;
+            loadNextUser();
+            resetCardPosition();
+        }, 300);
+        
+        console.log(isLike ? 'Лайк' : 'Дизлайк', recommendedUsers[currentUserIndex]?.name);
+        
+    } else {
+        // Возвращаем карточку на место
+        resetCardPosition();
+    }
+    
+    resetSwipeOverlay();
+}
+
+// Сброс позиции карточки
+function resetCardPosition() {
+    const card = document.getElementById('userCard');
+    card.style.transform = 'translateX(0) rotate(0)';
+    card.style.opacity = '1';
 }
 
 // Инициализация анкеты
@@ -606,19 +1008,11 @@ async function completeOnboarding() {
             console.log(response)
             const result = await response.json();
             console.log('Успешный ответ сервера:', result);
-            //alert('Профиль успешно сохранен! 🎉');
-            //setTimeout(() => {
-            //    location.reload();
-            //}, 1500);
+            location.reload()
         } else {
-            //const errorText = await response.text();
-            //console.error('Ошибка сервера:', response.status, errorText);
-            //throw new Error(`Ошибка сервера: ${response.status} - ${errorText}`);
             location.reload()
         }
     } catch (error) {
-        //console.error('Ошибка при сохранении профиля:', error);
-        //alert('Ошибка при сохранении профиля. Попробуйте еще раз.');
         location.reload()
     }
 }

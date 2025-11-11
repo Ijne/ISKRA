@@ -40,7 +40,7 @@ func main() {
 	// new routes
 	// r.Use(middleware.JWTAuthMiddleware(cfg))
 
-	r.Get("/rec-users", handlers.GetRecUsersHandler(s))
+	//r.Get("/rec-users", handlers.GetRecUsersHandler(s))
 	r.Post("/like-user", handlers.LikeUserHandler(s, nil))
 	r.Handle("/events", handlers.GetEventsHandler(s, t))
 	r.Post("/flames", handlers.GetFlamesHandler(s))
@@ -59,6 +59,8 @@ func main() {
 	r.Handle("/profile", http.HandlerFunc(handlers.ProfileScreenHandler(cfg)))
 	r.Handle("/createuser", http.HandlerFunc(handlers.CreateUserHandler(cfg)))
 	r.Handle("/updateuser", http.HandlerFunc(handlers.UpdateUserHandler(cfg)))
+	r.Handle("/recommendations", http.HandlerFunc(handlers.GetRecomendationsHandler(cfg)))
+	r.Handle("/interaction", http.HandlerFunc(handlers.InteractionHandler(cfg)))
 
 	// server
 	log.Println("Start serving...")
