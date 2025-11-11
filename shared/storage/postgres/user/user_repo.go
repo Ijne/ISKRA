@@ -3,13 +3,14 @@ package user
 import (
 	"database/sql"
 	"iskra/shared/models"
+	"iskra/shared/storage/repos"
 )
 
 type UserRepo struct {
 	db *sql.DB
 }
 
-func New(db *sql.DB) (*UserRepo, error) {
+func New(db *sql.DB) (repos.UserRepo, error) {
 	repo := UserRepo{db: db}
 	err := repo.CreateTable()
 	return &repo, err

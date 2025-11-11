@@ -31,6 +31,14 @@ type Config struct {
 		SSLMode  string `yaml:"ssl_mode" validate:"required"`
 	} `yaml:"postgres"`
 
+	Memgraph struct {
+		Protocol string `yaml:"protocol" validate:"required"`
+		Host     string `yaml:"host" validate:"required"`
+		Port     string `yaml:"port" validate:"required"`
+		Username string
+		Password string
+	} `yaml:"memgraph"`
+
 	Timepad struct {
 		Token string
 	}
@@ -66,6 +74,15 @@ func New(configPath string) (*Config, error) {
 	if cfg.Timepad.Token == "" {
 		cfg.Timepad.Token = "no token"
 		fmt.Println("cfg: no token for timepad")
+	}
+
+	cfg.Memgraph.Username = os.Getenv("MEMGRAPH_USER")
+	if cfg.Memgraph.Username == "" {
+		cfg.Memgraph.Username = ""
+	}
+	cfg.Memgraph.Password = os.Getenv("MEMGRAPH_PASSWORD")
+	if cfg.Memgraph.Password == "" {
+		cfg.Memgraph.Password = ""
 	}
 
 	return &cfg, nil

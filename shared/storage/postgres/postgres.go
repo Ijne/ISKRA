@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"fmt"
 	"iskra/shared/config"
+	"iskra/shared/storage/postgres/like"
+	"iskra/shared/storage/postgres/match"
 	"iskra/shared/storage/postgres/user"
 	"iskra/shared/storage/repos"
 
@@ -11,8 +13,10 @@ import (
 )
 
 type Storage struct {
-	db       *sql.DB
-	UserRepo repos.UserRepo
+	db        *sql.DB
+	UserRepo  repos.UserRepo
+	LikeRepo  repos.LikeRepo
+	MatchRepo repos.MatchRepo
 }
 
 func NewStorage(cfg *config.Config) (*Storage, error) {
@@ -26,7 +30,17 @@ func NewStorage(cfg *config.Config) (*Storage, error) {
 		return nil, err
 	}
 
-	return &Storage{db: db, UserRepo: userRepo}, nil
+	likeRepo, err := like.New(db)
+	if err != nil {
+		return nil, err
+	}
+
+	matchRepo, err := match.New(db)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Storage{db: db, UserRepo: userRepo, LikeRepo: likeRepo, MatchRepo: matchRepo}, nil
 }
 
 func getDSN(cfg *config.Config) string {

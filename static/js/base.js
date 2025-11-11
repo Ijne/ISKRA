@@ -1,5 +1,5 @@
 function getCurrentUser() {
-    return 2;
+    return 1;
 }
 
 // Функция для редиректа на нужные страницы

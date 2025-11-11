@@ -47,6 +47,8 @@ func main() {
 	r.Handle("/profile", http.HandlerFunc(handlers.ProfileScreenHandler(cfg)))
 	r.Handle("/createuser", http.HandlerFunc(handlers.CreateUserHandler(cfg)))
 	r.Handle("/updateuser", http.HandlerFunc(handlers.UpdateUserHandler(cfg)))
+	r.Handle("/recommendations", http.HandlerFunc(handlers.GetRecomendationsHandler(cfg)))
+	r.Handle("/interaction", http.HandlerFunc(handlers.InteractionHandler(cfg)))
 	r.Handle("/events", get.GetEventsHandler(t))
 
 	// server

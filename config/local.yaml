@@ -13,3 +13,8 @@ postgres:
   port: 5432
   database: postgres
   ssl_mode: disable
+
+memgraph:
+  protocol: bolt
+  host: localhost
+  port: 7687
