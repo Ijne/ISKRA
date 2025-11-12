@@ -20,29 +20,25 @@ func (r *UserRepo) CreateTable() error {
 	// const op = "postgres.user.create_table"
 
 	stmt := `
-		CREATE TABLE IF NOT EXISTS public.users (
-			id int NOT NULL,
-			username varchar NOT NULL,
-			"name" varchar NOT NULL,
-			surname varchar NULL,
-			age int NOT NULL,
-			gender int NOT NULL,
-			preferred_gender int DEFAULT 0,
-			career_type varchar NULL,
-			personality_type varchar NULL,
-			relationship_goal varchar NULL,
-			important_values varchar NULL,
-			city varchar NULL,
-			career_place varchar NULL,
-			music varchar NULL,
-			films varchar NULL,
-			hobbies varchar NULL,
-			event_preferences varchar NULL,
-			CONSTRAINT users_pk PRIMARY KEY (id),
-			CONSTRAINT users_unique UNIQUE (username)
-		);
+		CREATE TABLE IF NOT EXISTSusers
+			(id integer NOT NULL,
+			username character varying NOT NULL,
+			name character varying NOT NULL,
+			surname character varying,
+			age integer NOT NULL,
+			gender integer NOT NULL,
+			preferred_gender integer,
+			career_type character varying,
+			personality_type character varying,
+			relationship_goal character varying,
+			important_values character varying,
+			city character varying,
+			career_place character varying,
+			music character varying,
+			films character varying,
+			hobbies character varying,
+			event_preferences character varying);
 	`
-	// Дописать недостающее ^^^^^^
 
 	_, err := r.db.Exec(stmt)
 	return err
@@ -50,7 +46,7 @@ func (r *UserRepo) CreateTable() error {
 
 func (r *UserRepo) GetUser(ID int64) (models.UserDB, error) {
 	stmt, err := r.db.Prepare(`
-		SELECT id, username, name, surname, age, gender, preferred_gender, career_type, personality_type, relationship_goal, important_values, city, career_place, music, films, hobbies, event_preferences
+		SELECT id, username, name, COALESCE(surname, 'nil') as surname, age, gender, COALESCE(preferred_gender, '2') as preferred_gender, COALESCE(career_type, 'nil') as career_type, COALESCE(personality_type, 'nil') as personality_type, COALESCE(relationship_goal, 'nil') as relationship_goal, COALESCE(important_values, 'nil') as important_values, COALESCE(city, 'nil') as city, COALESCE(career_place, 'nil') as career_place, COALESCE(music, 'nil') as music, COALESCE(films, 'nil') as films, COALESCE(hobbies, 'nil') as hobbies, COALESCE(event_preferences, 'nil') as event_preferences
 		FROM users
 		WHERE id = $1
 	`)
@@ -66,7 +62,7 @@ func (r *UserRepo) GetUser(ID int64) (models.UserDB, error) {
 
 func (r *UserRepo) GetAll() ([]models.UserDB, error) {
 	stmt := `
-		SELECT id, username, name, surname, age, gender, preferred_gender, career_type, personality_type, relationship_goal, important_values, city, career_place, music, films, hobbies, event_preferences
+		SELECT id, username, name, COALESCE(surname, 'nil') as surname, age, gender, COALESCE(preferred_gender, '2') as preferred_gender, COALESCE(career_type, 'nil') as career_type, COALESCE(personality_type, 'nil') as personality_type, COALESCE(relationship_goal, 'nil') as relationship_goal, COALESCE(important_values, 'nil') as important_values, COALESCE(city, 'nil') as city, COALESCE(career_place, 'nil') as career_place, COALESCE(music, 'nil') as music, COALESCE(films, 'nil') as films, COALESCE(hobbies, 'nil') as hobbies, COALESCE(event_preferences, 'nil') as event_preferences
 		FROM users
 	`
 
