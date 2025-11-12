@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./css/events.css">
+    <link rel="stylesheet" href="./css/base.css">
+    <title>ISKRA - Мероприятия</title>
+</head>
+<body>
+    <main>
+        <div class="events-container">
+            <div class="events-header">
+                <h1 class="events-title">Мероприятия</h1>
+                <p class="events-subtitle">Найди интересные события вокруг</p>
+            </div>
+
+            <div class="events-list" id="eventsList">
+                <!-- Сюда будут загружаться мероприятия -->
+                <div class="loading-events">Загрузка мероприятий...</div>
+            </div>
+        </div>
+
+        <!-- Модальное окно лобби -->
+        <div class="modal" id="flamesModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="modalEventTitle">Лобби мероприятия</h3>
+                    <button class="close-btn" onclick="closeFlamesModal()">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="flames-actions">
+                        <button class="create-flame-btn" onclick="openCreateFlameModal()">
+                            Создать лобби
+                        </button>
+                    </div>
+                    <div class="flames-list" id="flamesList">
+                        <!-- Сюда загружаются лобби -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Модальное окно создания лобби -->
+        <div class="modal" id="createFlameModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Создать лобби</h3>
+                    <button class="close-btn" onclick="closeCreateFlameModal()">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="flameDescription">Описание лобби</label>
+                        <textarea 
+                            id="flameDescription" 
+                            placeholder="Расскажите о ваших планах на мероприятие..."
+                            rows="4"
+                        ></textarea>
+                    </div>
+                    <button class="submit-btn" onclick="createFlame()">Создать лобби</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="bottom-nav">
+        <div class="nav-container">
+            <button class="nav-button">
+                <div class="nav-icon">👤</div>
+                <div class="nav-label">Профиль</div>
+            </button>
+            
+            <button class="main-button">
+                <div class="main-icon">🔥</div>
+            </button>
+            
+            <button class="nav-button active">
+                <div class="nav-icon">🎯</div>
+                <div class="nav-label">Мероприятия</div>
+            </button>
+        </div>
+    </div>
+</body>
+<link rel="stylesheet" href="./css/base.css">
+<script src="./js/base.js"></script>
+<script src="./js/events.js"></script>
+</html>

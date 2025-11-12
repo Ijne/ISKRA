@@ -9,12 +9,12 @@ import (
 	"strconv"
 )
 
-func ProfileScreenHandler(cfg *config.Config) http.HandlerFunc {
+func ProfileScreenHandler(cfg *config.Config, s *postgres.Storage) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:5500")
-		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept")
-		w.Header().Set("Access-Control-Allow-Credentials", "true")
+		// w.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:5500")
+		// w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+		// w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept")
+		// w.Header().Set("Access-Control-Allow-Credentials", "true")
 		switch r.Method {
 		case http.MethodOptions:
 			w.WriteHeader(http.StatusOK)
@@ -24,11 +24,11 @@ func ProfileScreenHandler(cfg *config.Config) http.HandlerFunc {
 				log.Println(err)
 			}
 
-			container, err := postgres.NewStorage(cfg)
-			if err != nil {
-				log.Println(err)
-			}
-			user, err := container.UserRepo.GetUser(id)
+			// container, err := postgres.NewStorage(cfg)
+			// if err != nil {
+			// 	log.Println(err)
+			// }
+			user, err := s.UserRepo.GetUser(id)
 			if err != nil {
 				log.Println(err)
 			}
