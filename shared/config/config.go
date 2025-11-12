@@ -1,7 +1,6 @@
 package config
 
 import (
-	"fmt"
 	"log"
 	"os"
 
@@ -10,6 +9,11 @@ import (
 )
 
 type Config struct {
+	Server struct {
+		Address           string `yaml:"address" validate:"required"`
+		AddressForMiniapp string
+	} `yaml:"server"`
+
 	Bot struct {
 		Host  string `yaml:"host" validate:"required"`
 		Port  string `yaml:"port" validate:"required"`
@@ -79,7 +83,7 @@ func New(configPath string) (*Config, error) {
 	cfg.Timepad.Token = os.Getenv("TIMEPAD_TOKEN")
 	if cfg.Timepad.Token == "" {
 		cfg.Timepad.Token = "no token"
-		fmt.Println("cfg: no token for timepad")
+		log.Println("cfg: no token for timepad")
 	}
 	cfg.JWT.SecretKey = []byte(os.Getenv("JWT_TOKEN"))
 	if len(cfg.JWT.SecretKey) == 0 {
@@ -88,7 +92,7 @@ func New(configPath string) (*Config, error) {
 	cfg.Bot.Token = os.Getenv("BOT_TOKEN")
 	if len(cfg.Bot.Token) == 0 {
 		cfg.Bot.Token = "no token"
-		fmt.Println("cfg: no token for bot")
+		log.Println("cfg: no token for bot")
 	}
 
 	cfg.Memgraph.Username = os.Getenv("MEMGRAPH_USER")
@@ -98,6 +102,12 @@ func New(configPath string) (*Config, error) {
 	cfg.Memgraph.Password = os.Getenv("MEMGRAPH_PASSWORD")
 	if cfg.Memgraph.Password == "" {
 		cfg.Memgraph.Password = ""
+	}
+
+	cfg.Server.AddressForMiniapp = os.Getenv("ADDRESS_FOR_MINIAPP")
+	if len(cfg.Server.AddressForMiniapp) == 0 {
+		cfg.Server.AddressForMiniapp = "localhost:8080"
+		log.Println("cfg: no address for miniapp")
 	}
 
 	return &cfg, nil

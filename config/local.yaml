@@ -1,3 +1,6 @@
+server:
+  address: 0.0.0.0:8080s
+
 bot:
   host: localhost
   port: 8090
