@@ -15,19 +15,7 @@ type SocialWebRepo struct {
 
 func New(driver neo4j.DriverWithContext) (repos.SocialWebRepo, error) {
 	repo := SocialWebRepo{driver: driver}
-	//err := repo.CreateTable()
 	return &repo, nil
-}
-
-func (r *SocialWebRepo) CreateTable() error {
-	// const op = "postgres.user.create_table"
-
-	//stmt := `
-	//`
-	// Дописать недостающее ^^^^^^
-
-	//_, err := r.db.Exec(stmt)
-	return nil
 }
 
 func (r *SocialWebRepo) CreateUser(user models.UserCreate) error {
@@ -46,35 +34,45 @@ func (r *SocialWebRepo) CreateUser(user models.UserCreate) error {
 				career_type: $c_t, 
 				personality_type: $p_t, 
 				relationship_goal: $r_g, 
-				important_values: $i_v
+				important_values: $i_v,
+				currentLimit: 30,
+				lastLimitUpdate: toString(datetime()),
+				maxLimit: 30,
+				refreshAmount: 5,
+				refreshRate: "PT1H"
 			})
 		`
 		query2 := `	
 			MATCH (p:Person {id: $id})
 			UNWIND $music AS music
+			WITH p, music WHERE music <> 'nil'
 			MERGE (m:Music {name: music})
 			CREATE (p)-[:LIKES {since: date()}]->(m)
 		`
 		query3 := `	
 			MATCH (p:Person {id: $id})
-			UNWIND $hobbies AS hobbie
-			MERGE (h:Hobby {name: hobbie})
+			UNWIND $hobbies AS hobby
+			WITH p, hobby WHERE hobby <> 'nil'
+			MERGE (h:Hobby {name: hobby})
 			CREATE (p)-[:HAS_HOBBY {since: date()}]->(h)
 		`
 		query4 := `	
 			MATCH (p:Person {id: $id})
 			UNWIND $films AS film
+			WITH p, film WHERE film <> 'nil'
 			MERGE (f:Film {name: film})
 			CREATE (p)-[:LIKES {since: date()}]->(f)
 		`
 		query5 := `	
 			MATCH (p:Person {id: $id})
 			UNWIND $events AS event
+			WITH p, event WHERE event <> 'nil'
 			MERGE (e:Event {name: event})
 			CREATE (p)-[:WANTS_VISIT {since: date()}]->(e)
 		`
 		query6 := `	
 			MATCH (p:Person {id: $id})
+			WITH p, $city AS city WHERE city <> 'nil'
 			MERGE (c:City {name: $city})
 			MERGE (p)-[r:LIVES_IN]->(c)
 			SET r.since = date()
@@ -162,7 +160,7 @@ func (r *SocialWebRepo) UpdateUser(user models.UserDB) error {
 			UNWIND targetMusic AS musicName
 			OPTIONAL MATCH (p)-[:LIKES]->(existingMusic:Music {name: musicName})
 			WITH p, musicName
-			WHERE existingMusic IS NULL AND musicName <> ""
+			WHERE existingMusic IS NULL AND musicName <> "nil" AND musicName <> ""
 			MERGE (music:Music {name: musicName})
 			CREATE (p)-[:LIKES {since: date()}]->(music)
 		`
@@ -177,7 +175,7 @@ func (r *SocialWebRepo) UpdateUser(user models.UserDB) error {
 			UNWIND targetFilms AS filmName
 			OPTIONAL MATCH (p)-[:LIKES]->(existingFilm:Film {name: filmName})
 			WITH p, filmName
-			WHERE existingFilm IS NULL AND filmName <> ""
+			WHERE existingFilm IS NULL AND filmName <> "nil" AND filmName <> ""
 			MERGE (film:Film {name: filmName})
 			CREATE (p)-[:LIKES {since: date()}]->(film)
 		`
@@ -192,7 +190,7 @@ func (r *SocialWebRepo) UpdateUser(user models.UserDB) error {
 			UNWIND targetHobbies AS hobbyName
 			OPTIONAL MATCH (p)-[:HAS_HOBBY]->(existingHobby:Hobby {name: hobbyName})
 			WITH p, hobbyName
-			WHERE existingHobby  IS NULL AND hobbyName <> ""
+			WHERE existingHobby  IS NULL AND hobbyName <> "nil" AND hobbyName <> "" 
 			MERGE (hobby:Hobby {name: hobbyName})
 			CREATE (p)-[:HAS_HOBBY {since: date()}]->(hobby)
 		`
@@ -207,7 +205,7 @@ func (r *SocialWebRepo) UpdateUser(user models.UserDB) error {
 			UNWIND targetEvents AS eventName
 			OPTIONAL MATCH (p)-[:WANTS_VISIT]->(existingEvent:Event {name: eventName})
 			WITH p, eventName
-			WHERE existingEvent IS NULL AND eventName <> ""
+			WHERE existingEvent IS NULL AND eventName <> "nil" AND eventName <> ""
 			MERGE (event:Event {name: eventName})
 			CREATE (p)-[:WANTS_VISIT {since: date()}]->(event)
 		`
@@ -217,7 +215,7 @@ func (r *SocialWebRepo) UpdateUser(user models.UserDB) error {
 			OPTIONAL MATCH (p)-[r:LIVES_IN]->(:City)
 			DELETE r
 			WITH p
-			WHERE $city <> ""
+			WHERE $city <> "nil" AND $city <> ""
 			MERGE (newCity:City {name: $city})
 			CREATE (p)-[:LIVES_IN {since: date()}]->(newCity)
 		`

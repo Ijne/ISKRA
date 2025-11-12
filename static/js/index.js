@@ -1,5 +1,5 @@
 function getCurrentUser() {
-    return 383;
+    return 11000;
 }
 
 // Глобальные переменные

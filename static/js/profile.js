@@ -1,5 +1,5 @@
 function getCurrentUser() {
-    return 7465;
+    return 11000;
 }
 
 // Богатые наборы данных для капсул

@@ -20,7 +20,7 @@ func (r *UserRepo) CreateTable() error {
 	// const op = "postgres.user.create_table"
 
 	stmt := `
-		CREATE TABLE IF NOT EXISTSusers
+		CREATE TABLE IF NOT EXISTS users
 			(id integer NOT NULL,
 			username character varying NOT NULL,
 			name character varying NOT NULL,

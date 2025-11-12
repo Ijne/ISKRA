@@ -19,7 +19,7 @@ func (r *LikeRepo) CreateTable() error {
 	// const op = "postgres.user.create_table"
 
 	stmt := `
-		CREATE TABLE likes (
+		CREATE TABLE IF NOT EXISTS likes (
 			id integer NOT NULL,
 			user1 integer NOT NULL,
 			user2 integer NOT NULL
