@@ -10,12 +10,12 @@ import (
 	"net/http"
 )
 
-func InteractionHandler(cfg *config.Config) http.HandlerFunc {
+func InteractionHandler(cfg *config.Config, s *postgres.Storage, g *memgraph.Storage) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:5500")
-		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept")
-		w.Header().Set("Access-Control-Allow-Credentials", "true")
+		// w.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:5500")
+		// w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+		// w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept")
+		// w.Header().Set("Access-Control-Allow-Credentials", "true")
 		switch r.Method {
 		case http.MethodOptions:
 			w.WriteHeader(http.StatusOK)
@@ -30,30 +30,30 @@ func InteractionHandler(cfg *config.Config) http.HandlerFunc {
 			}
 
 			if req.Interaction_type == "like" {
-				postgresContainer, err := postgres.NewStorage(cfg)
-				if err != nil {
+				// postgresContainer, err := postgres.NewStorage(cfg)
+				// if err != nil {
+				// 	log.Println(err)
+				// }
+				if err := s.LikeRepo.SetLike(req.User_id, req.Target_user_id); err != nil {
 					log.Println(err)
 				}
-				if err := postgresContainer.LikeRepo.SetLike(req.User_id, req.Target_user_id); err != nil {
-					log.Println(err)
-				}
-				if postgresContainer.LikeRepo.IsLike(req.Target_user_id, req.User_id) {
+				if s.LikeRepo.IsLike(req.Target_user_id, req.User_id) {
 					match := models.MatchDB{
 						MothID:  req.User_id,
 						LightID: req.Target_user_id,
 					}
-					if err := postgresContainer.MatchesRepo.Create(match); err != nil {
+					if err := s.MatchesRepo.Create(match); err != nil {
 						log.Println(err)
 					}
 					// ПРОИЗОШЕЛ МЭТЧ - НАДО ЗАПУСТИТЬ НУЖНУЮ ЛОГИКУ ПОСЛЕ ЭТОГО
 				}
 			}
 
-			memgraphContainer, err := memgraph.NewStorage(cfg)
-			if err != nil {
-				log.Println(err)
-			}
-			if err := memgraphContainer.SocialWebRepo.SetSwipe(req.User_id, req.Target_user_id, req.Interaction_type); err != nil {
+			// memgraphContainer, err := memgraph.NewStorage(cfg)
+			// if err != nil {
+			// 	log.Println(err)
+			// }
+			if err := g.SocialWebRepo.SetSwipe(req.User_id, req.Target_user_id, req.Interaction_type); err != nil {
 				log.Println(err)
 			}
 

@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"iskra/bot"
 	"iskra/miniapp/internal/handlers"
+	"iskra/miniapp/internal/middleware"
 	"iskra/miniapp/internal/tools/timepad"
 	"iskra/shared/config"
+	"iskra/shared/storage/memgraph"
 	"iskra/shared/storage/postgres"
 	"log"
 	"net/http"
@@ -23,10 +25,10 @@ type Miniapp struct {
 	ctx     context.Context
 }
 
-func New(cfg *config.Config, s *postgres.Storage, bot *bot.Bot) *Miniapp {
+func New(cfg *config.Config, s *postgres.Storage, g *memgraph.Storage, bot *bot.Bot) *Miniapp {
 	ctx, _ := context.WithCancel(context.Background())
 
-	// timepad
+	// timepad api
 	t := timepad.New(cfg)
 
 	// router
@@ -34,15 +36,16 @@ func New(cfg *config.Config, s *postgres.Storage, bot *bot.Bot) *Miniapp {
 
 	// new routes
 	// r.Use(middleware.JWTAuthMiddleware(cfg))
+	r.Use(middleware.CorsMiddleware("*"))
 
 	//r.Get("/rec-users", handlers.GetRecUsersHandler(s))
-	r.Post("/like-user", handlers.LikeUserHandler(s, bot))
+	r.Post("/like-user", handlers.LikeUserHandler(s, nil))
 	r.Handle("/events", handlers.GetEventsHandler(s, t))
 	r.Post("/flames", handlers.GetFlamesHandler(s))
 	r.Post("/flame", handlers.CreateFlameHandler(s, t))
 	r.Put("/flame", handlers.UpdateFlameHandler(s))
 	r.Delete("/flame", handlers.DeleteFlameHandler(s))
-	r.Get("/user", handlers.GetProfileHandler(s)) // later change to "/profile"
+	// r.Get("/user", handlers.GetProfileHandler(s)) // later change to "/profile"
 
 	// r.Handle("/static/*", http.StripPrefix("/static/", fs))
 	// r.Handle("/", http.HandlerFunc(handlers.StartScreenHandler(cfg)))
@@ -51,9 +54,11 @@ func New(cfg *config.Config, s *postgres.Storage, bot *bot.Bot) *Miniapp {
 	// old routes
 	r.Handle("/start", http.HandlerFunc(handlers.StartScreenHandler(cfg)))
 	r.Handle("/", http.HandlerFunc(handlers.HomepageScreenHandler(cfg)))
-	r.Handle("/profile", http.HandlerFunc(handlers.ProfileScreenHandler(cfg)))
-	r.Handle("/createuser", http.HandlerFunc(handlers.CreateUserHandler(cfg)))
-	r.Handle("/updateuser", http.HandlerFunc(handlers.UpdateUserHandler(cfg)))
+	r.Handle("/profile", http.HandlerFunc(handlers.ProfileScreenHandler(cfg, s)))
+	r.Handle("/createuser", http.HandlerFunc(handlers.CreateUserHandler(cfg, s, g)))
+	r.Handle("/updateuser", http.HandlerFunc(handlers.UpdateUserHandler(cfg, s, g)))
+	r.Handle("/recommendations", http.HandlerFunc(handlers.GetRecomendationsHandler(cfg, g)))
+	r.Handle("/interaction", http.HandlerFunc(handlers.InteractionHandler(cfg, s, g)))
 
 	miniapp := Miniapp{
 		router:  r,

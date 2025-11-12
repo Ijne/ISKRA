@@ -32,9 +32,9 @@ func (r *LikeRepo) CreateTable() error {
 			relationship_goal varchar NULL,
 			important_values varchar NULL,
 			city varchar NULL,
-			career_place varchar NULL,
-			CONSTRAINT users_pk PRIMARY KEY (id),
-			CONSTRAINT users_unique UNIQUE (username)
+			career_place varchar NULL
+			-- CONSTRAINT users_pk PRIMARY KEY (id),
+			-- CONSTRAINT users_unique UNIQUE (username)
 		);
 	`
 	// Дописать недостающее ^^^^^^
