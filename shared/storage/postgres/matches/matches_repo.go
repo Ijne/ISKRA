@@ -19,11 +19,10 @@ func (r *MatchesRepo) CreateTable() error {
 	// const op = "postgres.user.create_table"
 
 	stmt := `
-		CREATE TABLE IF NOT EXISTS public.matches (
-			id int GENERATED ALWAYS AS IDENTITY NOT NULL,
-			user1 int NOT NULL,
-			user2 int NOT NULL,
-			CONSTRAINT matches_pk PRIMARY KEY (id)
+		CREATE TABLE matches 
+			(id integer NOT NULL,
+			user1 integer NOT NULL,
+			user2 integer NOT NULL
 		);
 	`
 
@@ -35,7 +34,7 @@ func (r *MatchesRepo) Exists(mothID int64, lightID int64) bool {
 	stmt, err := r.db.Prepare(`
 		SELECT EXISTS(
 			SELECT 1 FROM matches
-			WHERE moth_id = $1 AND light_id = $2 LIMIT 1
+			WHERE user1 = $1 AND user2 = $2 LIMIT 1
 		)
 	`)
 	if err != nil {
