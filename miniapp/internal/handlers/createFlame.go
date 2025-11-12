@@ -7,6 +7,7 @@ import (
 	"iskra/miniapp/internal/tools/timepad"
 	"iskra/shared/models"
 	"iskra/shared/storage/postgres"
+	"log"
 	"net/http"
 	"time"
 
@@ -31,12 +32,13 @@ func CreateFlameHandler(s *postgres.Storage, t *timepad.TimepadPoller) http.Hand
 		// save event if there is no in db
 		saved := s.FlamesRepo.EventSaved(req.EventID)
 		if !saved {
+			log.Println("Save event")
 			event, err := t.GetEventByID(req.EventID)
 			if err != nil {
 				render.JSON(w, r, response.Error("Wrong event id"))
 				return
 			}
-			fmt.Printf("%v\n", event)
+
 			date, err := time.Parse("2006-01-02T15:04:05-0700", event.StartsAt)
 			if err != nil {
 				fmt.Println("wrong date")

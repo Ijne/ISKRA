@@ -7,17 +7,58 @@ const API_BASE_URL = 'http://localhost:8080';
 let currentEvents = [];
 let currentFlames = [];
 let selectedEventId = null;
+let userCity = '';
+let currentSkip = 0;
+const limit = 5;
+let isLoading = false;
+let hasMoreEvents = true;
 
 // Загрузка мероприятий при загрузке страницы
 document.addEventListener('DOMContentLoaded', function() {
-    loadEvents();
+    loadUserCity();
     setupNavigation();
+    setupInfiniteScroll();
 });
+
+// Загрузка города пользователя
+async function loadUserCity() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/profile?id=${getCurrentUser()}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (response.ok) {
+            const userData = await response.json();
+            userCity = userData.city || '';
+            console.log('Город пользователя:', userCity);
+        }
+    } catch (error) {
+        console.error('Ошибка загрузки города пользователя:', error);
+    } finally {
+        loadEvents();
+    }
+}
+
+// Настройка бесконечной прокрутки
+function setupInfiniteScroll() {
+    window.addEventListener('scroll', () => {
+        if (isLoading || !hasMoreEvents) return;
+
+        const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
+        
+        if (scrollTop + clientHeight >= scrollHeight - 100) {
+            loadMoreEvents();
+        }
+    });
+}
 
 // Загрузка мероприятий
 async function loadEvents() {
     try {
-        const response = await fetch(`${API_BASE_URL}/events`, {
+        const response = await fetch(`${API_BASE_URL}/events?id=${getCurrentUser()}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -33,6 +74,11 @@ async function loadEvents() {
         if (data.status === 'ok') {
             currentEvents = data.events || [];
             displayEvents(currentEvents);
+            
+            // Если сохраненных событий мало, сразу загружаем дополнительные
+            if (currentEvents.length < 5 && userCity) {
+                loadMoreEvents();
+            }
         } else {
             throw new Error(data.error || 'Неизвестная ошибка');
         }
@@ -42,9 +88,68 @@ async function loadEvents() {
     }
 }
 
+// Загрузка дополнительных мероприятий
+async function loadMoreEvents() {
+    if (isLoading || !userCity || !hasMoreEvents) return;
+    
+    isLoading = true;
+    showLoadingIndicator();
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/events?id=${getCurrentUser()}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                limit: limit,
+                skip: currentSkip
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error('Ошибка при загрузке дополнительных мероприятий');
+        }
+
+        const data = await response.json();
+        
+        if (data.status === 'ok') {
+            const newEvents = data.events || [];
+            
+            if (newEvents.length > 0) {
+                currentEvents = [...currentEvents, ...newEvents];
+                displayEvents(currentEvents);
+                currentSkip += limit;
+                
+                // Если пришло меньше событий, чем запрошено, значит больше нет
+                if (newEvents.length < limit) {
+                    hasMoreEvents = false;
+                    hideLoadingIndicator();
+                    showNoMoreEvents();
+                }
+            } else {
+                hasMoreEvents = false;
+                showNoMoreEvents();
+            }
+        } else {
+            throw new Error(data.error || 'Неизвестная ошибка');
+        }
+    } catch (error) {
+        console.error('Ошибка загрузки дополнительных мероприятий:', error);
+        showMessage('Не удалось загрузить дополнительные мероприятия', 'error');
+    } finally {
+        isLoading = false;
+        hideLoadingIndicator();
+    }
+}
+
 // Отображение мероприятий
 function displayEvents(events) {
     const eventsList = document.getElementById('eventsList');
+    
+    // Удаляем индикаторы загрузки если они есть
+    const existingIndicators = eventsList.querySelectorAll('.loading-indicator, .no-more-events');
+    existingIndicators.forEach(indicator => indicator.remove());
     
     if (!events || events.length === 0) {
         eventsList.innerHTML = `
@@ -66,9 +171,48 @@ function displayEvents(events) {
             </div>
             <h3 class="event-name">${escapeHtml(event.Name)}</h3>
             <div class="event-date">${formatDate(event.StartsAt)}</div>
-            <div class="event-url">${event.Url}</div>
+            <div class="event-url">
+                <a href="${event.Url}" target="_blank" onclick="event.stopPropagation()">
+                    ${event.Url}
+                </a>
+            </div>
         </div>
     `).join('');
+    
+    // Добавляем индикатор загрузки если есть еще события
+    if (hasMoreEvents && userCity) {
+        eventsList.innerHTML += `<div class="loading-indicator">Загрузка...</div>`;
+    }
+}
+
+// Показать индикатор загрузки
+function showLoadingIndicator() {
+    const eventsList = document.getElementById('eventsList');
+    const existingIndicator = eventsList.querySelector('.loading-indicator');
+    if (!existingIndicator) {
+        eventsList.innerHTML += `<div class="loading-indicator">Загрузка...</div>`;
+    }
+}
+
+// Скрыть индикатор загрузки
+function hideLoadingIndicator() {
+    const indicator = document.querySelector('.loading-indicator');
+    if (indicator) {
+        indicator.remove();
+    }
+}
+
+// Показать сообщение о том, что события закончились
+function showNoMoreEvents() {
+    const eventsList = document.getElementById('eventsList');
+    const existingMessage = eventsList.querySelector('.no-more-events');
+    if (!existingMessage) {
+        eventsList.innerHTML += `
+            <div class="no-more-events">
+                Все мероприятия загружены
+            </div>
+        `;
+    }
 }
 
 // Открытие модального окна с лобби
@@ -81,7 +225,7 @@ async function openFlamesModal(eventId) {
     }
     
     try {
-        const response = await fetch(`${API_BASE_URL}/flames`, {
+        const response = await fetch(`${API_BASE_URL}/flames?id=${getCurrentUser()}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -167,7 +311,7 @@ function displayFlames(flames) {
 // Лайк пользователя
 async function likeUser(userId, button) {
     try {
-        const response = await fetch(`${API_BASE_URL}/like-user`, {
+        const response = await fetch(`${API_BASE_URL}/like-user?id=${getCurrentUser()}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -221,7 +365,7 @@ async function createFlame() {
     }
 
     try {
-        const response = await fetch(`${API_BASE_URL}/flame`, {
+        const response = await fetch(`${API_BASE_URL}/flame?id=${getCurrentUser()}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

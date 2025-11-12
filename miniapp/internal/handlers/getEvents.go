@@ -1,11 +1,14 @@
 package handlers
 
 import (
+	"iskra/miniapp/internal/middleware"
 	"iskra/miniapp/internal/tools/response"
 	"iskra/miniapp/internal/tools/timepad"
 	"iskra/shared/models"
 	"iskra/shared/storage/postgres"
+	"log"
 	"net/http"
+	"strings"
 
 	"github.com/go-chi/render"
 )
@@ -14,7 +17,6 @@ func GetEventsHandler(s *postgres.Storage, t *timepad.TimepadPoller) http.Handle
 	return func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
-			// without filters
 			// return all saved events
 			res, err := s.FlamesRepo.GetEvents()
 			if err != nil {
@@ -66,10 +68,34 @@ func GetEventsHandler(s *postgres.Storage, t *timepad.TimepadPoller) http.Handle
 				return
 			}
 
-			events, err := t.GetFilteredEvents(req)
+			userID, _ := middleware.GetUserIDFromContext(r.Context())
+			log.Printf("userId: %d\n", userID)
+			user, err := s.UserRepo.GetUser(userID)
+			log.Printf("%v\n", user)
+
 			if err != nil {
 				render.JSON(w, r, response.Error("Server error"))
 				return
+			}
+
+			cats := strings.Split(user.EventPreferences, ",")
+			// log.Printf("%v\n", cats)
+
+			filter := timepad.EventsFilter{
+				City:       user.City,
+				Categories: cats,
+				Limit:      req.Limit,
+				Skip:       req.Skip,
+			}
+
+			events, err := t.GetFilteredEvents(filter)
+			log.Printf("%v\n", events)
+			if err != nil {
+				events, err = t.GetEvents()
+				if err != nil {
+					render.JSON(w, r, response.Error("Server error"))
+					return
+				}
 			}
 
 			// convert structs

@@ -31,6 +31,7 @@ func LikeUserHandler(s *postgres.Storage, b *bot.Bot) http.HandlerFunc {
 
 		// произошёл ли match
 		haveMatch := s.MatchesRepo.Exists(req.LightID, userID)
+		log.Printf("Before match: %v\n", haveMatch)
 		if haveMatch {
 			// с помощью бота рассылаем ники
 			if b != nil {
@@ -65,6 +66,7 @@ func LikeUserHandler(s *postgres.Storage, b *bot.Bot) http.HandlerFunc {
 
 		err = s.MatchesRepo.Create(models.MatchDB{MothID: userID, LightID: req.LightID})
 		if err != nil {
+			log.Printf("Error while createing match: %v\n", err)
 			render.JSON(w, r, response.Error("Server error"))
 			return
 		}

@@ -3,10 +3,11 @@ package timepad
 import (
 	"fmt"
 	"iskra/shared/config"
-	"iskra/shared/models"
+	"log"
 	"net/http"
 	"net/url"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/go-chi/render"
@@ -60,7 +61,7 @@ func (t *TimepadPoller) GetEvents() ([]Event, error) {
 	return response.Values, nil
 }
 
-func (t *TimepadPoller) GetFilteredEvents(filter models.FilteredEventsRequest) ([]Event, error) {
+func (t *TimepadPoller) GetFilteredEvents(filter EventsFilter) ([]Event, error) {
 	baseURL := t.timepadUrl + "events.json"
 	params := url.Values{}
 
@@ -76,8 +77,25 @@ func (t *TimepadPoller) GetFilteredEvents(filter models.FilteredEventsRequest) (
 		params.Add("skip", strconv.Itoa(filter.Skip))
 	}
 
+	catIds := make([]string, 0)
+	// категории
+	for _, cat := range filter.Categories {
+		newCat, ok := Categories[cat]
+		log.Printf("- %v\n", newCat)
+
+		if !ok {
+			catIds = append(catIds, strconv.Itoa(463))
+		} else {
+			catIds = append(catIds, strconv.Itoa(int(newCat.ID)))
+		}
+	}
+	log.Printf("* %v\n", catIds)
+	if len(catIds) != 0 {
+		params.Add("category_ids", strings.Join(catIds, ","))
+	}
+
 	fullURL := baseURL + "?" + params.Encode()
-	// log.Println("Full url: " + fullURL)
+	log.Println("Full url: " + fullURL)
 	req, err := http.NewRequest("GET", fullURL, nil)
 	if err != nil {
 		return nil, err
@@ -120,6 +138,60 @@ func (t *TimepadPoller) GetEventByID(eventID int64) (Event, error) {
 	}
 
 	return response, nil
+}
+
+type EventsFilter struct {
+	City       string
+	Categories []string
+	Limit      int
+	Skip       int
+}
+
+type Category struct {
+	Name string
+	ID   int64
+}
+
+var Categories = map[string]Category{
+	"Концерты": Category{"Концерты", 460},
+
+	"Кино": Category{"Кино", 374},
+
+	"Выставки": {"Выставки", 458},
+
+	"Театры": Category{"Театры", 459},
+
+	"Фестивали": Category{"Другие события", 462},
+
+	"Спортивные события": Category{"Спорт", 376},
+
+	"Вечеринки": Category{"Вечеринки", 457},
+
+	"Клубы": Category{"Другие развлечения", 463},
+
+	"Рестораны": Category{"Еда", 456},
+
+	"Кафе": Category{"Еда", 456},
+
+	"Пикники": Category{"Экскурсии и путешествия", 461},
+
+	"Походы": Category{"Экскурсии и путешествия", 461},
+
+	"Мастер классы": Category{"Хобби и творчество", 524},
+
+	"Лекции": Category{"Наука", 2465},
+
+	"Йога сессии": Category{"Спорт", 376},
+
+	"Танцы": Category{"Спорт", 376},
+
+	"Настольные игры": Category{"Интеллектуальные игры", 2335},
+
+	"Караоке": Category{"Другие развлечения", 463},
+
+	"Боулинг": Category{"Спорт", 376},
+
+	"Картинг": Category{"Спорт", 376},
 }
 
 /*
@@ -238,4 +310,44 @@ func (t *TimepadPoller) GetEventByID(eventID int64) (Event, error) {
     }
   ]
 }
+
+Концерты → Концерты (id: 460)
+
+Кино → Кино (id: 374)
+
+Выставки → Выставки (id: 458)
+
+Театры → Театры (id: 459)
+
+Фестивали → Другие события (id: 462)
+
+Спортивные события → Спорт (id: 376)
+
+Вечеринки → Вечеринки (id: 457)
+
+Клубы → Другие развлечения (id: 463)
+
+Рестораны → Еда (id: 456)
+
+Кафе → Еда (id: 456)
+
+Пикники → Экскурсии и путешествия (id: 461)
+
+Походы → Экскурсии и путешествия (id: 461)
+
+Мастер-классы → Хобби и творчество (id: 524)
+
+Лекции → Наука (id: 2465)
+
+Йога-сессии → Спорт (id: 376)
+
+Танцы → Спорт (id: 376)
+
+Настольные игры → Интеллектуальные игры (id: 2335)
+
+Караоке → Другие развлечения (id: 463)
+
+Боулинг → Спорт (id: 376)
+
+Картинг → Спорт (id: 376)
 */

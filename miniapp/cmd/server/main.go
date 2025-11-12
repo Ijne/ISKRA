@@ -47,6 +47,7 @@ func main() {
 	// new routes
 	// r.Use(middleware.JWTAuthMiddleware(cfg))
 	r.Use(middleware.CorsMiddleware("*"))
+	r.Use(middleware.UserMiddleware())
 
 	//r.Get("/rec-users", handlers.GetRecUsersHandler(s))
 	r.Post("/like-user", handlers.LikeUserHandler(s, nil))

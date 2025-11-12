@@ -116,6 +116,17 @@
     word-break: break-all;
 }
 
+.event-url a {
+    color: rgba(255, 170, 0, 0.7);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.event-url a:hover {
+    color: #ffaa00;
+    text-decoration: underline;
+}
+
 .loading-events {
     text-align: center;
     padding: 40px;
@@ -128,6 +139,21 @@
     padding: 40px;
     color: rgba(255, 170, 0, 0.5);
     font-size: 1rem;
+}
+
+.loading-indicator {
+    text-align: center;
+    padding: 20px;
+    color: rgba(255, 170, 0, 0.7);
+    font-size: 0.9rem;
+}
+
+.no-more-events {
+    text-align: center;
+    padding: 20px;
+    color: rgba(255, 170, 0, 0.5);
+    font-size: 0.9rem;
+    font-style: italic;
 }
 
 /* Модальные окна */

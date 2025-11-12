@@ -19,8 +19,8 @@ func (r *MatchesRepo) CreateTable() error {
 	// const op = "postgres.user.create_table"
 
 	stmt := `
-		CREATE TABLE IF NOT EXISTS matches 
-			(id integer NOT NULL,
+		CREATE TABLE IF NOT EXISTS matches (
+			id SERIAL PRIMARY KEY,
 			user1 integer NOT NULL,
 			user2 integer NOT NULL
 		);
