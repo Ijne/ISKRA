@@ -1,5 +1,5 @@
 function getCurrentUser() {
-    return 2;
+    return 96419039;
 }
 
 const API_BASE_URL = 'http://localhost:8080';
