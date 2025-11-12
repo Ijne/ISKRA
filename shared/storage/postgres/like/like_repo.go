@@ -19,25 +19,12 @@ func (r *LikeRepo) CreateTable() error {
 	// const op = "postgres.user.create_table"
 
 	stmt := `
-		CREATE TABLE IF NOT EXISTS public.likes (
-			id int NOT NULL,
-			username varchar NOT NULL,
-			"name" varchar NOT NULL,
-			surname varchar NULL,
-			age int NOT NULL,
-			gender int NOT NULL,
-			preferred_gender int NULL,
-			career_type varchar NULL,
-			personality_type varchar NULL,
-			relationship_goal varchar NULL,
-			important_values varchar NULL,
-			city varchar NULL,
-			career_place varchar NULL,
-			CONSTRAINT users_pk PRIMARY KEY (id),
-			CONSTRAINT users_unique UNIQUE (username)
+		CREATE TABLE likes (
+			id integer NOT NULL,
+			user1 integer NOT NULL,
+			user2 integer NOT NULL
 		);
 	`
-	// Дописать недостающее ^^^^^^
 
 	_, err := r.db.Exec(stmt)
 	return err
