@@ -37,9 +37,10 @@ func New(cfg *config.Config, s *postgres.Storage, g *memgraph.Storage, bot *bot.
 	// new routes
 	// r.Use(middleware.JWTAuthMiddleware(cfg))
 	r.Use(middleware.CorsMiddleware("*"))
+	r.Use(middleware.UserMiddleware())
 
 	//r.Get("/rec-users", handlers.GetRecUsersHandler(s))
-	r.Post("/like-user", handlers.LikeUserHandler(s, nil))
+	r.Post("/like-user", handlers.LikeUserHandler(s, bot))
 	r.Handle("/events", handlers.GetEventsHandler(s, t))
 	r.Post("/flames", handlers.GetFlamesHandler(s))
 	r.Post("/flame", handlers.CreateFlameHandler(s, t))

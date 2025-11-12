@@ -1,0 +1,23 @@
+bot:
+  host: localhost
+  port: 8090
+
+mini-app:
+  host: localhost
+  port: 8080
+  static-path: "miniapp/internal/static/"
+  templates-path: "miniapp/internal/templates/"
+
+postgres:
+  host: iskra-postgres-2
+  port: 5432
+  database: postgres
+  ssl_mode: disable
+
+memgraph:
+  protocol: bolt
+  host: iskra-memgraph
+  port: 7687
+
+jwt:
+  token_ttl_seconds: 86400

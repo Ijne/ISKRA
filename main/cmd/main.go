@@ -7,10 +7,17 @@ import (
 	"iskra/shared/config"
 	"iskra/shared/storage/memgraph"
 	"iskra/shared/storage/postgres"
+	"os"
 )
 
 func main() {
-	cfg, err := config.New("./config/local.yaml")
+	configPath := os.Getenv("CONFIG_PATH")
+	if configPath == "" {
+		configPath = "./config/local.yaml"
+	}
+
+	// config
+	cfg, err := config.New(configPath)
 	if err != nil {
 		panic(err)
 	}
