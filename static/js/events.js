@@ -3,7 +3,7 @@ let WebApp = null;
 
 function waitForWebApp() {
     return new Promise((resolve) => {
-        if (window.WebApp) {
+        if (window.WebApp?.initData) {
             WebApp = window.WebApp;
             initData = window.WebApp?.initData;
             console.log('WebApp загружен:', WebApp);

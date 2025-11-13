@@ -435,3 +435,40 @@
         align-self: flex-start;
     }
 }
+
+.profile-icon {
+    width: 28.77px;
+    height: 28px;
+    margin-bottom: 4px;
+    background-image: url('../img/profile.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    
+    display: block;
+}
+
+.event-icon {
+    width: 28.77px;
+    height: 28px;
+    margin-bottom: 4px;
+    background-image: url('../img/event.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    
+    display: block;
+}
+
+.flame-icon {
+    width: 28.77px;
+    height: 28px;
+    margin-bottom: 4px;
+    background-image: url('../img/flame.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    
+    display: block;
+}
+

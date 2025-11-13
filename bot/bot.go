@@ -236,7 +236,7 @@ func (b *Bot) ListenUpdates() chan bool {
 		for {
 			upds, err := b.GetUpdates(30)
 			if err != nil {
-				log.Printf("err bot updates: %v\n", err)
+				//log.Printf("err bot updates: %v\n", err)
 				continue
 			}
 			for _, upd := range upds.Updates {

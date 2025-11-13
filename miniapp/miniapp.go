@@ -25,7 +25,8 @@ type Miniapp struct {
 }
 
 func New(cfg *config.Config, s *postgres.Storage, g *memgraph.Storage, bot *bot.Bot) *Miniapp {
-	ctx, _ := context.WithCancel(context.Background())
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
 
 	// timepad api
 	t := timepad.New(cfg)

@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"iskra/miniapp/internal/middleware"
 	"iskra/miniapp/internal/tools/response"
 	"iskra/miniapp/internal/tools/timepad"
@@ -20,6 +21,7 @@ func GetEventsHandler(s *postgres.Storage, t *timepad.TimepadPoller) http.Handle
 			// return all saved events
 			res, err := s.FlamesRepo.GetEvents()
 			if err != nil {
+				log.Printf("ERROR FROM[GetEventsHandler] GetEvents err: %s", err)
 				render.JSON(w, r, struct {
 					response.Response
 					models.ManyEventsResponse
@@ -29,6 +31,8 @@ func GetEventsHandler(s *postgres.Storage, t *timepad.TimepadPoller) http.Handle
 				})
 				return
 			}
+
+			fmt.Println(res)
 
 			// convert structs
 			resp := make([]models.EventResponse, len(res))
@@ -64,6 +68,7 @@ func GetEventsHandler(s *postgres.Storage, t *timepad.TimepadPoller) http.Handle
 			var req models.FilteredEventsRequest
 			err := render.DecodeJSON(r.Body, &req)
 			if err != nil {
+				log.Printf("ERROR FROM[GetEventsHandler] decode json err: %s", err)
 				render.JSON(w, r, response.Error("Wrong json"))
 				return
 			}
@@ -74,6 +79,7 @@ func GetEventsHandler(s *postgres.Storage, t *timepad.TimepadPoller) http.Handle
 			log.Printf("%v\n", user)
 
 			if err != nil {
+				log.Printf("ERROR FROM[GetEventsHandler] GetUser err: %s", err)
 				render.JSON(w, r, response.Error("Server error"))
 				return
 			}
@@ -91,12 +97,16 @@ func GetEventsHandler(s *postgres.Storage, t *timepad.TimepadPoller) http.Handle
 			events, err := t.GetFilteredEvents(filter)
 			log.Printf("%v\n", events)
 			if err != nil {
+				log.Printf("ERROR FROM[GetEventsHandler] GetFilteredEvents err: %s", err)
 				events, err = t.GetEvents()
 				if err != nil {
+					log.Printf("ERROR FROM[GetEventsHandler] GetEvents err: %s", err)
 					render.JSON(w, r, response.Error("Server error"))
 					return
 				}
 			}
+
+			fmt.Println(events)
 
 			// convert structs
 			res := make([]models.EventResponse, len(events))

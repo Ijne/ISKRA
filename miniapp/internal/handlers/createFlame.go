@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"iskra/miniapp/internal/middleware"
 	"iskra/miniapp/internal/tools/response"
 	"iskra/miniapp/internal/tools/timepad"
@@ -18,6 +17,7 @@ func CreateFlameHandler(s *postgres.Storage, t *timepad.TimepadPoller) http.Hand
 	return func(w http.ResponseWriter, r *http.Request) {
 		userID, ok := middleware.GetUserIDFromContext(r.Context())
 		if !ok {
+			log.Println("ERROR FROM[CreateFlameHandler] GetUserIDFromContext not ok")
 			render.JSON(w, r, response.Error("Server error"))
 			return
 		}
@@ -25,6 +25,7 @@ func CreateFlameHandler(s *postgres.Storage, t *timepad.TimepadPoller) http.Hand
 		var req models.FlameCreate
 		err := render.DecodeJSON(r.Body, &req)
 		if err != nil {
+			log.Printf("ERROR FROM[CreateFlameHandler] decode json err: %s", err)
 			render.JSON(w, r, response.Error("Wrong json"))
 			return
 		}
@@ -35,13 +36,14 @@ func CreateFlameHandler(s *postgres.Storage, t *timepad.TimepadPoller) http.Hand
 			log.Println("Save event")
 			event, err := t.GetEventByID(req.EventID)
 			if err != nil {
+				log.Printf("ERROR FROM[CreateFlameHandler] GetEventByID err: %s", err)
 				render.JSON(w, r, response.Error("Wrong event id"))
 				return
 			}
 
 			date, err := time.Parse("2006-01-02T15:04:05-0700", event.StartsAt)
 			if err != nil {
-				fmt.Println("wrong date")
+				log.Printf("ERROR FROM[CreateFlameHandler] wrong date err: %s", err)
 				render.JSON(w, r, response.Error("Server error"))
 				return
 			}
@@ -62,6 +64,7 @@ func CreateFlameHandler(s *postgres.Storage, t *timepad.TimepadPoller) http.Hand
 			Description: req.Description,
 		})
 		if err != nil {
+			log.Printf("ERROR FROM[CreateFlameHandler] Create Flame err: %s", err)
 			render.JSON(w, r, response.Error("Server error"))
 			return
 		}
