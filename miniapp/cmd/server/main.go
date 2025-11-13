@@ -68,7 +68,7 @@ func main() {
 	r.Handle("/createuser", http.HandlerFunc(handlers.CreateUserHandler(cfg, s, g)))
 	r.Handle("/updateuser", http.HandlerFunc(handlers.UpdateUserHandler(cfg, s, g)))
 	r.Handle("/recommendations", http.HandlerFunc(handlers.GetRecomendationsHandler(cfg, g)))
-	r.Handle("/interaction", http.HandlerFunc(handlers.InteractionHandler(cfg, s, g)))
+	r.Handle("/interaction", http.HandlerFunc(handlers.InteractionHandler(cfg, s, g, nil)))
 
 	// server
 	log.Println("Start serving...")

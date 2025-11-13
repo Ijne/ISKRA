@@ -73,28 +73,33 @@ func GetEventsHandler(s *postgres.Storage, t *timepad.TimepadPoller) http.Handle
 			user, err := s.UserRepo.GetUser(userID)
 			log.Printf("%v\n", user)
 
-			if err != nil {
-				render.JSON(w, r, response.Error("Server error"))
-				return
-			}
+			events := make([]timepad.Event, 0)
 
-			cats := strings.Split(user.EventPreferences, ",")
-			// log.Printf("%v\n", cats)
-
-			filter := timepad.EventsFilter{
-				City:       user.City,
-				Categories: cats,
-				Limit:      req.Limit,
-				Skip:       req.Skip,
-			}
-
-			events, err := t.GetFilteredEvents(filter)
-			log.Printf("%v\n", events)
 			if err != nil {
 				events, err = t.GetEvents()
 				if err != nil {
 					render.JSON(w, r, response.Error("Server error"))
 					return
+				}
+			} else {
+				cats := strings.Split(user.EventPreferences, ",")
+				// log.Printf("%v\n", cats)
+
+				filter := timepad.EventsFilter{
+					City:       user.City,
+					Categories: cats,
+					Limit:      req.Limit,
+					Skip:       req.Skip,
+				}
+
+				events, err := t.GetFilteredEvents(filter)
+				log.Printf("%v\n", events)
+				if err != nil {
+					events, err = t.GetEvents()
+					if err != nil {
+						render.JSON(w, r, response.Error("Server error"))
+						return
+					}
 				}
 			}
 
