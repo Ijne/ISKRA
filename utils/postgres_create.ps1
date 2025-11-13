@@ -5,3 +5,4 @@
 docker run --name iskra-postgres-2 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -d --network mynet postgres:13.22-alpine3.22
 # docker start iskra-postgres
 # psql -U postgres -d postgres -p 5432
+# docker run --rm --name iskra-memgraph -p 7687:7687 -itd memgraph/memgraph

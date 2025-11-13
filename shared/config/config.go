@@ -10,21 +10,18 @@ import (
 
 type Config struct {
 	Server struct {
-		Address           string `yaml:"address" validate:"required"`
-		AddressForMiniapp string
+		Address string `yaml:"address" validate:"required"`
 	} `yaml:"server"`
 
 	Bot struct {
-		Host  string `yaml:"host" validate:"required"`
-		Port  string `yaml:"port" validate:"required"`
-		Token string
+		Token    string
+		Username string `yaml:"username" validate:"required"`
 	} `yaml:"bot"`
 
 	MiniApp struct {
-		Host          string `yaml:"host" validate:"required"`
-		Port          string `yaml:"port" validate:"required"`
-		StaticPath    string `yaml:"static-path" validate:"required"`
-		TemplatesPath string `yaml:"templates-path" validate:"required"`
+		Proto string `yaml:"proto"`
+		Host  string `yaml:"host"`
+		Port  string `yaml:"port"`
 	} `yaml:"mini-app"`
 
 	Postgres struct {
@@ -104,10 +101,31 @@ func New(configPath string) (*Config, error) {
 		cfg.Memgraph.Password = ""
 	}
 
-	cfg.Server.AddressForMiniapp = os.Getenv("ADDRESS_FOR_MINIAPP")
-	if len(cfg.Server.AddressForMiniapp) == 0 {
-		cfg.Server.AddressForMiniapp = "localhost:8080"
-		log.Println("cfg: no address for miniapp")
+	// address for miniapp`s backend can be set using environment vars
+	miniappProto := os.Getenv("MINIAPP_PROTO")
+	if miniappProto != "" {
+		cfg.MiniApp.Proto = miniappProto
+	} else {
+		log.Println("cfg: proto for miniapp extracted from yaml")
+	}
+	miniappHost := os.Getenv("MINIAPP_HOST")
+	if miniappHost != "" {
+		cfg.MiniApp.Host = miniappHost
+	} else {
+		log.Println("cfg: host for miniapp extracted from yaml")
+	}
+	miniappPort := os.Getenv("MINIAPP_PORT")
+	if miniappPort != "" {
+		cfg.MiniApp.Port = miniappPort
+	} else {
+		log.Println("cfg: port for miniapp extracted from yaml")
+	}
+
+	serverAddress := os.Getenv("SERVER_ADDRESS")
+	if serverAddress != "" {
+		cfg.Server.Address = serverAddress
+	} else {
+		log.Println("cfg: address for server extracted from yaml")
 	}
 
 	return &cfg, nil

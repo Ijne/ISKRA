@@ -37,11 +37,13 @@ func LikeUserHandler(s *postgres.Storage, b *bot.Bot) http.HandlerFunc {
 			if b != nil {
 				user1, err := s.UserRepo.GetUser(userID)
 				if err != nil {
+					log.Println("error while getting user1")
 					render.JSON(w, r, response.Error("Server error"))
 					return
 				}
 				user2, err := s.UserRepo.GetUser(req.LightID)
 				if err != nil {
+					log.Println("error while getting user2")
 					render.JSON(w, r, response.Error("Server error"))
 					return
 				}

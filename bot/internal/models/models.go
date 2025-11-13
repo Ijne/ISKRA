@@ -67,12 +67,12 @@ type InlineKeyboard struct {
 }
 
 type Button struct {
-	Type      string  `json:"type"`
-	Text      string  `json:"text"`
-	WebApp    *string `json:"web_app,omitempty"`
-	ContactID *int64  `json:"contact_id,omitempty"`
-	Payload   *string `json:"payload,omitempty"`
-	URL       *string `json:"url,omitempty"`
+	Type   string  `json:"type"`
+	Text   string  `json:"text"`
+	WebApp *string `json:"web_app,omitempty"`
+	// ContactID *int64  `json:"contact_id,omitempty"`
+	Payload *string `json:"payload,omitempty"`
+	// URL       *string `json:"url,omitempty"`
 }
 
 type OpenAppButtonData struct {
@@ -82,3 +82,37 @@ type OpenAppButtonData struct {
 	UserID     int64  `json:"user_id"`
 	CallbackID string `json:"callback_id"`
 }
+
+type MessageRequest struct {
+	Text string `json:"text"`
+}
+
+type MessageOpenAppButtonRequest struct {
+	Text        string       `json:"text"`
+	Attachments []Attachment `json:"attachments"`
+}
+
+type Buttons struct {
+	Buttons [][]Button `json:"buttons"`
+}
+
+// {
+//     "text": "Запустите мини-приложение:",
+//     "attachments": [
+//       {
+//       "type": "inline_keyboard",
+//       "payload": {
+//         "buttons": [
+//         [
+//           {
+//           "type": "open_app",
+//           "text": "Запустить приложение",
+//           "web_app": "t21_hakaton_bot",
+//           "payload": "http___localhost___8080"
+//           }
+//         ]
+//         ]
+//       }
+//       }
+//     ]
+//   }

@@ -63,8 +63,8 @@ func main() {
 
 	// r.Handle("/static/*", http.StripPrefix("/static/", fs))
 	// old routes
-	r.Handle("/start", http.HandlerFunc(handlers.StartScreenHandler(cfg)))
-	r.Handle("/", http.HandlerFunc(handlers.HomepageScreenHandler(cfg)))
+	// r.Handle("/start", http.HandlerFunc(handlers.StartScreenHandler(cfg)))
+	// r.Handle("/", http.HandlerFunc(handlers.HomepageScreenHandler(cfg)))
 	r.Handle("/profile", http.HandlerFunc(handlers.ProfileScreenHandler(cfg, s)))
 	r.Handle("/createuser", http.HandlerFunc(handlers.CreateUserHandler(cfg, s, g)))
 	r.Handle("/updateuser", http.HandlerFunc(handlers.UpdateUserHandler(cfg, s, g)))
@@ -73,9 +73,7 @@ func main() {
 
 	// server
 	log.Println("Start serving...")
-	if err := http.ListenAndServe(fmt.Sprintf("%s:%s", cfg.MiniApp.Host, cfg.MiniApp.Port), r); err != nil {
+	if err := http.ListenAndServe(cfg.Server.Address, r); err != nil {
 		log.Println(err)
-	} else {
-		log.Printf("Server started on %s:%s\n", cfg.MiniApp.Host, cfg.MiniApp.Port)
 	}
 }

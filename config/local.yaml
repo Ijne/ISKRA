@@ -1,15 +1,13 @@
 server:
-  address: 0.0.0.0:8080s
+  address: 0.0.0.0:8080
 
 bot:
-  host: localhost
-  port: 8090
+  username: "t21_hakaton_bot"
 
 mini-app:
+  proto: http
   host: localhost
   port: 8080
-  static-path: "miniapp/internal/static/"
-  templates-path: "miniapp/internal/templates/"
 
 postgres:
   host: localhost
