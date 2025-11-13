@@ -51,7 +51,17 @@ func (r *UserRepo) CreateTable() error {
 func (r *UserRepo) GetUser(ID int64) (models.UserDB, error) {
 	const op = "postgres.user.get"
 	stmt, err := r.db.Prepare(`
-		SELECT id, username, name, COALESCE(surname, 'nil') as surname, age, gender, COALESCE(preferred_gender, '2') as preferred_gender, COALESCE(career_type, 'nil') as career_type, COALESCE(personality_type, 'nil') as personality_type, COALESCE(relationship_goal, 'nil') as relationship_goal, COALESCE(important_values, 'nil') as important_values, COALESCE(city, 'nil') as city, COALESCE(career_place, 'nil') as career_place, COALESCE(music, 'nil') as music, COALESCE(films, 'nil') as films, COALESCE(hobbies, 'nil') as hobbies, COALESCE(event_preferences, 'nil') as event_preferences
+		SELECT id, username, name, COALESCE(surname, 'nil')
+			as surname, age, gender,
+			COALESCE(preferred_gender, '2') as preferred_gender,
+		    COALESCE(career_type, 'nil') as career_type,
+		    COALESCE(personality_type, 'nil') as personality_type,
+			COALESCE(relationship_goal, 'nil') as relationship_goal,
+			COALESCE(important_values, 'nil') as important_values,
+			COALESCE(city, 'nil') as city, COALESCE(career_place, 'nil') as career_place,
+		    COALESCE(music, 'nil') as music, COALESCE(films, 'nil') as films,
+			COALESCE(hobbies, 'nil') as hobbies, COALESCE(event_preferences, 'nil') as event_preferences,
+			COALESCE(photo, 'nil') as photo
 		FROM users
 		WHERE id = $1
 	`)
@@ -62,7 +72,7 @@ func (r *UserRepo) GetUser(ID int64) (models.UserDB, error) {
 		return res, err
 	}
 
-	err = stmt.QueryRow(ID).Scan(&res.ID, &res.Username, &res.Name, &res.Surname, &res.Age, &res.Gender, &res.PreferredGender, &res.CareerType, &res.PersonalityType, &res.RelationshipGoal, &res.ImportantValues, &res.City, &res.CareerPlace, &res.Music, &res.Films, &res.Hobbies, &res.EventPreferences)
+	err = stmt.QueryRow(ID).Scan(&res.ID, &res.Username, &res.Name, &res.Surname, &res.Age, &res.Gender, &res.PreferredGender, &res.CareerType, &res.PersonalityType, &res.RelationshipGoal, &res.ImportantValues, &res.City, &res.CareerPlace, &res.Music, &res.Films, &res.Hobbies, &res.EventPreferences, &res.Photo)
 	if err != nil {
 		log.Printf("%s: %v", op, err)
 	}
@@ -72,7 +82,17 @@ func (r *UserRepo) GetUser(ID int64) (models.UserDB, error) {
 func (r *UserRepo) GetAll() ([]models.UserDB, error) {
 	const op = "postgres.user.get_all"
 	stmt := `
-		SELECT id, username, name, COALESCE(surname, 'nil') as surname, age, gender, COALESCE(preferred_gender, '2') as preferred_gender, COALESCE(career_type, 'nil') as career_type, COALESCE(personality_type, 'nil') as personality_type, COALESCE(relationship_goal, 'nil') as relationship_goal, COALESCE(important_values, 'nil') as important_values, COALESCE(city, 'nil') as city, COALESCE(career_place, 'nil') as career_place, COALESCE(music, 'nil') as music, COALESCE(films, 'nil') as films, COALESCE(hobbies, 'nil') as hobbies, COALESCE(event_preferences, 'nil') as event_preferences
+		SELECT id, username, name, COALESCE(surname, 'nil')
+			as surname, age, gender,
+			COALESCE(preferred_gender, '2') as preferred_gender,
+		    COALESCE(career_type, 'nil') as career_type,
+		    COALESCE(personality_type, 'nil') as personality_type,
+			COALESCE(relationship_goal, 'nil') as relationship_goal,
+			COALESCE(important_values, 'nil') as important_values,
+			COALESCE(city, 'nil') as city, COALESCE(career_place, 'nil') as career_place,
+		    COALESCE(music, 'nil') as music, COALESCE(films, 'nil') as films,
+			COALESCE(hobbies, 'nil') as hobbies, COALESCE(event_preferences, 'nil') as event_preferences,
+			COALESCE(photo, 'nil') as photo
 		FROM users
 	`
 
@@ -86,7 +106,7 @@ func (r *UserRepo) GetAll() ([]models.UserDB, error) {
 
 	for rows.Next() {
 		var curr models.UserDB
-		rows.Scan(&curr.ID, &curr.Username, &curr.Name, &curr.Surname, &curr.Age, &curr.Gender, &curr.PreferredGender, &curr.CareerType, &curr.PersonalityType, &curr.RelationshipGoal, &curr.ImportantValues, &curr.City, &curr.CareerPlace, &curr.Music, &curr.Films, &curr.Hobbies, &curr.EventPreferences)
+		rows.Scan(&curr.ID, &curr.Username, &curr.Name, &curr.Surname, &curr.Age, &curr.Gender, &curr.PreferredGender, &curr.CareerType, &curr.PersonalityType, &curr.RelationshipGoal, &curr.ImportantValues, &curr.City, &curr.CareerPlace, &curr.Music, &curr.Films, &curr.Hobbies, &curr.EventPreferences, &curr.Photo)
 		res = append(res, curr)
 	}
 
@@ -113,16 +133,17 @@ func (r *UserRepo) CreateUser(user models.UserCreate) error {
 			music,
 			films,
 			hobbies,
-			event_preferences
+			event_preferences,
+			photo
 		)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
 	`)
 	if err != nil {
 		log.Printf("%s: %v", op, err)
 		return err
 	}
 
-	_, err = stmt.Exec(user.ID, user.Username, user.Name, user.Surname, user.Age, user.Gender, user.PreferredGender, user.CareerType, user.PersonalityType, user.RelationshipGoal, user.ImportantValues, user.City, user.CareerPlace, user.Music, user.Films, user.Hobbies, user.EventPreferences)
+	_, err = stmt.Exec(user.ID, user.Username, user.Name, user.Surname, user.Age, user.Gender, user.PreferredGender, user.CareerType, user.PersonalityType, user.RelationshipGoal, user.ImportantValues, user.City, user.CareerPlace, user.Music, user.Films, user.Hobbies, user.EventPreferences, user.Photo)
 	if err != nil {
 		log.Printf("%s: %v", op, err)
 	}
@@ -145,8 +166,9 @@ func (r *UserRepo) UpdateUser(user models.UserDB) error {
             films = $10, 
             hobbies = $11, 
             event_preferences = $12,
-			gender = $13
-        WHERE id = $14
+			gender = $13,
+			photo = $14
+        WHERE id = $15
     `)
 	if err != nil {
 		log.Printf("%s: %v", op, err)
@@ -168,6 +190,7 @@ func (r *UserRepo) UpdateUser(user models.UserDB) error {
 		user.Hobbies,
 		user.EventPreferences,
 		user.Gender,
+		user.Photo,
 		user.ID,
 	)
 	if err != nil {

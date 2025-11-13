@@ -19,6 +19,7 @@ type UserDB struct {
 	Films            string `json:"films,omitempty" db:"films"`
 	Hobbies          string `json:"hobbies,omitempty" db:"hobbies"`
 	EventPreferences string `json:"event_preferences,omitempty" db:"event_preferences"`
+	Photo            string `json:"photo" db:"photo"`
 }
 
 type UserCreate struct {
@@ -39,6 +40,7 @@ type UserCreate struct {
 	Films            string `json:"films,omitempty" db:"films"`
 	Hobbies          string `json:"hobbies,omitempty" db:"hobbies"`
 	EventPreferences string `json:"event_preferences,omitempty" db:"event_preferences"`
+	Photo            string `json:"photo" db:"photo"`
 }
 
 type ManyUserResponse struct {
@@ -63,6 +65,7 @@ type UserRequest struct {
 	Films            string  `json:"films,omitempty" db:"films"`
 	Hobbies          string  `json:"hobbies,omitempty" db:"hobbies"`
 	EventPreferences string  `json:"event_preferences,omitempty" db:"event_preferences"`
+	Photo            string  `json:"photo" db:"photo"`
 }
 
 type UserResponse struct {
@@ -83,6 +86,7 @@ type UserResponse struct {
 	Films            string  `json:"films,omitempty" db:"films"`
 	Hobbies          string  `json:"hobbies,omitempty" db:"hobbies"`
 	EventPreferences string  `json:"event_preferences,omitempty" db:"event_preferences"`
+	Photo            string  `json:"photo" db:"photo"`
 }
 
 type UserGetRequest struct {

@@ -4,6 +4,7 @@ body {
     background: linear-gradient(135deg, #0c0c0c 0%, #1a1a1a 100%);
     color: white;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    min-height: 100vh;
 }
 
 .onboarding-screen {
@@ -56,7 +57,7 @@ body {
     margin-bottom: 25px;
 }
 
-.onboarding-title {
+.profile-section-title {
     font-size: 2.2rem;
     font-weight: 300;
     margin-bottom: 8px;
@@ -82,6 +83,81 @@ body {
     flex: 1;
     display: flex;
     flex-direction: column;
+}
+
+/* Стили для загрузки фото */
+.photo-upload-section {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 25px;
+}
+
+.photo-upload-container {
+    text-align: center;
+    width: 100%;
+}
+
+.photo-preview {
+    width: 100%;
+    max-width: 300px;
+    height: 400px;
+    border-radius: 20px;
+    background: rgba(255, 170, 0, 0.05);
+    border: 2px dashed rgba(255, 170, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 15px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.photo-preview:hover {
+    border-color: rgba(255, 170, 0, 0.6);
+}
+
+.photo-preview.has-photo {
+    border: 2px solid rgba(255, 170, 0, 0.6);
+}
+
+.photo-placeholder {
+    text-align: center;
+    color: rgba(255, 170, 0, 0.7);
+    padding: 20px;
+}
+
+.camera-icon {
+    font-size: 48px;
+    margin-bottom: 15px;
+    opacity: 0.5;
+}
+
+.photo-text {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.photo-upload-btn {
+    background: rgba(255, 170, 0, 0.1);
+    border: 1px solid rgba(255, 170, 0, 0.3);
+    color: rgba(255, 170, 0, 0.9);
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.photo-upload-btn:hover {
+    background: rgba(255, 170, 0, 0.2);
+}
+
+.photo-optional {
+    font-size: 12px;
+    color: rgba(255, 170, 0, 0.6);
+    margin-top: 8px;
 }
 
 .onboarding-capsules-grid {
@@ -325,25 +401,48 @@ body {
     opacity: 0;
 }
 
-.onboarding-avatar {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #ffaa00, #ff6600);
-    margin: 0 auto 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    border: 2px solid rgba(255, 170, 0, 0.5);
-    position: relative;
-    cursor: pointer;
-    transition: all 0.3s ease;
+.onboarding-input-compact.select-input .onboarding-input-field {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    padding-right: 40px;
+    background: transparent;
 }
 
-.onboarding-avatar:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 25px rgba(255, 170, 0, 0.4);
+.onboarding-input-edit, .onboarding-input-arrow {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255, 170, 0, 0.7);
+    font-size: 14px;
+    pointer-events: none;
+    transition: color 0.3s ease;
+}
+
+.onboarding-input-compact.select-input .onboarding-input-field::-ms-expand {
+    display: none;
+}
+
+.onboarding-input-field:focus + .onboarding-input-edit,
+.onboarding-input-field:focus + .onboarding-input-arrow {
+    color: #ffaa00;
+}
+
+.onboarding-input-compact.select-input .onboarding-input-edit {
+    display: none;
+}
+
+.onboarding-input-compact.select-input .onboarding-input-arrow {
+    display: block;
+}
+
+.onboarding-input-compact:not(.select-input) .onboarding-input-arrow {
+    display: none;
+}
+
+.onboarding-input-compact:not(.select-input) .onboarding-input-edit {
+    display: block;
 }
 
 .main-app {
@@ -368,7 +467,12 @@ body {
 .user-card {
     width: 100%;
     height: 100%;
-    background: rgba(40, 40, 40, 0.95);
+    background: linear-gradient(
+        180deg,
+        rgba(40, 40, 40, 0) 0%,
+        rgba(40, 40, 40, 0.2) 40%,
+        rgb(40, 40, 40, 0.7) 100%
+    );
     border-radius: 20px;
     border: 1px solid rgba(255, 170, 0, 0.1);
     backdrop-filter: blur(10px);
@@ -386,6 +490,9 @@ body {
     height: 100%;
     background: linear-gradient(135deg, rgba(255, 170, 0, 0.05), rgba(255, 102, 0, 0.05));
     opacity: 0.5;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
 }
 
 .swipe-overlay {
@@ -607,109 +714,7 @@ body {
     }
 }
 
-@media (max-width: 480px) {
-    .onboarding-screen {
-        padding: 15px;
-    }
-    
-    .onboarding-capsule {
-        flex: 1 1 100%;
-        min-width: 100%;
-        padding: 12px 10px;
-    }
-    
-    .onboarding-capsules-grid {
-        max-height: 55vh;
-    }
-    
-    .onboarding-fields-grid {
-        grid-template-columns: 1fr;
-        gap: 15px;
-    }
-    
-    .main-app {
-        padding: 8px;
-        padding-bottom: 80px;
-    }
-    
-    .cards-container {
-        height: calc(100vh - 96px);
-    }
-    
-    .user-card {
-        border-radius: 16px;
-    }
-    
-    .user-name {
-        font-size: 2rem;
-    }
-    
-    .user-age-city {
-        font-size: 1.1rem;
-    }
-    
-    .card-content {
-        padding: 20px;
-    }
-    
-    .show-more-btn {
-        width: 130px;
-        padding: 0px 10px;
-    }
-    
-    .onboarding-capsule.multiple {
-        flex: 1 1 calc(50% - 8px);
-        min-width: calc(50% - 8px);
-    }
-}
-
-@media (max-width: 360px) {
-    .onboarding-capsule.multiple {
-        flex: 1 1 100%;
-        min-width: 100%;
-    }
-}
-
-@media (max-height: 700px) {
-    .card-main-info {
-        padding-bottom: 15px;
-    }
-    
-    .user-name {
-        font-size: 2rem;
-    }
-    
-    .user-details.active {
-        max-height: 250px;
-    }
-}
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-body {
-    background: linear-gradient(135deg, #0a0a0a 0%, #1a0f00 100%);
-    color: #fff;
-    min-height: 100vh;
-    overflow: hidden;
-}
-
-.auth-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    text-align: center;
-    padding: 20px;
-    position: relative;
-    z-index: 100;
-}
-
+/* Анимации для искры */
 .spark-container {
     position: relative;
     width: 140px;
@@ -924,56 +929,128 @@ body {
     box-shadow: 0 0 10px #ffaa00;
 }
 
+/* Адаптивность для мобильных */
+@media (max-width: 480px) {
+    .onboarding-screen {
+        padding: 15px;
+    }
+    
+    .onboarding-capsule {
+        flex: 1 1 100%;
+        min-width: 100%;
+        padding: 12px 10px;
+    }
+    
+    .onboarding-capsules-grid {
+        max-height: 55vh;
+    }
+    
+    .onboarding-fields-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .main-app {
+        padding: 8px;
+        padding-bottom: 80px;
+    }
+    
+    .cards-container {
+        height: calc(100vh - 96px);
+    }
+    
+    .user-card {
+        border-radius: 16px;
+    }
+    
+    .user-name {
+        font-size: 2rem;
+    }
+    
+    .user-age-city {
+        font-size: 1.1rem;
+    }
+    
+    .card-content {
+        padding: 20px;
+    }
+    
+    .show-more-btn {
+        width: 130px;
+        padding: 0px 10px;
+    }
+    
+    .onboarding-capsule.multiple {
+        flex: 1 1 calc(50% - 8px);
+        min-width: calc(50% - 8px);
+    }
+    
+    /* Адаптивность для фото */
+    .photo-preview {
+        height: 400px;
+        max-width: 225px;
+    }
+}
+
+@media (max-width: 360px) {
+    .onboarding-capsule.multiple {
+        flex: 1 1 100%;
+        min-width: 100%;
+    }
+}
+
+@media (max-height: 700px) {
+    .card-main-info {
+        padding-bottom: 15px;
+    }
+    
+    .user-name {
+        font-size: 2rem;
+    }
+    
+    .user-details.active {
+        max-height: 250px;
+    }
+    
+    /* Адаптивность для фото на маленьких экранах */
+    .photo-preview {
+        height: 350px;
+        max-width: 197px;
+    }
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a0f00 100%);
+    color: #fff;
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+.auth-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    text-align: center;
+    padding: 20px;
+    position: relative;
+    z-index: 100;
+}
+
 .main-container {
     display: none;
 }
 
-.onboarding-input-compact {
-    position: relative;
-}
-
-.onboarding-input-compact.select-input .onboarding-input-field {
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    padding-right: 40px;
-    background: transparent;
-}
-
-.onboarding-input-edit, .onboarding-input-arrow {
-    position: absolute;
-    right: 12px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: rgba(255, 170, 0, 0.7);
-    font-size: 14px;
-    pointer-events: none;
-    transition: color 0.3s ease;
-}
-
-.onboarding-input-compact.select-input .onboarding-input-field::-ms-expand {
-    display: none;
-}
-
-.onboarding-input-field:focus + .onboarding-input-edit,
-.onboarding-input-field:focus + .onboarding-input-arrow {
-    color: #ffaa00;
-}
-
-.onboarding-input-compact.select-input .onboarding-input-edit {
-    display: none;
-}
-
-.onboarding-input-compact.select-input .onboarding-input-arrow {
-    display: block;
-}
-
-.onboarding-input-compact:not(.select-input) .onboarding-input-arrow {
-    display: none;
-}
-
-.onboarding-input-compact:not(.select-input) .onboarding-input-edit {
-    display: block;
+.full-width {
+    grid-column: 1 / -1;
 }
 
 .profile-icon {

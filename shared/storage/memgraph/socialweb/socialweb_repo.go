@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"iskra/shared/models"
 	"iskra/shared/storage/repos"
+	"log"
 	"strings"
 
 	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
@@ -44,7 +45,8 @@ func (r *SocialWebRepo) CreateUser(user models.UserCreate) error {
 				music: $music_string,
 				films: $films_string,
 				hobbies: $hobbies_string,
-				event_preferences: $events_string
+				event_preferences: $events_string,
+				photo: $photo
 			})
 		`
 		query2 := `	
@@ -103,6 +105,7 @@ func (r *SocialWebRepo) CreateUser(user models.UserCreate) error {
 			"films_string":   user.Films,
 			"hobbies_string": user.Hobbies,
 			"events_string":  user.EventPreferences,
+			"photo":          user.Photo,
 		}
 
 		result, err := tx.Run(context.Background(), query1, params)
@@ -346,6 +349,7 @@ func (r *SocialWebRepo) GetRecommendations(id int64) ([]models.UserResponse, err
                 candidate.films AS films,
                 candidate.hobbies AS hobbies,
                 candidate.event_preferences AS event_preferences,
+				candidate.photo AS photo,
                 total_score AS match_score
             ORDER BY total_score DESC
             LIMIT 50
@@ -444,11 +448,16 @@ func (r *SocialWebRepo) GetRecommendations(id int64) ([]models.UserResponse, err
 				user.EventPreferences, _ = eventPreferences.(string)
 			}
 
+			if photo, ok := record.Get("photo"); ok {
+				user.Photo, _ = photo.(string)
+			}
+
 			if matchScore, ok := record.Get("match_score"); ok {
 				fmt.Println(matchScore)
 			}
 
 			users = append(users, user)
+			log.Println(user.Photo, "--------")
 		}
 
 		if err := result.Err(); err != nil {
