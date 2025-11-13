@@ -12,10 +12,6 @@ import (
 
 func InteractionHandler(cfg *config.Config, s *postgres.Storage, g *memgraph.Storage) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		// w.Header().Set("Access-Control-Allow-Origin", "http://127.0.0.1:5500")
-		// w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
-		// w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization, Accept")
-		// w.Header().Set("Access-Control-Allow-Credentials", "true")
 		switch r.Method {
 		case http.MethodOptions:
 			w.WriteHeader(http.StatusOK)
@@ -26,16 +22,14 @@ func InteractionHandler(cfg *config.Config, s *postgres.Storage, g *memgraph.Sto
 				Interaction_type string `json:"interaction_type"`
 			}
 			if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-				log.Println(err)
+				log.Printf("ERROR FROM[InteractionHandler] json decode err: %s", err)
+				return
 			}
 
 			if req.Interaction_type == "like" {
-				// postgresContainer, err := postgres.NewStorage(cfg)
-				// if err != nil {
-				// 	log.Println(err)
-				// }
 				if err := s.LikeRepo.SetLike(req.User_id, req.Target_user_id); err != nil {
-					log.Println(err)
+					log.Printf("ERROR FROM[InteractionHandler] SetLike err: %s", err)
+					return
 				}
 				if s.LikeRepo.IsLike(req.Target_user_id, req.User_id) {
 					match := models.MatchDB{
@@ -43,22 +37,21 @@ func InteractionHandler(cfg *config.Config, s *postgres.Storage, g *memgraph.Sto
 						LightID: req.Target_user_id,
 					}
 					if err := s.MatchesRepo.Create(match); err != nil {
-						log.Println(err)
+						log.Printf("ERROR FROM[InteractionHandler] CreateMatch err: %s", err)
+						return
 					}
 					// ПРОИЗОШЕЛ МЭТЧ - НАДО ЗАПУСТИТЬ НУЖНУЮ ЛОГИКУ ПОСЛЕ ЭТОГО
 				}
 			}
 
-			// memgraphContainer, err := memgraph.NewStorage(cfg)
-			// if err != nil {
-			// 	log.Println(err)
-			// }
 			if err := g.SocialWebRepo.SetSwipe(req.User_id, req.Target_user_id, req.Interaction_type); err != nil {
-				log.Println(err)
+				log.Printf("ERROR FROM[InteractionHandler] SetSwipe err: %s", err)
+				return
 			}
 
+			log.Printf("SUCCESS FROM[InteractionHandler] Interaction of type[%s] of user[id%d] set", req.Interaction_type, req.User_id)
 		default:
-			// Дописать
+			log.Printf("ERROR FROM[InteractionHandler] Not allowed method: %s", r.Method)
 		}
 	}
 }

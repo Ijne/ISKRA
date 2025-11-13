@@ -1,5 +1,150 @@
-function getCurrentUser() {
-    return 96419039;
+let initData = null;
+let WebApp = null;
+
+function waitForWebApp() {
+    return new Promise((resolve) => {
+        if (window.WebApp) {
+            WebApp = window.WebApp;
+            initData = window.WebApp?.initData;
+            console.log('WebApp загружен:', WebApp);
+            resolve();
+            return;
+        }
+
+        let attempts = 0;
+        const maxAttempts = 50;
+        
+        const check = () => {
+            attempts++;
+            if (window.WebApp) {
+                WebApp = window.WebApp;
+                initData = window.WebApp?.initData;
+                console.log('WebApp загружен:', WebApp);
+                console.log('InitData:', initData);
+                resolve();
+            } else if (attempts < maxAttempts) {
+                setTimeout(check, 100);
+            } else {
+                console.warn('WebApp не загрузился, продолжаем без него');
+                resolve();
+            }
+        };
+        
+        check();
+    });
+}
+
+async function getCurrentUser() {
+    try {
+        await waitForWebApp();
+        
+        if (!initData) {
+            console.error('No init data found');
+            return null;
+        }
+
+        let decodedString;
+        
+        if (typeof initData === 'object') {
+            const user = initData.user || initData;
+            return user.id || null;
+        }
+
+        if (typeof initData === 'string') {
+            decodedString = decodeURIComponent(initData);
+
+            const params = new URLSearchParams(decodedString);
+            const receivedHash = params.get('hash');
+            
+            if (!receivedHash) {
+                console.error('Hash not found in init data');
+                const userParam = params.get('user');
+                if (userParam) {
+                    try {
+                        const userData = JSON.parse(userParam);
+                        return userData.id || null;
+                    } catch (e) {
+                        console.error('Error parsing user data:', e);
+                    }
+                }
+                return null;
+            }
+
+            const userParam = params.get('user');
+            
+            const dataPairs = [];
+            for (const [key, value] of params) {
+                if (key !== 'hash') {
+                    dataPairs.push(`${key}=${value}`);
+                }
+            }
+            dataPairs.sort();
+            
+            const dataCheckString = dataPairs.join('\n');
+
+            const botToken = 'f9LHodD0cOLRQi29OdyXpiSqLM-SyPUJnePMbZQH3ceilC7cKmf12ib4C7Oeda975ZN_gzuX6fJmQVKE5j1e';
+            
+            const encoder = new TextEncoder();
+
+            const secretKey = await crypto.subtle.importKey(
+                'raw',
+                encoder.encode('WebAppData'),
+                { name: 'HMAC', hash: 'SHA-256' },
+                false,
+                ['sign']
+            );
+
+            const cryptoKey = await crypto.subtle.sign(
+                'HMAC',
+                secretKey,
+                encoder.encode(botToken)
+            );
+
+            const hmacKey = await crypto.subtle.importKey(
+                'raw',
+                cryptoKey,
+                { name: 'HMAC', hash: 'SHA-256' },
+                false,
+                ['sign']
+            );
+
+            const signature = await crypto.subtle.sign(
+                'HMAC',
+                hmacKey,
+                encoder.encode(dataCheckString)
+            );
+            
+            const calculatedHash = Array.from(new Uint8Array(signature))
+                .map(b => b.toString(16).padStart(2, '0'))
+                .join('');
+            
+            console.log('Calculated hash:', calculatedHash);
+            console.log('Received hash:', receivedHash);
+
+            if (calculatedHash === receivedHash) {
+                console.log('Hash validation successful');
+                
+                if (userParam) {
+                    try {
+                        const userData = JSON.parse(userParam);
+                        console.log('User data:', userData);
+                        return userData.id || null;
+                    } catch (parseError) {
+                        console.error('Error parsing user data:', parseError);
+                        return null;
+                    }
+                }
+            } else {
+                console.log('Hash validation failed');
+                return null;
+            }
+        }
+        
+        return null;
+    } catch (error) {
+        console.error('Validation error:', error);
+        return null;
+    }
 }
 
 const API_BASE_URL = 'http://localhost:8080';
@@ -7,58 +152,28 @@ const API_BASE_URL = 'http://localhost:8080';
 let currentEvents = [];
 let currentFlames = [];
 let selectedEventId = null;
-let userCity = '';
-let currentSkip = 0;
-const limit = 5;
-let isLoading = false;
-let hasMoreEvents = true;
 
-// Загрузка мероприятий при загрузке страницы
-document.addEventListener('DOMContentLoaded', function() {
-    loadUserCity();
-    setupNavigation();
-    setupInfiniteScroll();
-});
-
-// Загрузка города пользователя
-async function loadUserCity() {
+async function initApp() {
     try {
-        const response = await fetch(`${API_BASE_URL}/profile?id=${getCurrentUser()}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-
-        if (response.ok) {
-            const userData = await response.json();
-            userCity = userData.city || '';
-            console.log('Город пользователя:', userCity);
-        }
+        await waitForWebApp();
+        console.log('Приложение инициализировано');
+        
+        await loadEvents();
+        setupNavigation();
+        
     } catch (error) {
-        console.error('Ошибка загрузки города пользователя:', error);
-    } finally {
-        loadEvents();
+        console.error('Ошибка инициализации приложения:', error);
+        await loadEvents();
+        setupNavigation();
     }
 }
 
-// Настройка бесконечной прокрутки
-function setupInfiniteScroll() {
-    window.addEventListener('scroll', () => {
-        if (isLoading || !hasMoreEvents) return;
+document.addEventListener('DOMContentLoaded', initApp);
 
-        const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
-        
-        if (scrollTop + clientHeight >= scrollHeight - 100) {
-            loadMoreEvents();
-        }
-    });
-}
-
-// Загрузка мероприятий
 async function loadEvents() {
     try {
-        const response = await fetch(`${API_BASE_URL}/events?id=${getCurrentUser()}`, {
+        console.log('Загрузка мероприятий...');
+        const response = await fetch(`${API_BASE_URL}/events`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -66,19 +181,15 @@ async function loadEvents() {
         });
 
         if (!response.ok) {
-            throw new Error('Ошибка при загрузке мероприятий');
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
 
         const data = await response.json();
         
         if (data.status === 'ok') {
             currentEvents = data.events || [];
+            console.log(`Загружено мероприятий: ${currentEvents.length}`);
             displayEvents(currentEvents);
-            
-            // Если сохраненных событий мало, сразу загружаем дополнительные
-            if (currentEvents.length < 5 && userCity) {
-                loadMoreEvents();
-            }
         } else {
             throw new Error(data.error || 'Неизвестная ошибка');
         }
@@ -88,68 +199,13 @@ async function loadEvents() {
     }
 }
 
-// Загрузка дополнительных мероприятий
-async function loadMoreEvents() {
-    if (isLoading || !userCity || !hasMoreEvents) return;
-    
-    isLoading = true;
-    showLoadingIndicator();
-
-    try {
-        const response = await fetch(`${API_BASE_URL}/events?id=${getCurrentUser()}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                limit: limit,
-                skip: currentSkip
-            })
-        });
-
-        if (!response.ok) {
-            throw new Error('Ошибка при загрузке дополнительных мероприятий');
-        }
-
-        const data = await response.json();
-        
-        if (data.status === 'ok') {
-            const newEvents = data.events || [];
-            
-            if (newEvents.length > 0) {
-                currentEvents = [...currentEvents, ...newEvents];
-                displayEvents(currentEvents);
-                currentSkip += limit;
-                
-                // Если пришло меньше событий, чем запрошено, значит больше нет
-                if (newEvents.length < limit) {
-                    hasMoreEvents = false;
-                    hideLoadingIndicator();
-                    showNoMoreEvents();
-                }
-            } else {
-                hasMoreEvents = false;
-                showNoMoreEvents();
-            }
-        } else {
-            throw new Error(data.error || 'Неизвестная ошибка');
-        }
-    } catch (error) {
-        console.error('Ошибка загрузки дополнительных мероприятий:', error);
-        showMessage('Не удалось загрузить дополнительные мероприятия', 'error');
-    } finally {
-        isLoading = false;
-        hideLoadingIndicator();
-    }
-}
-
-// Отображение мероприятий
 function displayEvents(events) {
     const eventsList = document.getElementById('eventsList');
     
-    // Удаляем индикаторы загрузки если они есть
-    const existingIndicators = eventsList.querySelectorAll('.loading-indicator, .no-more-events');
-    existingIndicators.forEach(indicator => indicator.remove());
+    if (!eventsList) {
+        console.error('Элемент eventsList не найден');
+        return;
+    }
     
     if (!events || events.length === 0) {
         eventsList.innerHTML = `
@@ -171,61 +227,25 @@ function displayEvents(events) {
             </div>
             <h3 class="event-name">${escapeHtml(event.Name)}</h3>
             <div class="event-date">${formatDate(event.StartsAt)}</div>
-            <div class="event-url">
-                <a href="${event.Url}" target="_blank" onclick="event.stopPropagation()">
-                    ${event.Url}
-                </a>
-            </div>
+            <div class="event-url">${event.Url}</div>
         </div>
     `).join('');
-    
-    // Добавляем индикатор загрузки если есть еще события
-    if (hasMoreEvents && userCity) {
-        eventsList.innerHTML += `<div class="loading-indicator">Загрузка...</div>`;
-    }
 }
 
-// Показать индикатор загрузки
-function showLoadingIndicator() {
-    const eventsList = document.getElementById('eventsList');
-    const existingIndicator = eventsList.querySelector('.loading-indicator');
-    if (!existingIndicator) {
-        eventsList.innerHTML += `<div class="loading-indicator">Загрузка...</div>`;
-    }
-}
-
-// Скрыть индикатор загрузки
-function hideLoadingIndicator() {
-    const indicator = document.querySelector('.loading-indicator');
-    if (indicator) {
-        indicator.remove();
-    }
-}
-
-// Показать сообщение о том, что события закончились
-function showNoMoreEvents() {
-    const eventsList = document.getElementById('eventsList');
-    const existingMessage = eventsList.querySelector('.no-more-events');
-    if (!existingMessage) {
-        eventsList.innerHTML += `
-            <div class="no-more-events">
-                Все мероприятия загружены
-            </div>
-        `;
-    }
-}
-
-// Открытие модального окна с лобби
 async function openFlamesModal(eventId) {
-    selectedEventId = eventId;
-    
-    const event = currentEvents.find(e => e.ID === eventId);
-    if (event) {
-        document.getElementById('modalEventTitle').textContent = event.Name;
-    }
-    
     try {
-        const response = await fetch(`${API_BASE_URL}/flames?id=${getCurrentUser()}`, {
+        selectedEventId = eventId;
+        
+        const event = currentEvents.find(e => e.ID === eventId);
+        if (event) {
+            const modalEventTitle = document.getElementById('modalEventTitle');
+            if (modalEventTitle) {
+                modalEventTitle.textContent = event.Name;
+            }
+        }
+        
+        console.log('Загрузка лобби для мероприятия:', eventId);
+        const response = await fetch(`${API_BASE_URL}/flames`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -234,15 +254,20 @@ async function openFlamesModal(eventId) {
         });
 
         if (!response.ok) {
-            throw new Error('Ошибка при загрузке лобби');
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
 
         const data = await response.json();
         
         if (data.status === 'ok') {
             currentFlames = data.flames || [];
-            displayFlames(currentFlames);
-            document.getElementById('flamesModal').style.display = 'flex';
+            console.log(`Загружено лобби: ${currentFlames.length}`);
+            await displayFlames(currentFlames);
+            
+            const flamesModal = document.getElementById('flamesModal');
+            if (flamesModal) {
+                flamesModal.style.display = 'flex';
+            }
         } else {
             throw new Error(data.error || 'Неизвестная ошибка');
         }
@@ -252,17 +277,24 @@ async function openFlamesModal(eventId) {
     }
 }
 
-// Закрытие модального окна лобби
 function closeFlamesModal() {
-    document.getElementById('flamesModal').style.display = 'none';
+    const flamesModal = document.getElementById('flamesModal');
+    if (flamesModal) {
+        flamesModal.style.display = 'none';
+    }
     selectedEventId = null;
     currentFlames = [];
 }
 
-// Отображение лобби
-function displayFlames(flames) {
+async function displayFlames(flames) {
     const flamesList = document.getElementById('flamesList');
-    const currentUserId = getCurrentUser();
+    if (!flamesList) {
+        console.error('Элемент flamesList не найден');
+        return;
+    }
+    
+    const currentUserId = await getCurrentUser();
+    console.log('Текущий пользователь ID:', currentUserId);
     
     if (!flames || flames.length === 0) {
         flamesList.innerHTML = `
@@ -278,7 +310,7 @@ function displayFlames(flames) {
     }
 
     flamesList.innerHTML = flames.map(flame => {
-        const isOwnFlame = flame.user_id === currentUserId;
+        const isOwnFlame = flame.user_id == currentUserId;
         const userInitials = getInitials(flame.name, flame.surname);
         
         return `
@@ -308,10 +340,10 @@ function displayFlames(flames) {
     }).join('');
 }
 
-// Лайк пользователя
 async function likeUser(userId, button) {
     try {
-        const response = await fetch(`${API_BASE_URL}/like-user?id=${getCurrentUser()}`, {
+        console.log('Отправка лайка пользователю:', userId);
+        const response = await fetch(`${API_BASE_URL}/like-user`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -320,19 +352,21 @@ async function likeUser(userId, button) {
         });
 
         if (!response.ok) {
-            throw new Error('Ошибка при отправке лайка');
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
 
         const data = await response.json();
         
         if (data.status === 'ok') {
-            button.classList.add('liked');
-            button.innerHTML = '❤️ Лайк отправлен!';
-            button.disabled = true;
-            
-            setTimeout(() => {
-                button.style.opacity = '0.7';
-            }, 1000);
+            if (button) {
+                button.classList.add('liked');
+                button.innerHTML = '❤️ Лайк отправлен!';
+                button.disabled = true;
+                
+                setTimeout(() => {
+                    button.style.opacity = '0.7';
+                }, 1000);
+            }
             
             console.log('Лайк успешно отправлен пользователю:', userId);
         } else {
@@ -344,20 +378,34 @@ async function likeUser(userId, button) {
     }
 }
 
-// Открытие модального окна создания лобби
 function openCreateFlameModal() {
-    document.getElementById('createFlameModal').style.display = 'flex';
-    document.getElementById('flameDescription').value = '';
+    const createFlameModal = document.getElementById('createFlameModal');
+    const flameDescription = document.getElementById('flameDescription');
+    
+    if (createFlameModal) {
+        createFlameModal.style.display = 'flex';
+    }
+    
+    if (flameDescription) {
+        flameDescription.value = '';
+    }
 }
 
-// Закрытие модального окна создания лобби
 function closeCreateFlameModal() {
-    document.getElementById('createFlameModal').style.display = 'none';
+    const createFlameModal = document.getElementById('createFlameModal');
+    if (createFlameModal) {
+        createFlameModal.style.display = 'none';
+    }
 }
 
-// Создание лобби
 async function createFlame() {
-    const description = document.getElementById('flameDescription').value.trim();
+    const flameDescription = document.getElementById('flameDescription');
+    if (!flameDescription) {
+        showMessage('Элемент описания не найден', 'error');
+        return;
+    }
+    
+    const description = flameDescription.value.trim();
     
     if (!description) {
         showMessage('Введите описание лобби', 'error');
@@ -365,7 +413,8 @@ async function createFlame() {
     }
 
     try {
-        const response = await fetch(`${API_BASE_URL}/flame?id=${getCurrentUser()}`, {
+        console.log('Создание лобби для мероприятия:', selectedEventId);
+        const response = await fetch(`${API_BASE_URL}/flame`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -377,7 +426,7 @@ async function createFlame() {
         });
 
         if (!response.ok) {
-            throw new Error('Ошибка при создании лобби');
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
 
         const data = await response.json();
@@ -386,7 +435,6 @@ async function createFlame() {
             closeCreateFlameModal();
             console.log('Лобби успешно создано для мероприятия:', selectedEventId);
             
-            // Обновляем список лобби
             setTimeout(() => {
                 openFlamesModal(selectedEventId);
             }, 500);
@@ -399,19 +447,24 @@ async function createFlame() {
     }
 }
 
-// Вспомогательные функции
 function formatDate(dateString) {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('ru-RU', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-    });
+    try {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('ru-RU', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    } catch (error) {
+        console.error('Ошибка форматирования даты:', error);
+        return dateString;
+    }
 }
 
 function escapeHtml(text) {
+    if (!text) return '';
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
@@ -427,7 +480,6 @@ function showMessage(message, type = 'info') {
     console.log(`${type.toUpperCase()}: ${message}`);
 }
 
-// Настройка навигации
 function setupNavigation() {
     const profileButton = document.querySelector('.nav-button:nth-child(1)');
     const mainButton = document.querySelector('.main-button');
@@ -445,7 +497,6 @@ function setupNavigation() {
     }
 }
 
-// Закрытие модальных окон при клике вне их
 document.addEventListener('click', function(event) {
     const flamesModal = document.getElementById('flamesModal');
     const createFlameModal = document.getElementById('createFlameModal');

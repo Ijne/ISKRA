@@ -2,34 +2,30 @@ function getCurrentUser() {
     return 1;
 }
 
-// Функция для редиректа на нужные страницы
 function setupNavigation() {
-    // Получаем все кнопки навигации
-    const profileButton = document.querySelector('.nav-button:nth-child(1)'); // Профиль
-    const mainButton = document.querySelector('.main-button'); // Главная
-    const eventsButton = document.querySelector('.nav-button:nth-child(3)'); // Мероприятия
+    const profileButton = document.querySelector('.nav-button:nth-child(1)');
+    const mainButton = document.querySelector('.main-button');
+    const eventsButton = document.querySelector('.nav-button:nth-child(3)');
     
-    // Добавляем обработчики событий
     if (profileButton) {
         profileButton.addEventListener('click', function() {
-            window.location.href = 'profile.html'; // Редирект на страницу профиля
+            window.location.href = 'profile.html';
         });
     }
     
     if (mainButton) {
         mainButton.addEventListener('click', function() {
-            window.location.href = 'index.html'; // Редирект на главную страницу
+            window.location.href = 'index.html';
         });
     }
     
     if (eventsButton) {
         eventsButton.addEventListener('click', function() {
-            window.location.href = 'events.html'; // Редирект на страницу мероприятий
+            window.location.href = 'events.html';
         });
     }
 }
 
-// Запускаем настройку навигации когда DOM загружен
 document.addEventListener('DOMContentLoaded', function() {
     setupNavigation();
 });

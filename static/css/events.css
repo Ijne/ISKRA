@@ -156,7 +156,6 @@
     font-style: italic;
 }
 
-/* Модальные окна */
 .modal {
     display: none;
     position: fixed;
@@ -215,7 +214,6 @@
     padding: 20px 25px;
 }
 
-/* Стили для списка лобби */
 .flames-actions {
     margin-bottom: 20px;
 }
@@ -363,7 +361,6 @@
     box-shadow: 0 4px 15px rgba(255, 170, 0, 0.3);
 }
 
-/* Форма создания лобби */
 .form-group {
     margin-bottom: 20px;
 }
@@ -410,7 +407,6 @@
     box-shadow: 0 6px 20px rgba(255, 170, 0, 0.4);
 }
 
-/* Адаптивность */
 @media (max-width: 480px) {
     .events-container {
         padding: 10px;

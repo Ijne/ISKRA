@@ -1,17 +1,155 @@
-function getCurrentUser() {
-    return 96419039;
+let initData = null;
+let WebApp = null;
+
+function waitForWebApp() {
+    return new Promise((resolve, reject) => {
+        if (window.WebApp) {
+            WebApp = window.WebApp;
+            initData = window.WebApp?.initData;
+            resolve();
+            return;
+        }
+
+        let attempts = 0;
+        const maxAttempts = 50;
+        
+        const check = () => {
+            attempts++;
+            if (window.WebApp) {
+                WebApp = window.WebApp;
+                initData = window.WebApp?.initData;
+                console.log('WebApp загружен:', WebApp);
+                console.log('InitData:', initData);
+                resolve();
+            } else if (attempts < maxAttempts) {
+                setTimeout(check, 100);
+            } else {
+                console.warn('WebApp не загрузился, продолжаем без него');
+                resolve();
+            }
+        };
+        
+        check();
+    });
 }
 
-// Богатые наборы данных для капсул
+async function getCurrentUser() {
+    try {
+        await waitForWebApp();
+        
+        if (!initData) {
+            console.error('No init data found');
+            return 0;
+        }
+
+        let decodedString;
+        
+        if (typeof initData === 'object') {
+            const user = initData.user || initData;
+            return user.id || 0;
+        }
+        
+        if (typeof initData === 'string') {
+            decodedString = decodeURIComponent(initData);
+
+            const params = new URLSearchParams(decodedString);
+            const receivedHash = params.get('hash');
+            
+            if (!receivedHash) {
+                console.error('Hash not found in init data');
+                const userParam = params.get('user');
+                if (userParam) {
+                    try {
+                        const userData = JSON.parse(userParam);
+                        return userData.id || 0;
+                    } catch (e) {
+                        console.error('Error parsing user data:', e);
+                    }
+                }
+                return 0;
+            }
+
+            const userParam = params.get('user');
+            
+            const dataPairs = [];
+            for (const [key, value] of params) {
+                if (key !== 'hash') {
+                    dataPairs.push(`${key}=${value}`);
+                }
+            }
+            dataPairs.sort();
+            
+            const dataCheckString = dataPairs.join('\n');
+
+            const botToken = 'f9LHodD0cOLRQi29OdyXpiSqLM-SyPUJnePMbZQH3ceilC7cKmf12ib4C7Oeda975ZN_gzuX6fJmQVKE5j1e';
+            
+            const encoder = new TextEncoder();
+
+            const secretKey = await crypto.subtle.importKey(
+                'raw',
+                encoder.encode('WebAppData'),
+                { name: 'HMAC', hash: 'SHA-256' },
+                false,
+                ['sign']
+            );
+
+            const cryptoKey = await crypto.subtle.sign(
+                'HMAC',
+                secretKey,
+                encoder.encode(botToken)
+            );
+
+            const hmacKey = await crypto.subtle.importKey(
+                'raw',
+                cryptoKey,
+                { name: 'HMAC', hash: 'SHA-256' },
+                false,
+                ['sign']
+            );
+
+            const signature = await crypto.subtle.sign(
+                'HMAC',
+                hmacKey,
+                encoder.encode(dataCheckString)
+            );
+            
+            const calculatedHash = Array.from(new Uint8Array(signature))
+                .map(b => b.toString(16).padStart(2, '0'))
+                .join('');
+            
+
+            if (calculatedHash === receivedHash) {
+                
+                if (userParam) {
+                    try {
+                        const userData = JSON.parse(userParam);
+                        return userData.id || 0;
+                    } catch (parseError) {
+                        console.error('Error parsing user data:', parseError);
+                        return 0;
+                    }
+                }
+            } else {
+                return 0;
+            }
+        }
+        
+        return null;
+    } catch (error) {
+        console.error('Validation error:', error);
+        return null;
+    }
+}
+
 const capsuleData = {
-        career: ['IT и технологии', 'Дизайн и UX', 'Медицина', 'Образование', 'Бизнес', 'Финансы', 'Маркетинг', 'Искусство', 'Музыка', 'Кино', 'Фотография', 'Архитектура', 'Инженерия', 'Недвижимость', 'Юриспруденция', 'Психология'],
-        personality: ['Экстраверт', 'Интроверт', 'Амбиверт', 'Аналитик', 'Творец', 'Прагматик', 'Романтик', 'Реалист', 'Оптимист', 'Философ', 'Новатор', 'Лидер', 'Целеустремленный', 'Гибкий', 'Настойчивый', 'Командный'],
-        relationship: ['Серьезные отношения', 'Дружба', 'Несерьезные отношения', 'Создание семьи', 'Поиск партнера', 'Романтика', 'Деловое партнерство', 'Творчество', 'Путешествия', 'Совместные проекты', 'Духовность', 'Карьера'],
-        values: ['Любовь и забота', 'Семья', 'Карьера', 'Финансы', 'Духовность', 'Здоровье', 'Образование', 'Творчество', 'Свобода', 'Приключения', 'Безопасность', 'Экология'],
-        music: ['Поп', 'Рок', 'Хип-хоп', 'Электроника', 'Джаз', 'Классика', 'R&B', 'Метал', 'Инди', 'Фолк', 'Кантри', 'Регги', 'Блюз', 'Соул', 'Диско', 'Альтернатива', 'Рэп'],
-        movies: ['Комедия', 'Драма', 'Боевик', 'Триллер', 'Ужасы', 'Фантастика', 'Фэнтези', 'Мелодрама', 'Детектив', 'Приключения', 'Аниме', 'Документальный', 'Артхаус', 'Исторический', 'Криминал', 'Мюзикл'],
-        hobbies: ['Спорт', 'Путешествия', 'Кулинария', 'Фотография', 'Рисование', 'Танцы', 'Йога', 'Велоспорт', 'Гейминг', 'Чтение', 'Садоводство', 'Рукоделие', 'Музыка', 'Театр', 'Кино', 'Настолки', 'Рыбалка', 'Охота', 'Авто', 'Технологии'],
-        events: ['Концерты', 'Кино', 'Выставки', 'Театры', 'Фестивали', 'Спортивные события', 'Вечеринки', 'Клубы', 'Рестораны', 'Кафе', 'Пикники', 'Походы', 'Мастер-классы', 'Лекции', 'Йога-сессии', 'Танцы', 'Настольные игры', 'Караоке', 'Боулинг', 'Картинг']
+    career: ['IT и технологии', 'Дизайн и UX', 'Медицина', 'Образование', 'Бизнес', 'Финансы', 'Маркетинг', 'Искусство', 'Музыка', 'Кино', 'Фотография', 'Архитектура', 'Инженерия', 'Недвижимость', 'Юриспруденция', 'Психология'],
+    personality: ['Экстраверт', 'Интроверт', 'Амбиверт', 'Аналитик', 'Творец', 'Прагматик', 'Романтик', 'Реалист', 'Оптимист', 'Философ', 'Новатор', 'Лидер', 'Целеустремленный', 'Гибкий', 'Настойчивый', 'Командный'],
+    relationship: ['Серьезные отношения', 'Дружба', 'Несерьезные отношения', 'Создание семьи', 'Поиск партнера', 'Романтика', 'Деловое партнерство', 'Творчество', 'Путешествия', 'Совместные проекты', 'Духовность', 'Карьера'],
+    values: ['Любовь и забота', 'Семья', 'Карьера', 'Финансы', 'Духовность', 'Здоровье', 'Образование', 'Творчество', 'Свобода', 'Приключения', 'Безопасность', 'Экология'],
+    music: ['Поп', 'Рок', 'Хип-хоп', 'Электроника', 'Джаз', 'Классика', 'R&B', 'Метал', 'Инди', 'Фолк', 'Кантри', 'Регги', 'Блюз', 'Соул', 'Диско', 'Альтернатива', 'Рэп'],
+    movies: ['Комедия', 'Драма', 'Боевик', 'Триллер', 'Ужасы', 'Фантастика', 'Фэнтези', 'Мелодрама', 'Детектив', 'Приключения', 'Аниме', 'Документальный', 'Артхаус', 'Исторический', 'Криминал', 'Мюзикл'],
+    hobbies: ['Спорт', 'Путешествия', 'Кулинария', 'Фотография', 'Рисование', 'Танцы', 'Йога', 'Велоспорт', 'Гейминг', 'Чтение', 'Садоводство', 'Рукоделие', 'Музыка', 'Театр', 'Кино', 'Настолки', 'Рыбалка', 'Охота', 'Авто', 'Технологии'],
+    events: ['Концерты', 'Кино', 'Выставки', 'Театры', 'Фестивали', 'Спортивные события', 'Вечеринки', 'Клубы', 'Рестораны', 'Кафе', 'Пикники', 'Походы', 'Мастер-классы', 'Лекции', 'Йога-сессии', 'Танцы', 'Настольные игры', 'Караоке', 'Боулинг', 'Картинг']
 };
 
 let currentField = '';
@@ -27,11 +165,9 @@ const selectedItems = {
     events: []
 };
 
-// Данные о поле и предпочтительном поле
-let userGender = 0; // 0 - мужской, 1 - женский
-let preferredGender = 1; // 0 - мужчин, 1 - женщин, 2 - всех
+let userGender = 0;
+let preferredGender = 1;
 
-// Максимальное количество выборов для каждой категории
 const maxSelections = {
     career: 1,
     personality: 1,
@@ -43,13 +179,11 @@ const maxSelections = {
     events: 3
 };
 
-// Базовый URL API
-const API_BASE_URL = 'http://localhost:8080/profile?id=';
-
-// Функции для работы с API
 async function fetchUserProfile() {
     try {
-        const response = await fetch(API_BASE_URL + getCurrentUser(), {
+        const userId = await getCurrentUser();
+
+        const response = await fetch(`http://localhost:8080/profile?id=${userId}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
@@ -57,7 +191,7 @@ async function fetchUserProfile() {
         });
         
         if (!response.ok) {
-            throw new Error('Ошибка при загрузке профиля');
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
         
         const userData = await response.json();
@@ -71,7 +205,13 @@ async function fetchUserProfile() {
 
 async function updateUserProfile(profileData) {
     try {
-        const response = await fetch(`http://localhost:8080/updateuser?id=`+getCurrentUser(), {
+        const userId = await getCurrentUser();
+        console.log('Updating profile for user:', userId);
+        console.log('Profile data:', profileData);
+        
+        profileData.id = userId;
+
+        const response = await fetch(`http://localhost:8080/updateuser?id=${userId}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -80,20 +220,30 @@ async function updateUserProfile(profileData) {
         });
         
         if (!response.ok) {
-            throw new Error('Ошибка при обновлении профиля');
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
         
-        return await response.json();
+        const result = await response.json();
+        console.log('Profile updated successfully:', result);
+        return result;
     } catch (error) {
-        console.error('Ошибка обновления профиля:', error);
-        throw error;
+        
     }
 }
 
-// Преобразование данных из формата сервера в формат клиента
 function parseServerData(userData) {
-    // Преобразуем строки с разделителями в массивы
-    const parseArray = (str) => str ? str.split(',').map(item => item.trim()).filter(item => item) : [];
+    if (!userData) return {
+        name: '',
+        surname: '',
+        age: '',
+        city: '',
+        careerPlace: ''
+    };
+
+    const parseArray = (str) => {
+        if (!str || str === 'null' || str === 'undefined') return [];
+        return str.split(',').map(item => item.trim()).filter(item => item && item !== 'null' && item !== 'undefined');
+    };
     
     selectedItems.career = parseArray(userData.career_type).slice(0, maxSelections.career);
     selectedItems.personality = parseArray(userData.personality_type).slice(0, maxSelections.personality);
@@ -103,10 +253,9 @@ function parseServerData(userData) {
     selectedItems.hobbies = parseArray(userData.hobbies).slice(0, maxSelections.hobbies);
     selectedItems.movies = parseArray(userData.films).slice(0, maxSelections.movies);
     selectedItems.events = parseArray(userData.event_preferences).slice(0, maxSelections.events);
-    
-    // Обрабатываем пол и предпочтительный пол
-    userGender = userData.gender || 0;
-    preferredGender = userData.preferred_gender !== undefined ? userData.preferred_gender : 1;
+
+    userGender = userData.gender !== undefined ? parseInt(userData.gender) : 0;
+    preferredGender = userData.preferred_gender !== undefined ? parseInt(userData.preferred_gender) : 1;
     
     return {
         name: userData.name || '',
@@ -117,49 +266,51 @@ function parseServerData(userData) {
     };
 }
 
-// Преобразование данных из формата клиента в формат сервера
 function prepareDataForServer(profileData) {
     return {
         id: currentUserId,
-        name: profileData.name,
+        name: profileData.name || '',
         surname: profileData.surname || '',
         age: parseInt(profileData.age) || 0,
-        city: profileData.city,
+        city: profileData.city || '',
         gender: userGender,
         preferred_gender: preferredGender,
         career_place: profileData.careerPlace || '',
-        career_type: profileData.career.join(','),
-        personality_type: profileData.personality.join(','),
-        relationship_goal: profileData.relationship.join(','),
-        important_values: profileData.values.join(','),
-        music: profileData.music.join(','),
-        hobbies: profileData.hobbies.join(','),
-        films: profileData.movies.join(','),
-        event_preferences: profileData.events.join(',')
+        career_type: (selectedItems.career || []).join(','),
+        personality_type: (selectedItems.personality || []).join(','),
+        relationship_goal: (selectedItems.relationship || []).join(','),
+        important_values: (selectedItems.values || []).join(','),
+        music: (selectedItems.music || []).join(','),
+        hobbies: (selectedItems.hobbies || []).join(','),
+        films: (selectedItems.movies || []).join(','),
+        event_preferences: (selectedItems.events || []).join(',')
     };
 }
 
-// Загрузка данных профиля с сервера
 async function loadProfileData() {
-    const userData = await fetchUserProfile();
-    if (userData) {
+    try {
+        const userData = await fetchUserProfile();
         const parsedData = parseServerData(userData);
-        
-        // Обновляем интерфейс
-        document.getElementById('nameValue').textContent = parsedData.name;
-        document.getElementById('ageValue').textContent = parsedData.age ? parsedData.age + ' лет' : '';
-        document.getElementById('cityValue').textContent = parsedData.city;
-        
-        // Обновляем отображение пола
+
+        updateUIElement('nameValue', parsedData.name);
+        updateUIElement('ageValue', parsedData.age ? parsedData.age + ' лет' : '');
+        updateUIElement('cityValue', parsedData.city);
+
         updateGenderDisplay();
         updatePreferredGenderDisplay();
-        
-        // Обновляем выбранные капсулы для всех категорий
         updateAllSelectedCapsules();
+    } catch (error) {
+        console.error('Ошибка загрузки данных профиля:', error);
     }
 }
 
-// Обновление отображения пола
+function updateUIElement(elementId, value) {
+    const element = document.getElementById(elementId);
+    if (element) {
+        element.textContent = value;
+    }
+}
+
 function updateGenderDisplay() {
     const genderValue = document.getElementById('genderValue');
     if (genderValue) {
@@ -167,7 +318,6 @@ function updateGenderDisplay() {
     }
 }
 
-// Обновление отображения предпочтительного пола
 function updatePreferredGenderDisplay() {
     const preferredGenderValue = document.getElementById('preferredGenderValue');
     if (preferredGenderValue) {
@@ -187,54 +337,45 @@ function updatePreferredGenderDisplay() {
     }
 }
 
-// Обновление ВСЕХ выбранных капсул в интерфейсе (только при загрузке)
 function updateAllSelectedCapsules() {
     Object.keys(selectedItems).forEach(category => {
         updateSelectedCapsulesForCategory(category);
     });
 }
 
-// Обновление выбранных капсул для КОНКРЕТНОЙ категории
 function updateSelectedCapsulesForCategory(category) {
     const grid = document.getElementById(`${category}Grid`);
     const tagsContainer = document.getElementById(`${category}Tags`);
     
     if (!grid || !tagsContainer) return;
-    
-    // Очищаем контейнер тегов
+
     tagsContainer.innerHTML = '';
-    
-    // Добавляем теги для выбранных элементов
+
     selectedItems[category].forEach(item => {
         addTag(category, item, tagsContainer);
     });
-    
-    // Обновляем состояние капсул
+
     const capsules = grid.querySelectorAll('.capsule');
     capsules.forEach(capsule => {
         const capsuleText = capsule.textContent;
-        
-        // Сбрасываем класс selected
-        capsule.classList.remove('selected');
-        
-        // Добавляем класс selected только если элемент выбран
+
+        capsule.classList.remove('selected', 'disabled');
+
         if (selectedItems[category].includes(capsuleText)) {
             capsule.classList.add('selected');
         }
-        
-        // Для категорий с ограничением показываем, если достигнут лимит
+
         if (selectedItems[category].length >= maxSelections[category] && 
             !selectedItems[category].includes(capsuleText)) {
             capsule.classList.add('disabled');
-        } else {
-            capsule.classList.remove('disabled');
         }
     });
 }
 
-// Переключение раскрытия/скрытия
 function toggleExpand(gridId, button) {
     const grid = document.getElementById(gridId);
+    if (!grid) return;
+
     const isExpanded = grid.classList.contains('expanded');
     
     if (isExpanded) {
@@ -244,91 +385,77 @@ function toggleExpand(gridId, button) {
         grid.classList.add('expanded');
         button.querySelector('span:first-child').textContent = 'Скрыть';
     }
-    
-    // Анимируем иконку
+
     const icon = button.querySelector('.expand-icon');
-    icon.style.transform = isExpanded ? 'rotate(0deg)' : 'rotate(180deg)';
+    if (icon) {
+        icon.style.transform = isExpanded ? 'rotate(0deg)' : 'rotate(180deg)';
+    }
 }
 
-// Инициализация капсул
-function initCapsules() {
-    Object.keys(capsuleData).forEach(category => {
-        const grid = document.getElementById(`${category}Grid`);
-        const tagsContainer = document.getElementById(`${category}Tags`);
+async function initCapsules() {
+    try {
+        await waitForWebApp();
         
-        if (!grid) {
-            console.error(`Element with id ${category}Grid not found`);
-            return;
-        }
-        
-        // Перемешиваем массив для случайного порядка
-        const shuffledItems = [...capsuleData[category]].sort(() => Math.random() - 0.5);
-        
-        shuffledItems.forEach(item => {
-            const capsule = document.createElement('div');
-            capsule.className = 'capsule';
-            capsule.textContent = item;
+        Object.keys(capsuleData).forEach(category => {
+            const grid = document.getElementById(`${category}Grid`);
+            const tagsContainer = document.getElementById(`${category}Tags`);
             
-            capsule.addEventListener('click', () => toggleCapsule(category, item, capsule, tagsContainer));
-            grid.appendChild(capsule);
+            if (!grid) {
+                console.warn(`Element with id ${category}Grid not found`);
+                return;
+            }
+
+            const shuffledItems = [...capsuleData[category]].sort(() => Math.random() - 0.5);
+            
+            shuffledItems.forEach(item => {
+                const capsule = document.createElement('div');
+                capsule.className = 'capsule';
+                capsule.textContent = item;
+                
+                capsule.addEventListener('click', () => toggleCapsule(category, item, capsule, tagsContainer));
+                grid.appendChild(capsule);
+            });
         });
-    });
-    
-    // Загружаем данные профиля после инициализации капсул
-    loadProfileData();
-    
-    // Делаем имя и город неизменяемыми
-    makeFieldsReadonly();
+
+        await loadProfileData();
+        makeNameFieldReadonly();
+
+    } catch (error) {
+        console.error('Ошибка инициализации капсул:', error);
+    }
 }
 
-// Делаем поля имя и город неизменяемыми
-function makeFieldsReadonly() {
-    const nameField = document.querySelector('[onclick="openModal(\'name\')"]');
-    const cityField = document.querySelector('[onclick="openModal(\'city\')"]');
-    
+function makeNameFieldReadonly() {
+    const nameField = document.querySelector('.readonly-field');
     if (nameField) {
         nameField.style.pointerEvents = 'none';
         nameField.style.opacity = '0.7';
         nameField.style.cursor = 'default';
         nameField.title = 'Имя нельзя изменить';
     }
-    
-    if (cityField) {
-        cityField.style.pointerEvents = 'none';
-        cityField.style.opacity = '0.7';
-        cityField.style.cursor = 'default';
-        cityField.title = 'Город нельзя изменить';
-    }
 }
 
-// Переключение капсулы - с учетом ограничений
 function toggleCapsule(category, text, capsule, tagsContainer) {
     const maxSelect = maxSelections[category];
     const currentSelected = selectedItems[category];
-    
-    // Если уже выбран этот элемент - убираем его
+
     if (currentSelected.includes(text)) {
         selectedItems[category] = currentSelected.filter(item => item !== text);
     } 
-    // Если можно добавить еще элементы
     else if (currentSelected.length < maxSelect) {
-        // Для категорий с одним выбором заменяем, для нескольких добавляем
         if (maxSelect === 1) {
             selectedItems[category] = [text];
         } else {
             selectedItems[category] = [...currentSelected, text];
         }
     }
-    // Если достигнут лимит - ничего не делаем
     else {
         return;
     }
-    
-    // Обновляем отображение ТОЛЬКО для этой категории
+
     updateSelectedCapsulesForCategory(category);
 }
 
-// Добавление тега с возможностью удаления
 function addTag(category, text, container) {
     const tag = document.createElement('div');
     tag.className = 'selected-tag';
@@ -339,19 +466,16 @@ function addTag(category, text, container) {
     container.appendChild(tag);
 }
 
-// Удаление тега
 function removeTag(category, text) {
     selectedItems[category] = selectedItems[category].filter(item => item !== text);
     updateSelectedCapsulesForCategory(category);
 }
 
-// Функции для работы с модальными окнами пола
 function openGenderModal() {
     const modal = document.getElementById('genderModal');
     if (modal) {
         modal.style.display = 'flex';
         
-        // Подсвечиваем текущий выбор
         const options = modal.querySelectorAll('.gender-option');
         options.forEach(option => option.classList.remove('selected'));
         
@@ -381,7 +505,6 @@ function openPreferredGenderModal() {
     if (modal) {
         modal.style.display = 'flex';
         
-        // Подсвечиваем текущий выбор
         const options = modal.querySelectorAll('.gender-option');
         options.forEach(option => option.classList.remove('selected'));
         options[preferredGender].classList.add('selected');
@@ -401,10 +524,8 @@ function selectPreferredGender(gender, label) {
     closePreferredGenderModal();
 }
 
-// Модальное окно - только для возраста
 function openModal(field) {
-    // Блокируем открытие модального окна для имени и города
-    if (field === 'name' || field === 'city') {
+    if (field === 'name') {
         return;
     }
     
@@ -414,7 +535,8 @@ function openModal(field) {
     const input = document.getElementById('modalInput');
     
     const fieldTitles = {
-        age: 'Возраст'
+        age: 'Возраст',
+        city: 'Город'
     };
     
     if (!modal || !title || !input) {
@@ -426,7 +548,11 @@ function openModal(field) {
     
     const valueElement = document.getElementById(`${field}Value`);
     if (valueElement) {
-        input.value = valueElement.textContent.replace(' лет', '');
+        if (field === 'age') {
+            input.value = valueElement.textContent.replace(' лет', '');
+        } else {
+            input.value = valueElement.textContent;
+        }
     }
     
     input.placeholder = `Введите ${fieldTitles[field].toLowerCase()}`;
@@ -453,6 +579,8 @@ function saveField() {
     
     if (currentField === 'age') {
         valueElement.textContent = value + ' лет';
+    } else if (currentField === 'city') {
+        valueElement.textContent = value;
     }
     
     closeModal();
@@ -465,28 +593,20 @@ async function saveProfile() {
             age: document.getElementById('ageValue')?.textContent.replace(' лет', '') || '',
             city: document.getElementById('cityValue')?.textContent || '',
             careerPlace: '',
-            career: selectedItems.career,
-            personality: selectedItems.personality,
-            relationship: selectedItems.relationship,
-            values: selectedItems.values,
-            music: selectedItems.music,
-            hobbies: selectedItems.hobbies,
-            movies: selectedItems.movies,
-            events: selectedItems.events
+            gender: userGender,
+            preferredGender: preferredGender
         };
         
         const serverData = prepareDataForServer(profileData);
         
         await updateUserProfile(serverData);
         
-        //alert('Профиль успешно сохранен!');
+        console.log('Профиль успешно сохранен!');
     } catch (error) {
-        //console.error('Ошибка при сохранении профиля:', error);
-        //alert('Ошибка при сохранении профиля. Попробуйте еще раз.');
+        console.error('Ошибка при сохранении профиля:', error);
     }
 }
 
-// Инициализация при загрузке DOM
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initCapsules);
 } else {

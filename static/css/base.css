@@ -9,13 +9,12 @@ body {
     background: linear-gradient(135deg, #0a0a0a 0%, #1a0f00 100%);
     color: #fff;
     min-height: 100vh;
-    /* УБИРАЕМ overflow: hidden - он обрезает контент */
 }
 
 main {
-    min-height: calc(100vh - 80px); /* Высота минус навигация */
+    min-height: calc(100vh - 80px);
     padding-bottom: 20px;
-    overflow-y: auto; /* Добавляем скролл только для main */
+    overflow-y: auto;
 }
 
 .bottom-nav {
