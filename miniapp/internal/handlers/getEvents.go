@@ -24,7 +24,7 @@ func GetEventsHandler(s *postgres.Storage, t *timepad.TimepadPoller) http.Handle
 					response.Response
 					models.ManyEventsResponse
 				}{
-					response.Error("Server error"),
+					response.Ok(),
 					models.ManyEventsResponse{Events: nil},
 				})
 				return

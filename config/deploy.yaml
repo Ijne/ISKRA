@@ -2,24 +2,22 @@ server:
   address: 0.0.0.0:8080
 
 bot:
-  host: localhost
-  port: 8090
+  username: "t21_hakaton_bot"
 
 mini-app:
+  proto: http
   host: localhost
   port: 8080
-  static-path: "miniapp/internal/static/"
-  templates-path: "miniapp/internal/templates/"
 
 postgres:
-  host: iskra-postgres-2
+  host: postgres
   port: 5432
   database: postgres
   ssl_mode: disable
 
 memgraph:
   protocol: bolt
-  host: iskra-memgraph
+  host: memgraph
   port: 7687
 
 jwt:
