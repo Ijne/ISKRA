@@ -3,6 +3,7 @@ package matches
 import (
 	"database/sql"
 	"iskra/shared/models"
+	"log"
 )
 
 type MatchesRepo struct {
@@ -16,7 +17,7 @@ func New(db *sql.DB) (*MatchesRepo, error) {
 }
 
 func (r *MatchesRepo) CreateTable() error {
-	// const op = "postgres.user.create_table"
+	const op = "postgres.matches.create_table"
 
 	stmt := `
 		CREATE TABLE IF NOT EXISTS matches (
@@ -27,10 +28,14 @@ func (r *MatchesRepo) CreateTable() error {
 	`
 
 	_, err := r.db.Exec(stmt)
+	if err != nil {
+		log.Printf("%s: %v", op, err)
+	}
 	return err
 }
 
 func (r *MatchesRepo) Exists(mothID int64, lightID int64) bool {
+	const op = "postgres.matches.exists"
 	stmt, err := r.db.Prepare(`
 		SELECT EXISTS(
 			SELECT 1 FROM matches
@@ -38,39 +43,51 @@ func (r *MatchesRepo) Exists(mothID int64, lightID int64) bool {
 		)
 	`)
 	if err != nil {
+		log.Printf("%s: %v", op, err)
 		return false
 	}
 
 	var val bool
 	err = stmt.QueryRow(mothID, lightID).Scan(&val)
 	if err != nil {
+		log.Printf("%s: %v", op, err)
 		return false
 	}
 	return val
 }
 
 func (r *MatchesRepo) Create(match models.MatchDB) error {
+	const op = "postgres.matches.create"
 	stmt, err := r.db.Prepare(`
 		INSERT INTO matches (user1, user2)
 		VALUES ($1, $2)
 	`)
 	if err != nil {
+		log.Printf("%s: %v", op, err)
 		return err
 	}
 
 	_, err = stmt.Exec(match.MothID, match.LightID)
+	if err != nil {
+		log.Printf("%s: %v", op, err)
+	}
 	return err
 }
 
 func (r *MatchesRepo) Delete(mothID int64, lightID int64) error {
+	const op = "postgres.matches.delete"
 	stmt, err := r.db.Prepare(`
 		DELETE FROM matches
 		WHERE user1 = $1 AND user2 = $2
 	`)
 	if err != nil {
+		log.Printf("%s: %v", op, err)
 		return err
 	}
 
 	_, err = stmt.Exec(mothID, lightID)
+	if err != nil {
+		log.Printf("%s: %v", op, err)
+	}
 	return err
 }

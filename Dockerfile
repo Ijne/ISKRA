@@ -14,7 +14,7 @@ COPY main/ ./main/
 COPY miniapp/ ./miniapp/
 COPY bot/ ./bot/
 COPY shared/ ./shared/
-COPY config/ ./config/
+# COPY config/ ./config/
 
 # Собираем приложение
 # RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main ./main/cmd
@@ -22,18 +22,20 @@ COPY config/ ./config/
 RUN CGO_ENABLED=0 GOOS=linux go build -o main ./main/cmd/main.go
 
 # runner stage
-FROM alpine:latest
+FROM alpine:3.22
 
 # Устанавливаем зависимости времени выполнения (если нужны)
 # RUN apk --no-cache add ca-certificates
 
-WORKDIR /root/
+WORKDIR /root
 
 # COPY --from=builder /app/main/cmd/main .
 COPY --from=builder /app/main .
-COPY config ./config/
+# COPY ./config/local.yaml ./config/
+COPY ./config/deploy.yaml ./config/local.yaml
 
 EXPOSE 8080
 
 # Команда для запуска
-CMD ["./main"]
+CMD [ "./main" ]
+# CMD [ "tree" ]

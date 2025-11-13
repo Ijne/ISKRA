@@ -2,7 +2,6 @@ package miniapp
 
 import (
 	"context"
-	"fmt"
 	"iskra/bot"
 	"iskra/miniapp/internal/handlers"
 	"iskra/miniapp/internal/middleware"
@@ -53,8 +52,8 @@ func New(cfg *config.Config, s *postgres.Storage, g *memgraph.Storage, bot *bot.
 
 	// r.Handle("/static/*", http.StripPrefix("/static/", fs))
 	// old routes
-	r.Handle("/start", http.HandlerFunc(handlers.StartScreenHandler(cfg)))
-	r.Handle("/", http.HandlerFunc(handlers.HomepageScreenHandler(cfg)))
+	// r.Handle("/start", http.HandlerFunc(handlers.StartScreenHandler(cfg)))
+	// r.Handle("/", http.HandlerFunc(handlers.HomepageScreenHandler(cfg)))
 	r.Handle("/profile", http.HandlerFunc(handlers.ProfileScreenHandler(cfg, s)))
 	r.Handle("/createuser", http.HandlerFunc(handlers.CreateUserHandler(cfg, s, g)))
 	r.Handle("/updateuser", http.HandlerFunc(handlers.UpdateUserHandler(cfg, s, g)))
@@ -77,7 +76,7 @@ func (m *Miniapp) Listen() chan bool {
 	done := make(chan bool)
 	go func() {
 		log.Println("Start serving...")
-		if err := http.ListenAndServe(fmt.Sprintf("%s:%s", m.cfg.MiniApp.Host, m.cfg.MiniApp.Port), m.router); err != nil {
+		if err := http.ListenAndServe(m.cfg.Server.Address, m.router); err != nil {
 			log.Println(err)
 		}
 		done <- true

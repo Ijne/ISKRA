@@ -1,0 +1,29 @@
+services:
+
+  server:
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+      - memgraph
+    env_file:
+      - "./config/.env"
+    # environment:
+    #   - CONFIG_PATH="./config/deploy.yaml"
+
+  postgres:
+    image: "postgres:13.22-alpine3.22"
+    ports:
+      - "5433:5432"
+    env_file:
+      - "./postgres.env"
+    # volumes:
+    #   - ./data/postgres:/var/lib/postgresql/data
+  
+  memgraph:
+    image: "memgraph/memgraph:latest"
+    # volumes:
+    #   - ./data/memgraph/lib:/var/lib/memgraph
+    #   - ./data/memgraph/log:/var/log/memgraph
+    #   - ./memgraph-import:/import
