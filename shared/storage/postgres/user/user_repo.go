@@ -144,8 +144,9 @@ func (r *UserRepo) UpdateUser(user models.UserDB) error {
             music = $9, 
             films = $10, 
             hobbies = $11, 
-            event_preferences = $12
-        WHERE id = $13
+            event_preferences = $12,
+			gender = $13
+        WHERE id = $14
     `)
 	if err != nil {
 		log.Printf("%s: %v", op, err)
@@ -166,6 +167,7 @@ func (r *UserRepo) UpdateUser(user models.UserDB) error {
 		user.Films,
 		user.Hobbies,
 		user.EventPreferences,
+		user.Gender,
 		user.ID,
 	)
 	if err != nil {

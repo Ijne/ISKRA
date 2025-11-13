@@ -2,6 +2,7 @@ package socialweb
 
 import (
 	"context"
+	"fmt"
 	"iskra/shared/models"
 	"iskra/shared/storage/repos"
 	"strings"
@@ -39,7 +40,11 @@ func (r *SocialWebRepo) CreateUser(user models.UserCreate) error {
 				lastLimitUpdate: toString(datetime()),
 				maxLimit: 30,
 				refreshAmount: 5,
-				refreshRate: "PT1H"
+				refreshRate: "PT1H",
+				music: $music_string,
+				films: $films_string,
+				hobbies: $hobbies_string,
+				event_preferences: $events_string
 			})
 		`
 		query2 := `	
@@ -79,21 +84,25 @@ func (r *SocialWebRepo) CreateUser(user models.UserCreate) error {
 		`
 
 		params := map[string]interface{}{
-			"id":       user.ID,
-			"name":     user.Name,
-			"username": user.Username,
-			"age":      user.Age,
-			"city":     user.City,
-			"gender":   user.Gender,
-			"p_g":      user.PreferredGender,
-			"c_t":      user.CareerType,
-			"p_t":      user.PersonalityType,
-			"r_g":      user.RelationshipGoal,
-			"i_v":      user.ImportantValues,
-			"music":    strings.Split(user.Music, ","),
-			"films":    strings.Split(user.Films, ","),
-			"hobbies":  strings.Split(user.Hobbies, ","),
-			"events":   strings.Split(user.EventPreferences, ","),
+			"id":             user.ID,
+			"name":           user.Name,
+			"username":       user.Username,
+			"age":            user.Age,
+			"city":           user.City,
+			"gender":         user.Gender,
+			"p_g":            user.PreferredGender,
+			"c_t":            user.CareerType,
+			"p_t":            user.PersonalityType,
+			"r_g":            user.RelationshipGoal,
+			"i_v":            user.ImportantValues,
+			"music":          strings.Split(user.Music, ","),
+			"films":          strings.Split(user.Films, ","),
+			"hobbies":        strings.Split(user.Hobbies, ","),
+			"events":         strings.Split(user.EventPreferences, ","),
+			"music_string":   user.Music,
+			"films_string":   user.Films,
+			"hobbies_string": user.Hobbies,
+			"events_string":  user.EventPreferences,
 		}
 
 		result, err := tx.Run(context.Background(), query1, params)
@@ -317,7 +326,7 @@ func (r *SocialWebRepo) GetRecommendations(id int64) ([]models.UserResponse, err
                 -(abs(me.age - candidate.age) * 0.5) AS age_penalty
 
             WITH candidate, city, (event_score + city_score + taste_score + age_penalty) AS total_score
-            WHERE total_score >= $tier1_min_score
+            WHERE total_score >= -100000
 
             RETURN 
                 candidate.id AS id,
@@ -339,7 +348,7 @@ func (r *SocialWebRepo) GetRecommendations(id int64) ([]models.UserResponse, err
                 candidate.event_preferences AS event_preferences,
                 total_score AS match_score
             ORDER BY total_score DESC
-            LIMIT $limit
+            LIMIT 50
         `
 
 		result, err := tx.Run(context.Background(), query, params)
@@ -360,6 +369,7 @@ func (r *SocialWebRepo) GetRecommendations(id int64) ([]models.UserResponse, err
 				if idInt, ok := idVal.(int64); ok {
 					user.ID = idInt
 				}
+				print(user.ID)
 			}
 
 			if username, ok := record.Get("username"); ok {
@@ -432,6 +442,10 @@ func (r *SocialWebRepo) GetRecommendations(id int64) ([]models.UserResponse, err
 
 			if eventPreferences, ok := record.Get("event_preferences"); ok {
 				user.EventPreferences, _ = eventPreferences.(string)
+			}
+
+			if matchScore, ok := record.Get("match_score"); ok {
+				fmt.Println(matchScore)
 			}
 
 			users = append(users, user)

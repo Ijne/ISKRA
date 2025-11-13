@@ -52,8 +52,6 @@ func New(cfg *config.Config, s *postgres.Storage, g *memgraph.Storage, bot *bot.
 
 	// r.Handle("/static/*", http.StripPrefix("/static/", fs))
 	// old routes
-	// r.Handle("/start", http.HandlerFunc(handlers.StartScreenHandler(cfg)))
-	// r.Handle("/", http.HandlerFunc(handlers.HomepageScreenHandler(cfg)))
 	r.Handle("/profile", http.HandlerFunc(handlers.ProfileScreenHandler(cfg, s)))
 	r.Handle("/createuser", http.HandlerFunc(handlers.CreateUserHandler(cfg, s, g)))
 	r.Handle("/updateuser", http.HandlerFunc(handlers.UpdateUserHandler(cfg, s, g)))
