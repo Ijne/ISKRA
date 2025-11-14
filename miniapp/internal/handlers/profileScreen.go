@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"iskra/miniapp/internal/tools/image"
 	"iskra/shared/config"
 	"iskra/shared/storage/postgres"
 	"log"
@@ -26,6 +27,8 @@ func ProfileScreenHandler(cfg *config.Config, s *postgres.Storage) http.HandlerF
 				log.Printf("ERROR FROM[ProfileScreenHandler] GetUser err: %s", err)
 				return
 			}
+
+			user.Photo = image.GetUserPhoto(user.Photo)
 
 			if err := json.NewEncoder(w).Encode(user); err != nil {
 				log.Printf("ERROR FROM[ProfileScreenHandler] json encode err: %s", err)

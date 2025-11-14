@@ -85,7 +85,7 @@ body {
     flex-direction: column;
 }
 
-/* Стили для загрузки фото */
+
 .photo-upload-section {
     display: flex;
     justify-content: center;
@@ -714,7 +714,7 @@ body {
     }
 }
 
-/* Анимации для искры */
+
 .spark-container {
     position: relative;
     width: 140px;
@@ -929,7 +929,7 @@ body {
     box-shadow: 0 0 10px #ffaa00;
 }
 
-/* Адаптивность для мобильных */
+
 @media (max-width: 480px) {
     .onboarding-screen {
         padding: 15px;
@@ -985,7 +985,7 @@ body {
         min-width: calc(50% - 8px);
     }
     
-    /* Адаптивность для фото */
+   
     .photo-preview {
         height: 400px;
         max-width: 225px;
@@ -1012,7 +1012,7 @@ body {
         max-height: 250px;
     }
     
-    /* Адаптивность для фото на маленьких экранах */
+   
     .photo-preview {
         height: 350px;
         max-width: 197px;

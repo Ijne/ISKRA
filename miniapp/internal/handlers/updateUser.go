@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"iskra/miniapp/internal/tools/image"
 	"iskra/shared/config"
 	"iskra/shared/models"
 	"iskra/shared/storage/memgraph"
@@ -22,7 +23,7 @@ func UpdateUserHandler(cfg *config.Config, s *postgres.Storage, g *memgraph.Stor
 				return
 			}
 
-			path, err := SaveUserAvatar(user.ID, user.Photo)
+			path, err := image.SaveUserAvatar(user.ID, user.Photo)
 			if err != nil {
 				log.Printf("ERROR FROM[UpdateUserHandler] SaveUserAvatart err: %s\n", err)
 			}

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"iskra/shared/models"
 	"iskra/shared/storage/repos"
+	"iskra/shared/tools/image"
 	"strings"
 
 	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
@@ -451,6 +452,7 @@ func (r *SocialWebRepo) GetRecommendations(id int64) ([]models.UserResponse, err
 
 			if photo, ok := record.Get("photo"); ok {
 				user.Photo, _ = photo.(string)
+				user.Photo = image.GetUserPhoto(user.Photo)
 			}
 
 			if matchScore, ok := record.Get("match_score"); ok {

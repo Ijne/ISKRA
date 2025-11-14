@@ -34,7 +34,7 @@
     backdrop-filter: blur(10px);
 }
 
-/* Стили для секции фото */
+
 .photo-section {
     margin-bottom: 25px;
     text-align: center;
@@ -421,7 +421,7 @@
     box-shadow: 0 6px 20px rgba(255, 170, 0, 0.4);
 }
 
-/* Модальные окна */
+
 .profile-modal {
     display: none;
     position: fixed;
@@ -491,7 +491,7 @@
     transform: translateY(-1px);
 }
 
-/* Стили для выбора пола */
+
 .gender-options {
     display: flex;
     flex-direction: column;
@@ -535,7 +535,7 @@
     color: white;
 }
 
-/* Стили для загрузки фото в модальном окне */
+
 .photo-upload-area {
     width: 100%;
     height: 200px;
@@ -613,7 +613,7 @@
     font-weight: 500;
 }
 
-/* Стили для превью фото в модальном окне */
+
 .photo-preview-container {
     width: 100%;
     height: 400px;
@@ -673,7 +673,7 @@
     border-radius: 1px;
 }
 
-/* Адаптивность */
+
 @media (max-width: 480px) {
     .basic-info-fields {
         grid-template-columns: 1fr;
@@ -729,7 +729,7 @@
     }
 }
 
-/* Иконки навигации */
+
 .profile-icon {
     width: 28.77px;
     height: 28px;
@@ -763,7 +763,7 @@
     display: block;
 }
 
-/* Стили для нижней навигации */
+
 .bottom-nav {
     position: fixed;
     bottom: 0;
@@ -834,7 +834,7 @@
     height: 32px;
 }
 
-/* Базовые стили для body */
+
 body {
     margin: 0;
     padding: 0;
@@ -844,7 +844,7 @@ body {
     min-height: 100vh;
 }
 
-/* Стили для скроллбара */
+
 ::-webkit-scrollbar {
     width: 6px;
 }
@@ -863,7 +863,7 @@ body {
     background: rgba(255, 170, 0, 0.5);
 }
 
-/* Анимации */
+
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -879,7 +879,7 @@ body {
     animation: fadeIn 0.5s ease;
 }
 
-/* Утилитарные классы */
+
 .full-width {
     grid-column: 1 / -1;
 }
@@ -900,7 +900,7 @@ body {
     display: none;
 }
 
-/* Состояния загрузки */
+
 .loading {
     opacity: 0.7;
     pointer-events: none;
@@ -932,7 +932,7 @@ body {
     padding-bottom: 14px;
 }
 
-/* Добавь в конец CSS файла */
+
 .photo-change-small-btn {
     background: rgba(255, 170, 0, 0.1);
     border: 1px solid rgba(255, 170, 0, 0.3);
