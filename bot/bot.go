@@ -255,7 +255,7 @@ func (b *Bot) ListenUpdates() chan bool {
 	return done
 }
 
-func (b *Bot) SendMessage(chatID int64, msg string) error {
+func (b *Bot) SendMessage(userID int64, msg string) error {
 	url := fmt.Sprintf("%s/messages", b.BaseURL)
 
 	data := models.MessageRequest{Text: msg}
@@ -270,7 +270,7 @@ func (b *Bot) SendMessage(chatID int64, msg string) error {
 	}
 
 	q := req.URL.Query()
-	q.Add("chat_id", fmt.Sprintf("%d", chatID))
+	q.Add("user_id", fmt.Sprintf("%d", userID))
 	req.Header.Add("Authorization", b.Token)
 
 	req.URL.RawQuery = q.Encode()
@@ -282,6 +282,11 @@ func (b *Bot) SendMessage(chatID int64, msg string) error {
 
 	if resp.StatusCode != http.StatusOK {
 		log.Println("bot: message is not sent")
+		var body []byte
+		resp.Body.Read(body)
+		log.Printf("%v\n", body)
+		log.Printf("status: %d\n", resp.StatusCode)
+		log.Printf("query: %s\n", req.URL.RawQuery)
 	}
 	return nil
 }

@@ -29,49 +29,80 @@ func LikeUserHandler(s *postgres.Storage, b *bot.Bot) http.HandlerFunc {
 			return
 		}
 
-		// произошёл ли match
-		haveMatch := s.MatchesRepo.Exists(req.LightID, userID)
-		log.Printf("Before match: %v\n", haveMatch)
-		if haveMatch {
-			// с помощью бота рассылаем ники
-			if b != nil {
-				user1, err := s.UserRepo.GetUser(userID)
-				if err != nil {
-					log.Println("error while getting user1")
-					render.JSON(w, r, response.Error("Server error"))
-					return
-				}
-				user2, err := s.UserRepo.GetUser(req.LightID)
-				if err != nil {
-					log.Println("error while getting user2")
-					render.JSON(w, r, response.Error("Server error"))
-					return
-				}
-
-				b.SendNick(user1.ID, user2.Username)
-				b.SendNick(user2.ID, user1.Username)
-			}
-
-			s.MatchesRepo.Delete(req.LightID, userID)
-			s.MatchesRepo.Delete(userID, req.LightID)
-
-			render.JSON(w, r, response.Ok())
-			return
-		}
-
-		// лишний раз не сохраняем данные в бд
-		exists := s.MatchesRepo.Exists(userID, req.LightID)
+		// лишний раз не делаем рассылку
+		exists := s.MatchesRepo.FlamesExists(userID, req.LightID)
 		if exists {
 			render.JSON(w, r, response.Ok())
 			return
 		}
 
-		err = s.MatchesRepo.Create(models.MatchDB{MothID: userID, LightID: req.LightID})
+		err = s.MatchesRepo.FlamesCreate(models.MatchDB{MothID: userID, LightID: req.LightID})
 		if err != nil {
 			log.Printf("Error while createing match: %v\n", err)
 			render.JSON(w, r, response.Error("Server error"))
 			return
 		}
+
+		// с помощью бота рассылаем ники
+		if b != nil {
+			user1, err := s.UserRepo.GetUser(userID)
+			if err != nil {
+				log.Println("error while getting user1")
+				render.JSON(w, r, response.Error("Server error"))
+				return
+			}
+			user2, err := s.UserRepo.GetUser(req.LightID)
+			if err != nil {
+				log.Println("error while getting user2")
+				render.JSON(w, r, response.Error("Server error"))
+				return
+			}
+
+			b.SendNick(user1.ID, user2.Username)
+			b.SendNick(user2.ID, user1.Username)
+		}
+		// haveMatch := s.MatchesRepo.Exists(req.LightID, userID)
+		// log.Printf("Before match: %v\n", haveMatch)
+		// if haveMatch {
+		// 	// с помощью бота рассылаем ники
+		// 	if b != nil {
+		// 		user1, err := s.UserRepo.GetUser(userID)
+		// 		if err != nil {
+		// 			log.Println("error while getting user1")
+		// 			render.JSON(w, r, response.Error("Server error"))
+		// 			return
+		// 		}
+		// 		user2, err := s.UserRepo.GetUser(req.LightID)
+		// 		if err != nil {
+		// 			log.Println("error while getting user2")
+		// 			render.JSON(w, r, response.Error("Server error"))
+		// 			return
+		// 		}
+
+		// 		b.SendNick(user1.ID, user2.Username)
+		// 		b.SendNick(user2.ID, user1.Username)
+		// 	}
+
+		// 	s.MatchesRepo.Delete(req.LightID, userID)
+		// 	s.MatchesRepo.Delete(userID, req.LightID)
+
+		// 	render.JSON(w, r, response.Ok())
+		// 	return
+		// }
+
+		// // лишний раз не сохраняем данные в бд
+		// exists := s.MatchesRepo.Exists(userID, req.LightID)
+		// if exists {
+		// 	render.JSON(w, r, response.Ok())
+		// 	return
+		// }
+
+		// err = s.MatchesRepo.Create(models.MatchDB{MothID: userID, LightID: req.LightID})
+		// if err != nil {
+		// 	log.Printf("Error while createing match: %v\n", err)
+		// 	render.JSON(w, r, response.Error("Server error"))
+		// 	return
+		// }
 
 		render.JSON(w, r, response.Ok())
 	}

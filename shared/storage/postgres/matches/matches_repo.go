@@ -25,6 +25,12 @@ func (r *MatchesRepo) CreateTable() error {
 			user1 integer NOT NULL,
 			user2 integer NOT NULL
 		);
+
+		CREATE TABLE IF NOT EXISTS flames_matches (
+			id SERIAL PRIMARY KEY,
+			user1 integer NOT NULL,
+			user2 integer NOT NULL
+		);
 	`
 
 	_, err := r.db.Exec(stmt)
@@ -86,6 +92,46 @@ func (r *MatchesRepo) Delete(mothID int64, lightID int64) error {
 	}
 
 	_, err = stmt.Exec(mothID, lightID)
+	if err != nil {
+		log.Printf("%s: %v", op, err)
+	}
+	return err
+}
+
+func (r *MatchesRepo) FlamesExists(mothID int64, lightID int64) bool {
+	const op = "postgres.matches.flames_exists"
+	stmt, err := r.db.Prepare(`
+		SELECT EXISTS(
+			SELECT 1 FROM flames_matches
+			WHERE user1 = $1 AND user2 = $2 LIMIT 1
+		)
+	`)
+	if err != nil {
+		log.Printf("%s: %v", op, err)
+		return false
+	}
+
+	var val bool
+	err = stmt.QueryRow(mothID, lightID).Scan(&val)
+	if err != nil {
+		log.Printf("%s: %v", op, err)
+		return false
+	}
+	return val
+}
+
+func (r *MatchesRepo) FlamesCreate(match models.MatchDB) error {
+	const op = "postgres.matches.flames_create"
+	stmt, err := r.db.Prepare(`
+		INSERT INTO flames_matches (user1, user2)
+		VALUES ($1, $2)
+	`)
+	if err != nil {
+		log.Printf("%s: %v", op, err)
+		return err
+	}
+
+	_, err = stmt.Exec(match.MothID, match.LightID)
 	if err != nil {
 		log.Printf("%s: %v", op, err)
 	}

@@ -81,7 +81,7 @@ func (t *TimepadPoller) GetFilteredEvents(filter EventsFilter) ([]Event, error) 
 	// категории
 	for _, cat := range filter.Categories {
 		newCat, ok := Categories[cat]
-		log.Printf("- %v\n", newCat)
+		// log.Printf("- %v\n", newCat)
 
 		if !ok {
 			catIds = append(catIds, strconv.Itoa(463))
@@ -95,7 +95,7 @@ func (t *TimepadPoller) GetFilteredEvents(filter EventsFilter) ([]Event, error) 
 	}
 
 	fullURL := baseURL + "?" + params.Encode()
-	log.Println("Full url: " + fullURL)
+	// log.Println("Full url: " + fullURL)
 	req, err := http.NewRequest("GET", fullURL, nil)
 	if err != nil {
 		return nil, err
@@ -119,7 +119,7 @@ func (t *TimepadPoller) GetFilteredEvents(filter EventsFilter) ([]Event, error) 
 func (t *TimepadPoller) GetEventByID(eventID int64) (Event, error) {
 	fullURL := t.timepadUrl + "events/" + strconv.Itoa(int(eventID))
 
-	fmt.Println("Full url: " + fullURL)
+	// fmt.Println("Full url: " + fullURL)
 	req, err := http.NewRequest("GET", fullURL, nil)
 	if err != nil {
 		return Event{}, err
@@ -193,161 +193,3 @@ var Categories = map[string]Category{
 
 	"Картинг": Category{"Спорт", 376},
 }
-
-/*
-все категории событий:
-{
-  "values": [
-    {
-      "id": 217,
-      "name": "Бизнес",
-      "tag": "business"
-    },
-    {
-      "id": 374,
-      "name": "Кино",
-      "tag": "cinema"
-    },
-    {
-      "id": 376,
-      "name": "Спорт",
-      "tag": "sport"
-    },
-    {
-      "id": 379,
-      "name": "Для детей",
-      "tag": "kids"
-    },
-    {
-      "id": 382,
-      "name": "Иностранные языки",
-      "tag": "languages"
-    },
-    {
-      "id": 399,
-      "name": "Красота и здоровье",
-      "tag": "beauty"
-    },
-    {
-      "id": 452,
-      "name": "ИТ и интернет",
-      "tag": "it"
-    },
-    {
-      "id": 453,
-      "name": "Психология и самопознание",
-      "tag": "psychology"
-    },
-    {
-      "id": 456,
-      "name": "Еда",
-      "tag": "food"
-    },
-    {
-      "id": 457,
-      "name": "Вечеринки",
-      "tag": "party"
-    },
-    {
-      "id": 458,
-      "name": "Выставки",
-      "tag": "exhibition"
-    },
-    {
-      "id": 459,
-      "name": "Театры",
-      "tag": "theater"
-    },
-    {
-      "id": 460,
-      "name": "Концерты",
-      "tag": "concert"
-    },
-    {
-      "id": 461,
-      "name": "Экскурсии и путешествия",
-      "tag": "trip"
-    },
-    {
-      "id": 462,
-      "name": "Другие события",
-      "tag": "other_event"
-    },
-    {
-      "id": 463,
-      "name": "Другие развлечения",
-      "tag": "other_entertainment"
-    },
-    {
-      "id": 524,
-      "name": "Хобби и творчество",
-      "tag": "hobby"
-    },
-    {
-      "id": 525,
-      "name": "Искусство и культура",
-      "tag": "art"
-    },
-    {
-      "id": 1315,
-      "name": "Образование за рубежом",
-      "tag": "education_abroad"
-    },
-    {
-      "id": 1940,
-      "name": "Гражданские проекты",
-      "tag": "civil"
-    },
-    {
-      "id": 2335,
-      "name": "Интеллектуальные игры",
-      "tag": "intellekt"
-    },
-    {
-      "id": 2465,
-      "name": "Наука",
-      "tag": "science"
-    }
-  ]
-}
-
-Концерты → Концерты (id: 460)
-
-Кино → Кино (id: 374)
-
-Выставки → Выставки (id: 458)
-
-Театры → Театры (id: 459)
-
-Фестивали → Другие события (id: 462)
-
-Спортивные события → Спорт (id: 376)
-
-Вечеринки → Вечеринки (id: 457)
-
-Клубы → Другие развлечения (id: 463)
-
-Рестораны → Еда (id: 456)
-
-Кафе → Еда (id: 456)
-
-Пикники → Экскурсии и путешествия (id: 461)
-
-Походы → Экскурсии и путешествия (id: 461)
-
-Мастер-классы → Хобби и творчество (id: 524)
-
-Лекции → Наука (id: 2465)
-
-Йога-сессии → Спорт (id: 376)
-
-Танцы → Спорт (id: 376)
-
-Настольные игры → Интеллектуальные игры (id: 2335)
-
-Караоке → Другие развлечения (id: 463)
-
-Боулинг → Спорт (id: 376)
-
-Картинг → Спорт (id: 376)
-*/

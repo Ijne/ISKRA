@@ -45,34 +45,27 @@ func InteractionHandler(cfg *config.Config, s *postgres.Storage, g *memgraph.Sto
 						return
 					}
 					// ПРОИЗОШЕЛ МЭТЧ - НАДО ЗАПУСТИТЬ НУЖНУЮ ЛОГИКУ ПОСЛЕ ЭТОГО
-					haveMatch := s.MatchesRepo.Exists(req.Target_user_id, req.User_id)
-					log.Printf("Before match: %v\n", haveMatch)
-					if haveMatch {
-						// с помощью бота рассылаем ники
-						if b != nil {
-							user1, err := s.UserRepo.GetUser(req.User_id)
-							if err != nil {
-								log.Println("error while getting user1")
-								render.JSON(w, r, response.Error("Server error"))
-								return
-							}
-							user2, err := s.UserRepo.GetUser(req.Target_user_id)
-							if err != nil {
-								log.Println("error while getting user2")
-								render.JSON(w, r, response.Error("Server error"))
-								return
-							}
 
-							b.SendNick(user1.ID, user2.Username)
-							b.SendNick(user2.ID, user1.Username)
+					// с помощью бота рассылаем ники
+					if b != nil {
+						user1, err := s.UserRepo.GetUser(req.User_id)
+						if err != nil {
+							log.Println("error while getting user1")
+							render.JSON(w, r, response.Error("Server error"))
+							return
+						}
+						user2, err := s.UserRepo.GetUser(req.Target_user_id)
+						if err != nil {
+							log.Println("error while getting user2")
+							render.JSON(w, r, response.Error("Server error"))
+							return
 						}
 
-						s.MatchesRepo.Delete(req.Target_user_id, req.User_id)
-						s.MatchesRepo.Delete(req.User_id, req.Target_user_id)
-
-						render.JSON(w, r, response.Ok())
-						return
+						b.SendNick(user1.ID, user2.Username)
+						b.SendNick(user2.ID, user1.Username)
 					}
+					render.JSON(w, r, response.Ok())
+					return
 				}
 			}
 
