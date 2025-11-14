@@ -154,6 +154,8 @@ const capsuleData = {
 
 let currentField = '';
 let currentUserId = null;
+let userPhoto = null;
+let tempPhoto = null; // Временное фото для предпросмотра
 const selectedItems = {
     career: [],
     personality: [],
@@ -227,7 +229,7 @@ async function updateUserProfile(profileData) {
         console.log('Profile updated successfully:', result);
         return result;
     } catch (error) {
-        
+        console.error('Ошибка обновления профиля:', error);
     }
 }
 
@@ -257,6 +259,12 @@ function parseServerData(userData) {
     userGender = userData.gender !== undefined ? parseInt(userData.gender) : 0;
     preferredGender = userData.preferred_gender !== undefined ? parseInt(userData.preferred_gender) : 1;
     
+    // Загружаем фото
+    if (userData.photo && userData.photo !== 'null' && userData.photo !== 'undefined') {
+        userPhoto = userData.photo;
+        updateMainPhoto(userPhoto);
+    }
+    
     return {
         name: userData.name || '',
         surname: userData.surname || '',
@@ -283,7 +291,8 @@ function prepareDataForServer(profileData) {
         music: (selectedItems.music || []).join(','),
         hobbies: (selectedItems.hobbies || []).join(','),
         films: (selectedItems.movies || []).join(','),
-        event_preferences: (selectedItems.events || []).join(',')
+        event_preferences: (selectedItems.events || []).join(','),
+        photo: userPhoto || ''
     };
 }
 
@@ -471,6 +480,158 @@ function removeTag(category, text) {
     updateSelectedCapsulesForCategory(category);
 }
 
+// Функции для работы с фото
+function updateMainPhoto(photoUrl) {
+    const photoContainer = document.getElementById('mainPhoto');
+    if (photoContainer && photoUrl) {
+        photoContainer.innerHTML = `
+            <img src="${photoUrl}" alt="Фото профиля">
+            <div class="photo-overlay-main">
+                <div class="change-photo-text-main">Изменить фото</div>
+            </div>
+        `;
+        photoContainer.classList.add('has-photo');
+    } else {
+        // Сбрасываем к плейсхолдеру
+        photoContainer.innerHTML = `
+            <div class="photo-placeholder-main">
+                <div class="photo-text-main">Добавить главное фото</div>
+                <div class="photo-hint-main">Вертикальное фото 9:16</div>
+            </div>
+        `;
+        photoContainer.classList.remove('has-photo');
+    }
+}
+
+function openPhotoModal() {
+    const modal = document.getElementById('photoModal');
+    const previewContainer = document.getElementById('photoPreview');
+    
+    if (modal) {
+        modal.style.display = 'flex';
+        tempPhoto = null; // Сбрасываем временное фото
+        
+        // Показываем текущее фото если есть, или плейсхолдер
+        if (userPhoto) {
+            previewContainer.innerHTML = `
+                <div class="photo-preview-container">
+                    <img src="${userPhoto}" alt="Текущее фото">
+                </div>
+                <div class="photo-ratio-info">
+                    <button class="photo-change-small-btn" onclick="triggerFileInput()">Выбрать другое фото</button>
+                </div>
+            `;
+        } else {
+            previewContainer.innerHTML = `
+                <div class="photo-upload-area" id="photoUploadArea" onclick="triggerFileInput()">
+                    <div class="photo-placeholder">
+                        <div class="photo-text">Нажмите для выбора фото</div>
+                        <div class="photo-hint">Или перетащите файл сюда</div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Настраиваем input для файлов
+        const photoInput = document.getElementById('photoInput');
+        photoInput.onchange = handlePhotoSelect;
+    }
+}
+
+function triggerFileInput() {
+    document.getElementById('photoInput').click();
+}
+
+function handlePhotoSelect(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    handleFileSelect(event);
+}
+
+function handleFileSelect(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Проверяем тип файла
+    if (!file.type.startsWith('image/')) {
+        alert('Пожалуйста, выберите файл изображения');
+        return;
+    }
+
+    // Проверяем размер файла
+    if (file.size > 5 * 1024 * 1024) {
+        alert('Размер файла не должен превышать 5MB');
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+            // Проверяем соотношение сторон (примерно 9:16)
+            const ratio = img.width / img.height;
+            const targetRatio = 9/16;
+            const tolerance = 0.3; // 30% допуск
+            
+            let warningMessage = '';
+            if (Math.abs(ratio - targetRatio) > tolerance) {
+                warningMessage = '<div class="photo-warning">⚠️ Фото не вертикальное, но можно использовать</div>';
+            }
+            
+            // Показываем превью в модальном окне
+            const previewContainer = document.getElementById('photoPreview');
+            previewContainer.innerHTML = `
+                <div class="photo-preview-container">
+                    <img src="${e.target.result}" alt="Превью фото">
+                </div>
+                ${warningMessage}
+                <div class="photo-action-buttons">
+                    <button class="photo-action-btn primary" onclick="confirmPhotoChange()">Использовать это фото</button>
+                </div>
+            `;
+            
+            // Сохраняем временное фото
+            tempPhoto = e.target.result;
+        };
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+}
+
+function cancelPhotoChange() {
+    // Возвращаемся к исходному состоянию
+    openPhotoModal();
+}
+
+function confirmPhotoChange() {
+    if (!tempPhoto) {
+        alert('Сначала выберите фото');
+        return;
+    }
+    
+    // Сохраняем фото
+    userPhoto = tempPhoto;
+    updateMainPhoto(userPhoto);
+    closePhotoModal();
+    
+    console.log('Фото обновлено');
+    // Можно добавить уведомление об успешном сохранении
+}
+
+function savePhoto() {
+    // Эта функция теперь не нужна, но оставим для совместимости
+    confirmPhotoChange();
+}
+
+function closePhotoModal() {
+    const modal = document.getElementById('photoModal');
+    if (modal) {
+        modal.style.display = 'none';
+        tempPhoto = null; // Очищаем временное фото
+    }
+}
+
+// Остальные функции модальных окон
 function openGenderModal() {
     const modal = document.getElementById('genderModal');
     if (modal) {
@@ -602,11 +763,14 @@ async function saveProfile() {
         await updateUserProfile(serverData);
         
         console.log('Профиль успешно сохранен!');
+        alert('Профиль сохранен!');
     } catch (error) {
         console.error('Ошибка при сохранении профиля:', error);
+        alert('Ошибка при сохранении профиля');
     }
 }
 
+// Инициализация при загрузке страницы
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initCapsules);
 } else {

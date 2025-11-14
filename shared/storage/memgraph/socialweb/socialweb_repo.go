@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"iskra/shared/models"
 	"iskra/shared/storage/repos"
-	"log"
 	"strings"
 
 	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
@@ -158,7 +157,8 @@ func (r *SocialWebRepo) UpdateUser(user models.UserDB) error {
 				p.career_type = $c_t, 
 				p.personality_type = $p_t, 
 				p.relationship_goal = $r_g, 
-				p.important_values = $i_v
+				p.important_values = $i_v,
+				p.photo = $photo
 			RETURN p
 		`
 
@@ -248,6 +248,7 @@ func (r *SocialWebRepo) UpdateUser(user models.UserDB) error {
 			"newFilms":   strings.Split(user.Films, ","),
 			"newHobbies": strings.Split(user.Hobbies, ","),
 			"newEvents":  strings.Split(user.EventPreferences, ","),
+			"photo":      user.Photo,
 		}
 
 		result, err := tx.Run(context.Background(), query1, params)
@@ -457,7 +458,6 @@ func (r *SocialWebRepo) GetRecommendations(id int64) ([]models.UserResponse, err
 			}
 
 			users = append(users, user)
-			log.Println(user.Photo, "--------")
 		}
 
 		if err := result.Err(); err != nil {

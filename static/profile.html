@@ -11,14 +11,24 @@
     <main>
         <div class="profile-container">
             <div class="profile-header">
-                <h1 class="profile-title">ИСКРА</h1>
-                <p class="profile-subtitle">Настройте ваш профиль</p>
+                <h1 class="profile-title">ПРОФИЛЬ</h1>    
             </div>
 
             <div class="profile-board">
-                <div class="avatar-section">
-                    <div class="avatar">
-                        <!-- Аватар будет здесь -->
+                <!-- Аватар с фото -->
+                <div class="photo-section">
+                    <div class="photo-main">
+                        <div class="photo-container" id="mainPhoto" onclick="openPhotoModal()">
+                            <div class="photo-placeholder-main">
+                                <div class="photo-text-main">Добавить фото</div>
+                                <div class="photo-hint-main">Вертикальное фото 9:16</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="photo-controls">
+                        <button class="photo-change-btn" onclick="openPhotoModal()">
+                            Изменить фото
+                        </button>
                     </div>
                 </div>
 
@@ -141,6 +151,7 @@
             </div>
         </div>
 
+        <!-- Модальное окно для редактирования текстовых полей -->
         <div class="profile-modal" id="editModal">
             <div class="profile-modal-content">
                 <h3 class="profile-modal-title" id="modalTitle">Редактирование</h3>
@@ -152,6 +163,7 @@
             </div>
         </div>
 
+        <!-- Модальное окно для выбора пола -->
         <div class="profile-modal" id="genderModal">
             <div class="profile-modal-content">
                 <h3 class="profile-modal-title">Ваш пол</h3>
@@ -171,6 +183,7 @@
             </div>
         </div>
 
+        <!-- Модальное окно для выбора предпочтительного пола -->
         <div class="profile-modal" id="preferredGenderModal">
             <div class="profile-modal-content">
                 <h3 class="profile-modal-title">Кого ищете?</h3>
@@ -193,7 +206,23 @@
                 </div>
             </div>
         </div>
+
+        <!-- Модальное окно для загрузки фото -->
+        <div class="profile-modal" id="photoModal">
+            <div class="profile-modal-content">
+                <h3 class="profile-modal-title">Ваше фото</h3>
+                <div id="photoPreview">
+                    <!-- Контент будет добавляться динамически -->
+                </div>
+                <input type="file" id="photoInput" accept="image/*" style="display: none;">
+                <div class="profile-modal-buttons">
+                    <button class="profile-modal-btn secondary" onclick="closePhotoModal()">Отмена</button>
+                </div>
+            </div>
+        </div>
     </main>
+
+    <!-- Нижняя навигация -->
     <div class="bottom-nav">
         <div class="nav-container">
             <button class="nav-button active">
@@ -212,7 +241,7 @@
         </div>
     </div>
 
-    <script src="https://st.max.ru/js/max-web-app.js"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="./js/base.js"></script>
     <script src="./js/profile.js"></script>
 </body>

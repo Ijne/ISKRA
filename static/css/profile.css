@@ -34,6 +34,122 @@
     backdrop-filter: blur(10px);
 }
 
+/* Стили для секции фото */
+.photo-section {
+    margin-bottom: 25px;
+    text-align: center;
+}
+
+.photo-main {
+    margin-bottom: 15px;
+}
+
+.photo-container {
+    width: 100%;
+    max-width: 300px;
+    height: 500px;
+    border-radius: 20px;
+    background: rgba(255, 170, 0, 0.05);
+    border: 2px dashed rgba(255, 170, 0, 0.3);
+    margin: 0 auto;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.photo-container:hover {
+    border-color: rgba(255, 170, 0, 0.6);
+    background: rgba(255, 170, 0, 0.08);
+}
+
+.photo-container.has-photo {
+    border: 2px solid rgba(255, 170, 0, 0.6);
+    background: transparent;
+}
+
+.photo-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+.photo-placeholder-main {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 170, 0, 0.7);
+    padding: 40px;
+}
+
+.photo-text-main {
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+.photo-hint-main {
+    font-size: 0.85rem;
+    opacity: 0.6;
+}
+
+.photo-overlay-main {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.photo-container:hover .photo-overlay-main {
+    opacity: 1;
+}
+
+.change-photo-text-main {
+    color: white;
+    font-size: 1rem;
+    font-weight: 500;
+    padding: 12px 24px;
+    background: rgba(255, 170, 0, 0.8);
+    border-radius: 25px;
+}
+
+.photo-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.photo-change-btn {
+    background: rgba(255, 170, 0, 0.1);
+    border: 1px solid rgba(255, 170, 0, 0.3);
+    color: rgba(255, 170, 0, 0.9);
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.photo-change-btn:hover {
+    background: rgba(255, 170, 0, 0.2);
+    border-color: rgba(255, 170, 0, 0.5);
+}
+
 .basic-info-fields {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -60,6 +176,7 @@
     font-size: 0.7rem;
     opacity: 0.7;
     margin-bottom: 3px;
+    color: rgba(255, 255, 255, 0.7);
 }
 
 .compact-field-value {
@@ -76,53 +193,19 @@
     opacity: 0.5;
     font-size: 0.8rem;
     transition: opacity 0.3s ease;
+    color: #ffaa00;
 }
 
 .compact-field:hover .compact-edit-icon {
     opacity: 1;
 }
 
-.city-field {
-    grid-column: 1 / -1;
+.readonly-field {
+    pointer-events: none;
+    opacity: 0.7;
+    cursor: default;
     background: rgba(255, 170, 0, 0.08);
     border: 1px solid rgba(255, 170, 0, 0.2);
-    border-radius: 12px;
-    padding: 10px 12px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    position: relative;
-    margin-top: 5px;
-}
-
-.city-field:hover {
-    border-color: #ffaa00;
-    background: rgba(255, 170, 0, 0.12);
-}
-
-.city-field-label {
-    font-size: 0.7rem;
-    opacity: 0.7;
-    margin-bottom: 3px;
-}
-
-.city-field-value {
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: #ffaa00;
-}
-
-.city-edit-icon {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    opacity: 0.5;
-    font-size: 0.8rem;
-    transition: opacity 0.3s ease;
-}
-
-.city-field:hover .city-edit-icon {
-    opacity: 1;
 }
 
 .profile-section {
@@ -258,33 +341,6 @@
     transform: rotate(180deg);
 }
 
-.avatar-section {
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-.avatar {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #ffaa00, #ff6600);
-    margin: 0 auto 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2rem;
-    color: white;
-    border: 2px solid rgba(255, 170, 0, 0.5);
-    position: relative;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.avatar:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 25px rgba(255, 170, 0, 0.4);
-}
-
 .selected-tags {
     display: flex;
     flex-wrap: wrap;
@@ -365,6 +421,7 @@
     box-shadow: 0 6px 20px rgba(255, 170, 0, 0.4);
 }
 
+/* Модальные окна */
 .profile-modal {
     display: none;
     position: fixed;
@@ -391,6 +448,7 @@
     color: #ffaa00;
     margin-bottom: 20px;
     text-align: center;
+    font-size: 1.2rem;
 }
 
 .profile-modal-input {
@@ -416,6 +474,7 @@
     border-radius: 12px;
     cursor: pointer;
     transition: all 0.3s ease;
+    font-size: 0.9rem;
 }
 
 .profile-modal-btn.primary {
@@ -428,6 +487,11 @@
     color: white;
 }
 
+.profile-modal-btn:hover {
+    transform: translateY(-1px);
+}
+
+/* Стили для выбора пола */
 .gender-options {
     display: flex;
     flex-direction: column;
@@ -471,39 +535,201 @@
     color: white;
 }
 
-.basic-info-fields {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 20px;
+/* Стили для загрузки фото в модальном окне */
+.photo-upload-area {
+    width: 100%;
+    height: 200px;
+    border: 2px dashed rgba(255, 170, 0, 0.3);
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 15px;
+    overflow: hidden;
+    position: relative;
 }
 
+.photo-upload-area:hover {
+    border-color: rgba(255, 170, 0, 0.6);
+    background: rgba(255, 170, 0, 0.05);
+}
+
+.photo-upload-area.has-photo {
+    border: 2px solid rgba(255, 170, 0, 0.6);
+}
+
+.photo-upload-area img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.photo-placeholder {
+    text-align: center;
+    color: rgba(255, 170, 0, 0.7);
+    padding: 20px;
+}
+
+.photo-icon {
+    font-size: 3rem;
+    margin-bottom: 10px;
+    opacity: 0.5;
+}
+
+.photo-text {
+    font-size: 1rem;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.photo-hint {
+    font-size: 0.8rem;
+    opacity: 0.6;
+}
+
+.photo-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.photo-upload-area:hover .photo-overlay {
+    opacity: 1;
+}
+
+.change-photo-text {
+    color: white;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+/* Стили для превью фото в модальном окне */
+.photo-preview-container {
+    width: 100%;
+    height: 400px;
+    border-radius: 15px;
+    overflow: hidden;
+    margin-bottom: 15px;
+    border: 2px solid rgba(255, 170, 0, 0.3);
+    position: relative;
+}
+
+.photo-preview-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+.photo-upload-hint {
+    text-align: center;
+    color: rgba(255, 170, 0, 0.7);
+    font-size: 0.85rem;
+    margin-bottom: 10px;
+}
+
+.ratio-example {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.ratio-bar {
+    width: 40px;
+    height: 2px;
+    background: #ffaa00;
+    position: relative;
+}
+
+.ratio-bar::before {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: 0;
+    width: 9px;
+    height: 10px;
+    background: #ffaa00;
+    border-radius: 1px;
+}
+
+.ratio-bar::after {
+    content: '';
+    position: absolute;
+    top: -4px;
+    right: 0;
+    width: 16px;
+    height: 10px;
+    background: #ffaa00;
+    border-radius: 1px;
+}
+
+/* Адаптивность */
 @media (max-width: 480px) {
     .basic-info-fields {
         grid-template-columns: 1fr;
     }
+    
+    .profile-container {
+        padding: 10px;
+        padding-bottom: 80px;
+    }
+    
+    .photo-container {
+        height: 400px;
+        max-width: 250px;
+    }
+    
+    .photo-preview-container {
+        height: 350px;
+    }
+    
+    .profile-modal-content {
+        padding: 20px;
+        margin: 10px;
+    }
 }
 
-.city-field {
-    grid-column: 1 / -1;
-    background: rgba(255, 170, 0, 0.08);
-    border: 1px solid rgba(255, 170, 0, 0.2);
-    border-radius: 12px;
-    padding: 10px 12px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    position: relative;
-    margin-top: 0;
+@media (max-height: 700px) {
+    .photo-container {
+        height: 350px;
+    }
+    
+    .photo-preview-container {
+        height: 300px;
+    }
+    
+    .profile-modal-content {
+        max-height: 90vh;
+        overflow-y: auto;
+    }
 }
 
-.readonly-field {
-    pointer-events: none;
-    opacity: 0.7;
-    cursor: default;
-    background: rgba(255, 170, 0, 0.08);
-    border: 1px solid rgba(255, 170, 0, 0.2);
+@media (max-width: 360px) {
+    .photo-container {
+        height: 300px;
+        max-width: 200px;
+    }
+    
+    .photo-preview-container {
+        height: 250px;
+    }
+    
+    .profile-title {
+        font-size: 1.8rem;
+    }
 }
 
+/* Иконки навигации */
 .profile-icon {
     width: 28.77px;
     height: 28px;
@@ -512,7 +738,6 @@
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
-    
     display: block;
 }
 
@@ -524,7 +749,6 @@
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
-    
     display: block;
 }
 
@@ -536,7 +760,232 @@
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
-    
     display: block;
 }
 
+/* Стили для нижней навигации */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(20, 20, 20, 0.95);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(255, 170, 0, 0.1);
+    padding: 10px 0;
+    z-index: 1000;
+}
+
+.nav-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.nav-button {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 16px;
+    border-radius: 12px;
+}
+
+.nav-button:hover {
+    color: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 170, 0, 0.1);
+}
+
+.nav-label {
+    font-size: 0.7rem;
+    font-weight: 500;
+}
+
+.main-button {
+    background: linear-gradient(135deg, #ffaa00, #ff6600);
+    border: none;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(255, 170, 0, 0.3);
+    margin-top: -20px;
+}
+
+.main-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 170, 0, 0.4);
+}
+
+.main-icon {
+    width: 32px;
+    height: 32px;
+}
+
+/* Базовые стили для body */
+body {
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(135deg, #0c0c0c 0%, #1a1a1a 100%);
+    color: white;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    min-height: 100vh;
+}
+
+/* Стили для скроллбара */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255, 170, 0, 0.1);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 170, 0, 0.3);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 170, 0, 0.5);
+}
+
+/* Анимации */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.profile-board {
+    animation: fadeIn 0.5s ease;
+}
+
+/* Утилитарные классы */
+.full-width {
+    grid-column: 1 / -1;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.mb-10 {
+    margin-bottom: 10px;
+}
+
+.mb-20 {
+    margin-bottom: 20px;
+}
+
+.hidden {
+    display: none;
+}
+
+/* Состояния загрузки */
+.loading {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255, 170, 0, 0.3);
+    border-top: 2px solid #ffaa00;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+.photo-ratio-info {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-bottom: 14px;
+}
+
+/* Добавь в конец CSS файла */
+.photo-change-small-btn {
+    background: rgba(255, 170, 0, 0.1);
+    border: 1px solid rgba(255, 170, 0, 0.3);
+    color: rgba(255, 170, 0, 0.9);
+    padding: 8px 16px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.photo-change-small-btn:hover {
+    background: rgba(255, 170, 0, 0.2);
+}
+
+.photo-action-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    padding-bottom: 14px;
+}
+
+.photo-action-btn {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.photo-action-btn.primary {
+    background: linear-gradient(135deg, #ffaa00, #ff6600);
+    color: white;
+}
+
+.photo-action-btn.secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.photo-action-btn:hover {
+    transform: translateY(-1px);
+}
+
+.photo-warning {
+    background: rgba(255, 170, 0, 0.1);
+    border: 1px solid rgba(255, 170, 0, 0.3);
+    border-radius: 10px;
+    padding: 10px;
+    margin-bottom: 10px;
+    text-align: center;
+    color: rgba(255, 170, 0, 0.9);
+    font-size: 0.85rem;
+}

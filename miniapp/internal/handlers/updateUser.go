@@ -22,6 +22,12 @@ func UpdateUserHandler(cfg *config.Config, s *postgres.Storage, g *memgraph.Stor
 				return
 			}
 
+			path, err := SaveUserAvatar(user.ID, user.Photo)
+			if err != nil {
+				log.Printf("ERROR FROM[UpdateUserHandler] SaveUserAvatart err: %s\n", err)
+			}
+			user.Photo = path
+
 			if err := s.UserRepo.UpdateUser(user); err != nil {
 				log.Printf("ERROR FROM[UpdateUserHandler] postgres Updateuser err: %s", err)
 				return
