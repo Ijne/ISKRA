@@ -21,24 +21,27 @@ func (r *UserRepo) CreateTable() error {
 	const op = "postgres.user.create_table"
 
 	stmt := `
-		CREATE TABLE IF NOT EXISTS users
-			(id integer NOT NULL,
-			username character varying NOT NULL,
-			name character varying NOT NULL,
-			surname character varying,
-			age integer NOT NULL,
-			gender integer NOT NULL,
-			preferred_gender integer,
-			career_type character varying,
-			personality_type character varying,
-			relationship_goal character varying,
-			important_values character varying,
-			city character varying,
-			career_place character varying,
-			music character varying,
-			films character varying,
-			hobbies character varying,
-			event_preferences character varying);
+		CREATE TABLE IF NOT EXISTS public.users (
+			id int NOT NULL,
+			username varchar NULL,
+			"name" varchar DEFAULT '"Default_user_name"' NOT NULL,
+			surname varchar NULL,
+			age int DEFAULT 18 NULL,
+			gender int DEFAULT 0 NOT NULL,
+			preferred_gender int DEFAULT 2 NOT NULL,
+			career_type varchar NULL,
+			personality_type varchar NULL,
+			relationship_goal varchar NULL,
+			important_values varchar NULL,
+			city varchar NULL,
+			career_place varchar NULL,
+			music varchar NULL,
+			films varchar NULL,
+			hobbies varchar NULL,
+			event_preferences varchar NULL,
+			photo varchar NULL,
+			CONSTRAINT users_pk PRIMARY KEY (id)
+		);
 	`
 
 	_, err := r.db.Exec(stmt)

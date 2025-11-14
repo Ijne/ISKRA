@@ -28,6 +28,7 @@ FROM alpine:3.22
 # RUN apk --no-cache add ca-certificates
 
 #WORKDIR /root
+RUN mkdir -p /static/img 
 
 # COPY --from=builder /app/main/cmd/main .
 COPY --from=builder /app/main .
