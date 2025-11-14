@@ -13,8 +13,6 @@ import (
 	"github.com/go-chi/render"
 )
 
-// var orgs = []string{"abc"}
-
 type TimepadPoller struct {
 	client     *http.Client
 	token      string

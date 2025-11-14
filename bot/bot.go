@@ -334,29 +334,6 @@ func (b *Bot) SendMiniappButton(chatID int64) error {
 	}
 	log.Printf("Json for open app button:\n%s\n", string(body))
 
-	// 	json := `
-	// 	{
-	//     "text": "Запустите мини-приложение:",
-	//     "attachments": [
-	//       {
-	//       "type": "inline_keyboard",
-	//       "payload": {
-	//         "buttons": [
-	//         [
-	//           {
-	//           "type": "open_app",
-	//           "text": "Запустить приложение",
-	//           "web_app": "t21_hakaton_bot",
-	//           "payload": "http___localhost___8080"
-	//           }
-	//         ]
-	//         ]
-	//       }
-	//       }
-	//     ]
-	//   }
-	//   	`
-
 	url := fmt.Sprintf("%s/messages", b.BaseURL)
 
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(body))

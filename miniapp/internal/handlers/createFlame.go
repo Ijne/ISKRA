@@ -48,7 +48,6 @@ func CreateFlameHandler(s *postgres.Storage, t *timepad.TimepadPoller) http.Hand
 				return
 			}
 
-			// TODO: smth wrong with photo (empty)
 			s.FlamesRepo.CreateEvent(models.EventDB{
 				ID:       event.ID,
 				StartsAt: date,

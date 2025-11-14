@@ -1,1 +1,0 @@
-docker build -t iskra:2 .
