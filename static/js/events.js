@@ -11,7 +11,6 @@ const limit = 5;
 let isLoading = false;
 let hasMoreEvents = true;
 
-// Функция ожидания загрузки WebApp
 function waitForWebApp() {
     return new Promise((resolve) => {
         if (window.WebApp?.initData) {
@@ -45,7 +44,6 @@ function waitForWebApp() {
     });
 }
 
-// Получение текущего пользователя
 async function getCurrentUser() {
     try {
         await waitForWebApp();
@@ -159,7 +157,6 @@ async function getCurrentUser() {
     }
 }
 
-// Загрузка мероприятий при загрузке страницы
 async function initApp() {
     try {
         await waitForWebApp();
@@ -179,7 +176,6 @@ async function initApp() {
 
 document.addEventListener('DOMContentLoaded', initApp);
 
-// Загрузка города пользователя
 async function loadUserCity() {
     try {
         const userId = await getCurrentUser();
@@ -208,7 +204,6 @@ async function loadUserCity() {
     }
 }
 
-// Настройка бесконечной прокрутки
 function setupInfiniteScroll() {
     window.addEventListener('scroll', () => {
         if (isLoading || !hasMoreEvents) return;
@@ -221,7 +216,6 @@ function setupInfiniteScroll() {
     });
 }
 
-// Загрузка мероприятий
 async function loadEvents() {
     try {
         const userId = await getCurrentUser();
@@ -258,7 +252,6 @@ async function loadEvents() {
     }
 }
 
-// Загрузка дополнительных мероприятий
 async function loadMoreEvents() {
     if (isLoading || !hasMoreEvents) return;
     
@@ -296,7 +289,6 @@ async function loadMoreEvents() {
                 displayEvents(currentEvents);
                 currentSkip += limit;
                 
-                // Если пришло меньше событий, чем запрошено, значит больше нет
                 if (newEvents.length < limit) {
                     hasMoreEvents = false;
                     hideLoadingIndicator();
@@ -320,7 +312,6 @@ async function loadMoreEvents() {
     }
 }
 
-// Отображение мероприятий
 function displayEvents(events) {
     const eventsList = document.getElementById('eventsList');
     
@@ -329,7 +320,6 @@ function displayEvents(events) {
         return;
     }
     
-    // Удаляем индикаторы загрузки если они есть
     const existingIndicators = eventsList.querySelectorAll('.loading-indicator, .no-more-events');
     existingIndicators.forEach(indicator => indicator.remove());
     
@@ -360,14 +350,12 @@ function displayEvents(events) {
             </div>
         </div>
     `).join('');
-    
-    // Добавляем индикатор загрузки если есть еще события
+
     if (hasMoreEvents && userCity) {
         eventsList.innerHTML += `<div class="loading-indicator">Загрузка...</div>`;
     }
 }
 
-// Показать индикатор загрузки
 function showLoadingIndicator() {
     const eventsList = document.getElementById('eventsList');
     if (!eventsList) return;
@@ -378,7 +366,6 @@ function showLoadingIndicator() {
     }
 }
 
-// Скрыть индикатор загрузки
 function hideLoadingIndicator() {
     const indicator = document.querySelector('.loading-indicator');
     if (indicator) {
@@ -386,7 +373,6 @@ function hideLoadingIndicator() {
     }
 }
 
-// Показать сообщение о том, что события закончились
 function showNoMoreEvents() {
     const eventsList = document.getElementById('eventsList');
     if (!eventsList) return;
@@ -401,7 +387,6 @@ function showNoMoreEvents() {
     }
 }
 
-// Открытие модального окна с лобби
 async function openFlamesModal(eventId) {
     try {
         selectedEventId = eventId;
@@ -450,7 +435,6 @@ async function openFlamesModal(eventId) {
     }
 }
 
-// Закрытие модального окна лобби
 function closeFlamesModal() {
     const flamesModal = document.getElementById('flamesModal');
     if (flamesModal) {
@@ -460,7 +444,6 @@ function closeFlamesModal() {
     currentFlames = [];
 }
 
-// Отображение лобби
 async function displayFlames(flames) {
     const flamesList = document.getElementById('flamesList');
     if (!flamesList) {
@@ -515,7 +498,6 @@ async function displayFlames(flames) {
     }).join('');
 }
 
-// Лайк пользователя
 async function likeUser(userId, button) {
     try {
         const currentUserId = await getCurrentUser();
@@ -560,7 +542,6 @@ async function likeUser(userId, button) {
     }
 }
 
-// Открытие модального окна создания лобби
 function openCreateFlameModal() {
     const createFlameModal = document.getElementById('createFlameModal');
     const flameDescription = document.getElementById('flameDescription');
@@ -574,7 +555,6 @@ function openCreateFlameModal() {
     }
 }
 
-// Закрытие модального окна создания лобби
 function closeCreateFlameModal() {
     const createFlameModal = document.getElementById('createFlameModal');
     if (createFlameModal) {
@@ -582,7 +562,6 @@ function closeCreateFlameModal() {
     }
 }
 
-// Создание лобби
 async function createFlame() {
     const flameDescription = document.getElementById('flameDescription');
     if (!flameDescription) {
@@ -638,7 +617,6 @@ async function createFlame() {
     }
 }
 
-// Вспомогательные функции
 function formatDate(dateString) {
     try {
         const date = new Date(dateString);
@@ -672,7 +650,6 @@ function showMessage(message, type = 'info') {
     console.log(`${type.toUpperCase()}: ${message}`);
 }
 
-// Настройка навигации
 function setupNavigation() {
     const profileButton = document.querySelector('.nav-button:nth-child(1)');
     const mainButton = document.querySelector('.main-button');
@@ -690,7 +667,6 @@ function setupNavigation() {
     }
 }
 
-// Закрытие модальных окон при клике вне их
 document.addEventListener('click', function(event) {
     const flamesModal = document.getElementById('flamesModal');
     const createFlameModal = document.getElementById('createFlameModal');

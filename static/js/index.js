@@ -478,16 +478,13 @@ function initPhotoUpload() {
             reader.onload = function(e) {
                 const img = new Image();
                 img.onload = function() {
-                    // Простая проверка - вертикальное фото
                     if (img.height <= img.width) {
                         alert('Выберите вертикальное фото');
                         return;
                     }
-                    
-                    // Всё ок - сохраняем
+
                     userPhoto = e.target.result;
-                    
-                    // Просто показываем фото
+
                     photoPreview.innerHTML = `
                         <img src="${userPhoto}" alt="Фото" style="width: 100%; height: 100%; object-fit: cover; border-radius: 18px;">
                     `;
@@ -498,8 +495,7 @@ function initPhotoUpload() {
             reader.readAsDataURL(file);
         }
     });
-    
-    // Клик по превью открывает выбор файла
+
     photoPreview.addEventListener('click', function() {
         photoInput.click();
     });
@@ -816,12 +812,10 @@ function loadNextUser() {
     userCard.style.transform = 'translateY(20px)';
     
     setTimeout(() => {
-        // Обновляем фон карточки с фото пользователя или заглушкой
         const cardBackground = userCard.querySelector('.card-background');
         if (user.photo) {
             cardBackground.style.backgroundImage = `url(${user.photo})`;
         } else {
-            // Используем заглушку по умолчанию
             cardBackground.style.backgroundImage = `url(${DEFAULT_PHOTO})`;
         }
         
