@@ -301,6 +301,7 @@
     border: 1px solid rgba(255, 170, 0, 0.4);
     border-radius: 20px;
     padding: 8px 15px;
+    margin-top: 13px;
     color: #ffaa00;
     font-size: 0.8rem;
     cursor: pointer;
@@ -322,9 +323,17 @@
 }
 
 .flame-description {
-    font-size: 0.9rem;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 15px;
+    background: rgba(255, 170, 0, 0.2);
+    border: 1px solid rgba(255, 170, 0, 0.4);
+    border-radius: 12px;
+    font-size: 0.95rem;
     line-height: 1.4;
-    color: rgba(255, 255, 255, 0.9);
+    color: #ffaa00;
+    margin-top: 20px;
+    margin-bottom: 20px;
 }
 
 .no-flames {

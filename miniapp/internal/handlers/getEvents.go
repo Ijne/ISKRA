@@ -32,11 +32,13 @@ func GetEventsHandler(s *postgres.Storage, t *timepad.TimepadPoller) http.Handle
 				return
 			}
 
-			fmt.Println(res)
+			fmt.Println(res[0], "PIIIIIIIIIIIIIIIIZDOSSSSSSSSSSSSSSSS")
 
 			// convert structs
 			resp := make([]models.EventResponse, len(res))
-			for i, event := range res {
+			for i := 0; i < len(res); i++ {
+				event := res[i]
+				log.Println("BOLSHAAAAAAAAAAAAYA PISKAAAAAAAAAA")
 				curr := models.EventResponse{
 					ID:       event.ID,
 					StartsAt: event.StartsAt.Format("2006-01-02T15:04:05-0700"),
@@ -45,6 +47,7 @@ func GetEventsHandler(s *postgres.Storage, t *timepad.TimepadPoller) http.Handle
 					Photo:    event.Photo,
 				}
 				resp[i] = curr
+				log.Println("POSOSALIIIIIIIIIIIIIIIIIIIIIIII", resp)
 			}
 
 			render.JSON(w, r, struct {
@@ -55,16 +58,7 @@ func GetEventsHandler(s *postgres.Storage, t *timepad.TimepadPoller) http.Handle
 				models.ManyEventsResponse{Events: resp},
 			})
 
-			// events, err := t.GetEvents()
-			// if err != nil {
-			// 	log.Fatalf("get_events_handler: %v\n", err)
-			// 	return
-			// }
-			// render.JSON(w, r, events)
-
 		case http.MethodPost:
-			// with or without filters
-			// return found events
 			var req models.FilteredEventsRequest
 			err := render.DecodeJSON(r.Body, &req)
 			if err != nil {
@@ -81,7 +75,7 @@ func GetEventsHandler(s *postgres.Storage, t *timepad.TimepadPoller) http.Handle
 			events := make([]timepad.Event, 0)
 
 			if err != nil {
-				log.Printf("ERROR FROM[GetEventsHandler] GetFilteredEvents err: %s", err)
+				log.Printf("ERROR FROM[GetEventsHandler] GetUser err: %s", err)
 				events, err = t.GetEvents()
 				if err != nil {
 					log.Printf("ERROR FROM[GetEventsHandler] GetEvents err: %s", err)
@@ -90,7 +84,6 @@ func GetEventsHandler(s *postgres.Storage, t *timepad.TimepadPoller) http.Handle
 				}
 			} else {
 				cats := strings.Split(user.EventPreferences, ",")
-				// log.Printf("%v\n", cats)
 
 				filter := timepad.EventsFilter{
 					City:       user.City,
@@ -100,7 +93,6 @@ func GetEventsHandler(s *postgres.Storage, t *timepad.TimepadPoller) http.Handle
 				}
 
 				events, err = t.GetFilteredEvents(filter)
-				log.Printf("--- %v\n", events)
 				if err != nil {
 					events, err = t.GetEvents()
 					if err != nil {
@@ -109,8 +101,6 @@ func GetEventsHandler(s *postgres.Storage, t *timepad.TimepadPoller) http.Handle
 					}
 				}
 			}
-
-			// fmt.Println(events)
 
 			// convert structs
 			res := make([]models.EventResponse, len(events))
@@ -125,7 +115,7 @@ func GetEventsHandler(s *postgres.Storage, t *timepad.TimepadPoller) http.Handle
 				res[i] = curr
 			}
 
-			// fmt.Printf("events, resulting slice: %v\n", res)
+			fmt.Printf("events, resulting slice: %v\n", res)
 
 			render.JSON(w, r, struct {
 				response.Response
