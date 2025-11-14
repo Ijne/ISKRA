@@ -21,7 +21,7 @@ func (r *LikeRepo) CreateTable() error {
 
 	stmt := `
 		CREATE TABLE IF NOT EXISTS likes (
-			id integer NOT NULL,
+			id SERIAL PRIMARY KEY,
 			user1 integer NOT NULL,
 			user2 integer NOT NULL
 		);
