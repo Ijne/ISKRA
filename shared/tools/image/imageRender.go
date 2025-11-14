@@ -10,18 +10,15 @@ import (
 )
 
 func ConvertImageToBase64(imagePath string) (string, error) {
-	// Проверяем существование файла
 	if _, err := os.Stat(imagePath); os.IsNotExist(err) {
 		return "", fmt.Errorf("image file not found: %s", imagePath)
 	}
 
-	// Читаем файл
 	imageData, err := os.ReadFile(imagePath)
 	if err != nil {
 		return "", fmt.Errorf("failed to read image file: %v", err)
 	}
 
-	// Определяем MIME тип по расширению файла
 	var mimeType string
 	ext := strings.ToLower(filepath.Ext(imagePath))
 	switch ext {
@@ -34,24 +31,20 @@ func ConvertImageToBase64(imagePath string) (string, error) {
 	case ".webp":
 		mimeType = "image/webp"
 	default:
-		// Пытаемся определить по содержимому
 		mimeType = http.DetectContentType(imageData)
 		if !strings.HasPrefix(mimeType, "image/") {
 			return "", fmt.Errorf("unsupported image format: %s", ext)
 		}
 	}
 
-	// Кодируем в base64
 	base64String := base64.StdEncoding.EncodeToString(imageData)
 
-	// Формируем data URL
 	dataURL := fmt.Sprintf("data:%s;base64,%s", mimeType, base64String)
 
 	return dataURL, nil
 }
 
 func SaveUserAvatar(userID int64, base64Image string) (string, error) {
-	// Проверяем, является ли строка base64 изображением
 	if !strings.HasPrefix(base64Image, "data:image") {
 		return base64Image, nil
 	}
@@ -101,12 +94,10 @@ func GetUserPhoto(photoPath string) string {
 		return ""
 	}
 
-	// Если это уже base64, возвращаем как есть
 	if strings.HasPrefix(photoPath, "data:image") {
 		return photoPath
 	}
 
-	// Если это путь к файлу, конвертируем в base64
 	cleanPath := strings.TrimPrefix(photoPath, "/")
 	base64Photo, err := ConvertImageToBase64(cleanPath)
 	if err != nil {

@@ -317,21 +317,23 @@ func (r *SocialWebRepo) GetRecommendations(id int64) ([]models.UserResponse, err
 
             OPTIONAL MATCH (me)-[swipe:SWIPED]->(candidate)
             WITH candidate, me, swipe
-            WHERE swipe IS NULL
+            WHERE swipe IS NULL AND NOT candidate.name ENDS WITH "_t"
 
+			OPTIONAL MATCH (candidate)-[like:SWIPED {interaction_type: "like"}]->(me)
             OPTIONAL MATCH (me)-[:LIVES_IN]->(city:City)<-[:LIVES_IN]-(candidate)
             OPTIONAL MATCH (me)-[:WANTS_VISIT]->(event:Event)<-[:WANTS_VISIT]-(candidate)
             OPTIONAL MATCH (me)-[:LIKES]->(film:Film)<-[:LIKES]-(candidate)
             OPTIONAL MATCH (me)-[:LIKES]->(music:Music)<-[:LIKES]-(candidate)
 
             WITH candidate, me, city,
+				(COUNT(DISTINCT like) * 15) AS like_score,
                 (COUNT(DISTINCT event) * 10) AS event_score,
                 (CASE WHEN city IS NOT NULL THEN 15 ELSE 0 END) AS city_score,
                 (COUNT(DISTINCT film) + COUNT(DISTINCT music)) * 2 AS taste_score,
                 -(abs(me.age - candidate.age) * 0.5) AS age_penalty
 
-            WITH candidate, city, (event_score + city_score + taste_score + age_penalty) AS total_score
-            WHERE total_score >= -100000
+            WITH candidate, city, (like_score + event_score + city_score + taste_score + age_penalty) AS total_score
+            WHERE total_score >= $tier1_min_score
 
             RETURN 
                 candidate.id AS id,
@@ -354,7 +356,7 @@ func (r *SocialWebRepo) GetRecommendations(id int64) ([]models.UserResponse, err
 				candidate.photo AS photo,
                 total_score AS match_score
             ORDER BY total_score DESC
-            LIMIT 50
+            LIMIT $limit
         `
 
 		result, err := tx.Run(context.Background(), query, params)
@@ -464,6 +466,169 @@ func (r *SocialWebRepo) GetRecommendations(id int64) ([]models.UserResponse, err
 
 		if err := result.Err(); err != nil {
 			return nil, err
+		}
+
+		if len(users) < int(limit) {
+			params["limit"] = int(limit) - len(users)
+			query2 := `
+				MATCH (me:Person {id: $id})
+
+				MATCH (candidate:Person)
+				WHERE candidate.id <> me.id
+				AND (candidate.gender = me.preferred_gender OR me.preferred_gender = 2)
+				AND (me.gender = candidate.preferred_gender OR candidate.preferred_gender = 2)
+
+				OPTIONAL MATCH (me)-[swipe:SWIPED {interaction_type: "like"}]->(candidate)
+				WITH candidate, me, swipe
+				WHERE swipe IS NULL
+
+				OPTIONAL MATCH (candidate)-[like:SWIPED {interaction_type: "like"}]->(me)				
+				OPTIONAL MATCH (me)-[:LIVES_IN]->(city:City)<-[:LIVES_IN]-(candidate)
+				OPTIONAL MATCH (me)-[:WANTS_VISIT]->(event:Event)<-[:WANTS_VISIT]-(candidate)
+				OPTIONAL MATCH (me)-[:LIKES]->(film:Film)<-[:LIKES]-(candidate)
+				OPTIONAL MATCH (me)-[:LIKES]->(music:Music)<-[:LIKES]-(candidate)
+
+				WITH candidate, me, city,
+					(COUNT(DISTINCT like) * 15) AS like_score,
+					(COUNT(DISTINCT event) * 10) AS event_score,
+					(CASE WHEN city IS NOT NULL THEN 15 ELSE 0 END) AS city_score,
+					(COUNT(DISTINCT film) + COUNT(DISTINCT music)) * 2 AS taste_score,
+					-(abs(me.age - candidate.age) * 0.5) AS age_penalty,
+					CASE
+						WHEN candidate.name ENDS WITH "_t" THEN -200
+						ELSE 0
+					END AS test_user_penalty
+
+				WITH candidate, city, (event_score + city_score + taste_score + age_penalty + test_user_penalty) AS total_score
+				WHERE total_score >= $tier1_min_score
+
+				RETURN 
+					candidate.id AS id,
+					candidate.username AS username,
+					candidate.name AS name,
+					candidate.surname AS surname,
+					candidate.age AS age,
+					candidate.gender AS gender,
+					candidate.preferred_gender AS preferred_gender,
+					candidate.career_type AS career_type,
+					candidate.personality_type AS personality_type,
+					candidate.relationship_goal AS relationship_goal,
+					candidate.important_values AS important_values,
+					city.name AS city,
+					candidate.career_place AS career_place,
+					candidate.music AS music,
+					candidate.films AS films,
+					candidate.hobbies AS hobbies,
+					candidate.event_preferences AS event_preferences,
+					candidate.photo AS photo,
+					total_score AS match_score
+				ORDER BY total_score DESC
+				LIMIT $limit
+			`
+			result, err := tx.Run(context.Background(), query2, params)
+			if err != nil {
+				return nil, err
+			}
+
+			for result.Next(context.Background()) {
+				record := result.Record()
+				if record == nil {
+					continue
+				}
+
+				user := models.UserResponse{}
+
+				if idVal, ok := record.Get("id"); ok {
+					if idInt, ok := idVal.(int64); ok {
+						user.ID = idInt
+					}
+					print(user.ID)
+				}
+
+				if username, ok := record.Get("username"); ok {
+					user.Username, _ = username.(string)
+				}
+
+				if name, ok := record.Get("name"); ok {
+					user.Name, _ = name.(string)
+				}
+
+				if age, ok := record.Get("age"); ok {
+					if ageInt, ok := age.(int64); ok {
+						user.Age = int(ageInt)
+					}
+				}
+
+				if gender, ok := record.Get("gender"); ok {
+					if genderInt, ok := gender.(int64); ok {
+						user.Gender = int(genderInt)
+					}
+				}
+
+				if surname, ok := record.Get("surname"); ok && surname != nil {
+					if surnameStr, ok := surname.(string); ok {
+						user.Surname = &surnameStr
+					}
+				}
+
+				if preferredGender, ok := record.Get("preferred_gender"); ok {
+					if pgInt, ok := preferredGender.(int64); ok {
+						user.PreferredGender = int(pgInt)
+					}
+				}
+
+				if careerType, ok := record.Get("career_type"); ok {
+					user.CareerType, _ = careerType.(string)
+				}
+
+				if personalityType, ok := record.Get("personality_type"); ok {
+					user.PersonalityType, _ = personalityType.(string)
+				}
+
+				if relationshipGoal, ok := record.Get("relationship_goal"); ok {
+					user.RelationshipGoal, _ = relationshipGoal.(string)
+				}
+
+				if importantValues, ok := record.Get("important_values"); ok {
+					user.ImportantValues, _ = importantValues.(string)
+				}
+
+				if city, ok := record.Get("city"); ok {
+					user.City, _ = city.(string)
+				}
+
+				if careerPlace, ok := record.Get("career_place"); ok {
+					user.CareerPlace, _ = careerPlace.(string)
+				}
+
+				if music, ok := record.Get("music"); ok {
+					user.Music, _ = music.(string)
+				}
+
+				if films, ok := record.Get("films"); ok {
+					user.Films, _ = films.(string)
+				}
+
+				if hobbies, ok := record.Get("hobbies"); ok {
+					user.Hobbies, _ = hobbies.(string)
+				}
+
+				if eventPreferences, ok := record.Get("event_preferences"); ok {
+					user.EventPreferences, _ = eventPreferences.(string)
+				}
+
+				if photo, ok := record.Get("photo"); ok {
+					user.Photo, _ = photo.(string)
+					user.Photo = image.GetUserPhoto(user.Photo)
+				}
+
+				if matchScore, ok := record.Get("match_score"); ok {
+					fmt.Println(matchScore)
+				}
+
+				users = append(users, user)
+			}
+
 		}
 
 		return users, nil
