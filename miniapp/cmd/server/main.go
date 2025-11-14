@@ -26,6 +26,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	defer s.Close()
+
 	g, err := memgraph.NewStorage(cfg)
 	if err != nil {
 		fmt.Println("Memgraph is not started")

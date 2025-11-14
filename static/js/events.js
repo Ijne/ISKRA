@@ -1,5 +1,3 @@
-let initData = null;
-let WebApp = null;
 const API_BASE_URL = 'http://localhost:8080';
 
 let currentEvents = [];
@@ -10,13 +8,14 @@ let currentSkip = 0;
 const limit = 5;
 let isLoading = false;
 let hasMoreEvents = true;
+let initData = null;
+let WebApp = null;
 
 function waitForWebApp() {
-    return new Promise((resolve) => {
-        if (window.WebApp?.initData) {
+    return new Promise((resolve, reject) => {
+        if (window.WebApp) {
             WebApp = window.WebApp;
             initData = window.WebApp?.initData;
-            console.log('WebApp загружен:', WebApp);
             resolve();
             return;
         }
@@ -50,16 +49,16 @@ async function getCurrentUser() {
         
         if (!initData) {
             console.error('No init data found');
-            return null;
+            return 0;
         }
 
         let decodedString;
         
         if (typeof initData === 'object') {
             const user = initData.user || initData;
-            return user.id || null;
+            return user.id || 0;
         }
-
+        
         if (typeof initData === 'string') {
             decodedString = decodeURIComponent(initData);
 
@@ -72,12 +71,12 @@ async function getCurrentUser() {
                 if (userParam) {
                     try {
                         const userData = JSON.parse(userParam);
-                        return userData.id || null;
+                        return userData.id || 0;
                     } catch (e) {
                         console.error('Error parsing user data:', e);
                     }
                 }
-                return null;
+                return 0;
             }
 
             const userParam = params.get('user');
@@ -128,25 +127,20 @@ async function getCurrentUser() {
                 .map(b => b.toString(16).padStart(2, '0'))
                 .join('');
             
-            console.log('Calculated hash:', calculatedHash);
-            console.log('Received hash:', receivedHash);
 
             if (calculatedHash === receivedHash) {
-                console.log('Hash validation successful');
                 
                 if (userParam) {
                     try {
                         const userData = JSON.parse(userParam);
-                        console.log('User data:', userData);
-                        return userData.id || null;
+                        return userData.id || 0;
                     } catch (parseError) {
                         console.error('Error parsing user data:', parseError);
-                        return null;
+                        return 0;
                     }
                 }
             } else {
-                console.log('Hash validation failed');
-                return null;
+                return 0;
             }
         }
         
@@ -162,13 +156,11 @@ async function initApp() {
         await waitForWebApp();
         console.log('Приложение инициализировано');
         
-        await loadUserCity();
         setupNavigation();
         setupInfiniteScroll();
         
     } catch (error) {
         console.error('Ошибка инициализации приложения:', error);
-        await loadUserCity();
         setupNavigation();
         setupInfiniteScroll();
     }
@@ -176,6 +168,7 @@ async function initApp() {
 
 document.addEventListener('DOMContentLoaded', initApp);
 
+<<<<<<< HEAD
 async function loadUserCity() {
     try {
         const userId = await getCurrentUser();
@@ -204,6 +197,8 @@ async function loadUserCity() {
     }
 }
 
+=======
+>>>>>>> deploy-feature-1
 function setupInfiniteScroll() {
     window.addEventListener('scroll', () => {
         if (isLoading || !hasMoreEvents) return;
@@ -350,8 +345,14 @@ function displayEvents(events) {
             </div>
         </div>
     `).join('');
+<<<<<<< HEAD
 
     if (hasMoreEvents && userCity) {
+=======
+    
+    // Добавляем индикатор загрузки если есть еще события
+    if (hasMoreEvents) {
+>>>>>>> deploy-feature-1
         eventsList.innerHTML += `<div class="loading-indicator">Загрузка...</div>`;
     }
 }
