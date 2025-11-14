@@ -737,8 +737,8 @@ async function loadMainContent() {
                 
                 <div class="user-card" id="userCard">
                     <div class="card-background"></div>
-                    <div class="swipe-overlay swipe-like">👍</div>
-                    <div class="swipe-overlay swipe-dislike">👎</div>
+                    <div class="swipe-overlay swipe-like"></div>
+                    <div class="swipe-overlay swipe-dislike"></div>
                     <div class="card-content">
                         <div class="card-main-info" id="cardMainInfo">
                             <h2 class="user-name" id="userName">Имя</h2>

@@ -365,6 +365,7 @@ func (r *SocialWebRepo) GetRecommendations(id int64) ([]models.UserResponse, err
 		}
 
 		var users []models.UserResponse
+		existingIDs := make(map[int64]bool)
 		for result.Next(context.Background()) {
 			record := result.Record()
 			if record == nil {
@@ -461,7 +462,10 @@ func (r *SocialWebRepo) GetRecommendations(id int64) ([]models.UserResponse, err
 				fmt.Println(matchScore)
 			}
 
-			users = append(users, user)
+			if !existingIDs[user.ID] {
+				users = append(users, user)
+				existingIDs[user.ID] = true
+			}
 		}
 
 		if err := result.Err(); err != nil {
@@ -500,7 +504,6 @@ func (r *SocialWebRepo) GetRecommendations(id int64) ([]models.UserResponse, err
 					END AS test_user_penalty
 
 				WITH candidate, city, (event_score + city_score + taste_score + age_penalty + test_user_penalty) AS total_score
-				WHERE total_score >= $tier1_min_score
 
 				RETURN 
 					candidate.id AS id,
@@ -626,7 +629,10 @@ func (r *SocialWebRepo) GetRecommendations(id int64) ([]models.UserResponse, err
 					fmt.Println(matchScore)
 				}
 
-				users = append(users, user)
+				if !existingIDs[user.ID] {
+					users = append(users, user)
+					existingIDs[user.ID] = true
+				}
 			}
 
 		}

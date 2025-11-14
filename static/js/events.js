@@ -159,6 +159,7 @@ async function initApp() {
         setupNavigation();
         setupInfiniteScroll();
         
+        await loadEvents();
     } catch (error) {
         console.error('Ошибка инициализации приложения:', error);
         setupNavigation();
@@ -168,37 +169,6 @@ async function initApp() {
 
 document.addEventListener('DOMContentLoaded', initApp);
 
-<<<<<<< HEAD
-async function loadUserCity() {
-    try {
-        const userId = await getCurrentUser();
-        if (!userId) {
-            console.log('Пользователь не авторизован, загружаем базовые мероприятия');
-            await loadEvents();
-            return;
-        }
-
-        const response = await fetch(`${API_BASE_URL}/profile?id=${userId}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-
-        if (response.ok) {
-            const userData = await response.json();
-            userCity = userData.city || '';
-            console.log('Город пользователя:', userCity);
-        }
-    } catch (error) {
-        console.error('Ошибка загрузки города пользователя:', error);
-    } finally {
-        await loadEvents();
-    }
-}
-
-=======
->>>>>>> deploy-feature-1
 function setupInfiniteScroll() {
     window.addEventListener('scroll', () => {
         if (isLoading || !hasMoreEvents) return;
@@ -231,6 +201,7 @@ async function loadEvents() {
         const data = await response.json();
         
         if (data.status === 'ok') {
+            console.log(data)
             currentEvents = data.events || [];
             console.log(`Загружено мероприятий: ${currentEvents.length}`);
             displayEvents(currentEvents);
@@ -269,34 +240,26 @@ async function loadMoreEvents() {
             })
         });
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
         const data = await response.json();
         
-        if (data.status === 'ok') {
-            const newEvents = data.events || [];
-            console.log(`Загружено дополнительных мероприятий: ${newEvents.length}`);
+        const newEvents = data.events || [];
+        console.log(`Загружено дополнительных мероприятий: ${newEvents.length}`);
+        
+        if (newEvents.length > 0) {
+            currentEvents = [...currentEvents, ...newEvents];
+            displayEvents(currentEvents);
+            currentSkip += limit;
             
-            if (newEvents.length > 0) {
-                currentEvents = [...currentEvents, ...newEvents];
-                displayEvents(currentEvents);
-                currentSkip += limit;
-                
-                if (newEvents.length < limit) {
-                    hasMoreEvents = false;
-                    hideLoadingIndicator();
-                    showNoMoreEvents();
-                    console.log('Больше мероприятий нет');
-                }
-            } else {
+            if (newEvents.length < limit) {
                 hasMoreEvents = false;
+                hideLoadingIndicator();
                 showNoMoreEvents();
                 console.log('Больше мероприятий нет');
             }
         } else {
-            throw new Error(data.error || 'Неизвестная ошибка');
+            hasMoreEvents = false;
+            showNoMoreEvents();
+            console.log('Больше мероприятий нет');
         }
     } catch (error) {
         console.error('Ошибка загрузки дополнительных мероприятий:', error);
@@ -334,7 +297,7 @@ function displayEvents(events) {
                 ''
             }
             <div class="event-photo-placeholder" ${event.Photo ? 'style="display: none;"' : ''}>
-                🎭
+                
             </div>
             <h3 class="event-name">${escapeHtml(event.Name)}</h3>
             <div class="event-date">${formatDate(event.StartsAt)}</div>
@@ -345,14 +308,9 @@ function displayEvents(events) {
             </div>
         </div>
     `).join('');
-<<<<<<< HEAD
-
-    if (hasMoreEvents && userCity) {
-=======
     
-    // Добавляем индикатор загрузки если есть еще события
     if (hasMoreEvents) {
->>>>>>> deploy-feature-1
+        deploy-feature-1
         eventsList.innerHTML += `<div class="loading-indicator">Загрузка...</div>`;
     }
 }
@@ -476,24 +434,22 @@ async function displayFlames(flames) {
             <div class="flame-card ${isOwnFlame ? 'own-flame' : ''}">
                 <div class="flame-header">
                     <div class="flame-user">
-                        <div class="flame-avatar">${userInitials}</div>
+                        <div class="flame-avatar"></div>
                         <div class="flame-user-info">
-                            <div class="flame-username">${flame.username || 'Пользователь'}</div>
+                            <div class="flame-username">${flame.Name || 'Пользователь'}</div>
                             <div class="flame-user-details">
                                 ${flame.age ? flame.age + ' лет' : ''} 
                                 ${flame.gender !== undefined ? (flame.gender === 0 ? '♂' : '♀') : ''}
                             </div>
                         </div>
                     </div>
-                    ${!isOwnFlame ? `
-                        <button class="like-btn" onclick="likeUser(${flame.user_id}, this)">
-                            ❤️ Лайк
-                        </button>
-                    ` : ''}
                 </div>
                 <div class="flame-description">
                     ${escapeHtml(flame.description || 'Без описания')}
                 </div>
+                ${!isOwnFlame ? `
+                        <button class="like-btn" onclick="likeUser(${flame.user_id}, this)">+ Хочу пойти!</button>
+                    ` : ''}
             </div>
         `;
     }).join('');
@@ -502,7 +458,7 @@ async function displayFlames(flames) {
 async function likeUser(userId, button) {
     try {
         const currentUserId = await getCurrentUser();
-        if (!currentUserId) {
+        if (!currentUserId && currentUserId != 0) {
             showMessage('Необходимо авторизоваться', 'error');
             return;
         }
@@ -525,7 +481,7 @@ async function likeUser(userId, button) {
         if (data.status === 'ok') {
             if (button) {
                 button.classList.add('liked');
-                button.innerHTML = '❤️ Лайк отправлен!';
+                button.innerHTML = 'Запрос отправлен!';
                 button.disabled = true;
                 
                 setTimeout(() => {
