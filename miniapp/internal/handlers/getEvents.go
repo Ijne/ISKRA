@@ -99,8 +99,8 @@ func GetEventsHandler(s *postgres.Storage, t *timepad.TimepadPoller) http.Handle
 					Skip:       req.Skip,
 				}
 
-				events, err := t.GetFilteredEvents(filter)
-				log.Printf("%v\n", events)
+				events, err = t.GetFilteredEvents(filter)
+				log.Printf("--- %v\n", events)
 				if err != nil {
 					events, err = t.GetEvents()
 					if err != nil {
