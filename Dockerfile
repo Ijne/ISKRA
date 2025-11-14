@@ -27,7 +27,7 @@ FROM alpine:3.22
 # Устанавливаем зависимости времени выполнения (если нужны)
 # RUN apk --no-cache add ca-certificates
 
-#WORKDIR /root
+# WORKDIR /root
 RUN mkdir -p /static/img 
 
 # COPY --from=builder /app/main/cmd/main .

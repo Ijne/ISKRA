@@ -48,6 +48,10 @@ func NewStorage(cfg *config.Config) (*Storage, error) {
 	return &Storage{db: db, FlamesRepo: flamesRepo, UserRepo: userRepo, LikeRepo: likeRepo, MatchesRepo: matchesRepo}, nil
 }
 
+func (s *Storage) Close() error {
+	return s.db.Close()
+}
+
 func getDSN(cfg *config.Config) string {
 	return fmt.Sprintf(
 		"postgres://%s:%s@%s:%s/%s?sslmode=%s",

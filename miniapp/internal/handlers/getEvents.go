@@ -125,6 +125,8 @@ func GetEventsHandler(s *postgres.Storage, t *timepad.TimepadPoller) http.Handle
 				res[i] = curr
 			}
 
+			// fmt.Printf("events, resulting slice: %v\n", res)
+
 			render.JSON(w, r, struct {
 				response.Response
 				models.ManyEventsResponse

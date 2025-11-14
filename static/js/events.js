@@ -1,5 +1,3 @@
-let initData = null;
-let WebApp = null;
 const API_BASE_URL = 'http://localhost:8080';
 
 let currentEvents = [];
@@ -10,14 +8,14 @@ let currentSkip = 0;
 const limit = 5;
 let isLoading = false;
 let hasMoreEvents = true;
+let initData = null;
+let WebApp = null;
 
-// Функция ожидания загрузки WebApp
 function waitForWebApp() {
-    return new Promise((resolve) => {
-        if (window.WebApp?.initData) {
+    return new Promise((resolve, reject) => {
+        if (window.WebApp) {
             WebApp = window.WebApp;
             initData = window.WebApp?.initData;
-            console.log('WebApp загружен:', WebApp);
             resolve();
             return;
         }
@@ -45,23 +43,22 @@ function waitForWebApp() {
     });
 }
 
-// Получение текущего пользователя
 async function getCurrentUser() {
     try {
         await waitForWebApp();
         
         if (!initData) {
             console.error('No init data found');
-            return null;
+            return 0;
         }
 
         let decodedString;
         
         if (typeof initData === 'object') {
             const user = initData.user || initData;
-            return user.id || null;
+            return user.id || 0;
         }
-
+        
         if (typeof initData === 'string') {
             decodedString = decodeURIComponent(initData);
 
@@ -74,12 +71,12 @@ async function getCurrentUser() {
                 if (userParam) {
                     try {
                         const userData = JSON.parse(userParam);
-                        return userData.id || null;
+                        return userData.id || 0;
                     } catch (e) {
                         console.error('Error parsing user data:', e);
                     }
                 }
-                return null;
+                return 0;
             }
 
             const userParam = params.get('user');
@@ -130,25 +127,20 @@ async function getCurrentUser() {
                 .map(b => b.toString(16).padStart(2, '0'))
                 .join('');
             
-            console.log('Calculated hash:', calculatedHash);
-            console.log('Received hash:', receivedHash);
 
             if (calculatedHash === receivedHash) {
-                console.log('Hash validation successful');
                 
                 if (userParam) {
                     try {
                         const userData = JSON.parse(userParam);
-                        console.log('User data:', userData);
-                        return userData.id || null;
+                        return userData.id || 0;
                     } catch (parseError) {
                         console.error('Error parsing user data:', parseError);
-                        return null;
+                        return 0;
                     }
                 }
             } else {
-                console.log('Hash validation failed');
-                return null;
+                return 0;
             }
         }
         
@@ -159,19 +151,16 @@ async function getCurrentUser() {
     }
 }
 
-// Загрузка мероприятий при загрузке страницы
 async function initApp() {
     try {
         await waitForWebApp();
         console.log('Приложение инициализировано');
         
-        await loadUserCity();
         setupNavigation();
         setupInfiniteScroll();
         
     } catch (error) {
         console.error('Ошибка инициализации приложения:', error);
-        await loadUserCity();
         setupNavigation();
         setupInfiniteScroll();
     }
@@ -179,36 +168,6 @@ async function initApp() {
 
 document.addEventListener('DOMContentLoaded', initApp);
 
-// Загрузка города пользователя
-async function loadUserCity() {
-    try {
-        const userId = await getCurrentUser();
-        if (!userId) {
-            console.log('Пользователь не авторизован, загружаем базовые мероприятия');
-            await loadEvents();
-            return;
-        }
-
-        const response = await fetch(`${API_BASE_URL}/profile?id=${userId}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-
-        if (response.ok) {
-            const userData = await response.json();
-            userCity = userData.city || '';
-            console.log('Город пользователя:', userCity);
-        }
-    } catch (error) {
-        console.error('Ошибка загрузки города пользователя:', error);
-    } finally {
-        await loadEvents();
-    }
-}
-
-// Настройка бесконечной прокрутки
 function setupInfiniteScroll() {
     window.addEventListener('scroll', () => {
         if (isLoading || !hasMoreEvents) return;
@@ -362,7 +321,7 @@ function displayEvents(events) {
     `).join('');
     
     // Добавляем индикатор загрузки если есть еще события
-    if (hasMoreEvents && userCity) {
+    if (hasMoreEvents) {
         eventsList.innerHTML += `<div class="loading-indicator">Загрузка...</div>`;
     }
 }
