@@ -10,12 +10,19 @@ type Organization struct {
 	Name string `json:"name"`
 }
 
+// type Category struct {
+// 	ID   int    `json:"id"`
+// 	Name string `json:"name"`
+// }
+
 type Event struct {
 	ID          int64       `json:"id"`
 	Name        string      `json:"name"`
 	StartsAt    string      `json:"starts_at"`
 	URL         string      `json:"url"`
 	PosterImage PosterImage `json:"poster_image"`
+	// Organization Organization `json:"organization"`
+	// Categories []Category `json:"categories"`
 }
 
 type Response struct {

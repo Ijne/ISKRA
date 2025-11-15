@@ -31,7 +31,14 @@ func main() {
 	g, err := memgraph.NewStorage(cfg)
 	if err != nil {
 		fmt.Println("Memgraph is not started")
+		// panic(err)
 	}
+
+	// static
+	// workDir, _ := os.Getwd()
+	// log.Printf("WD for loading static: %s\n", workDir)
+	// staticDir := filepath.Join(workDir, cfg.MiniApp.StaticPath)
+	// fs := http.FileServer(http.Dir(staticDir))
 
 	// timepad api
 	t := timepad.New(cfg)

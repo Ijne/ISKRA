@@ -28,6 +28,8 @@ type ManyEventsResponse struct {
 }
 
 type FilteredEventsRequest struct {
+	// City       string   `json:"city,omitempty"`
+	// Categories []string `json:"categories,omitempty"`
 	Limit int `json:"limit,omitempty"`
 	Skip  int `json:"skip,omitempty"`
 }

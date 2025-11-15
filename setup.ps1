@@ -1,12 +1,12 @@
-Write-Host "🚀 Запуск ISKRA проекта (Windows версия)" -ForegroundColor Green
+﻿Write-Host "🚀 Запуск ISKRA проекта (Windows версия)" -ForegroundColor Green
 
 # 3. Запускаем базы данных
 Write-Host "📦 Запускаем базы данных..." -ForegroundColor Yellow
-docker-compose up
+docker-compose up -d
 
 # 4. Ждем запуска баз
-Write-Host "⏳ Ждем запуска баз данных (30 сек)..." -ForegroundColor Yellow
-Start-Sleep -Seconds 30
+Write-Host "⏳ Ждем запуска баз данных (5 сек)..." -ForegroundColor Yellow
+Start-Sleep -Seconds 5
 
 # 6. Заполняем Memgraph тестовыми данными
 Write-Host "🎯 Заполняем Memgraph тестовыми данными..." -ForegroundColor Yellow

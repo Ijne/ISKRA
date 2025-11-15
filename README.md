@@ -78,7 +78,7 @@
    ```bash
    git clone https://github.com/Ijne/ISKRA.git
    cd ISKRA
-   git checkout dev
+   git checkout master
    chmod +x setup.sh
    ./setup.sh
    ```
@@ -87,7 +87,7 @@
    ```powershell
    git clone https://github.com/Ijne/ISKRA.git
    cd ISKRA
-   git checkout dev
+   git checkout master
    # В PowerShell (от имени администратора если нужно)
    .\setup.ps1
 
@@ -96,8 +96,8 @@
    ```powershell
    git clone https://github.com/Ijne/ISKRA.git
    cd ISKRA
-   git checkout dev
-   docker-compose up
+   git checkout master
+   docker-compose up -d
    ```
 ## Послесловие
 Запустив проект можно переходить в мессенджер MAX и проверять работоспособность @t21_hakaton_bot. Скрипты для заполнения тестовыми пользователями лежат в папке init-scripts (если вам вдруг захочется повыполнять вручную).

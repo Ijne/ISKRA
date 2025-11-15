@@ -28,4 +28,5 @@ services:
   
   memgraph:
     image: "memgraph/memgraph:latest"
-
+    ports:
+      - "7687:7687"
