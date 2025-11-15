@@ -3,8 +3,8 @@ Write-Host "Starting ISKRA project (Windows version)" -ForegroundColor Green
 docker-compose up
 
 # 4. Wait for databases to start
-Write-Host "Waiting for databases to start (30 sec)..." -ForegroundColor Yellow
-Start-Sleep -Seconds 30
+Write-Host "Waiting for databases to start (5 sec)..." -ForegroundColor Yellow
+Start-Sleep -Seconds 5
 
 # 6. Fill Memgraph with test data
 Write-Host "Filling Memgraph with test data..." -ForegroundColor Yellow
