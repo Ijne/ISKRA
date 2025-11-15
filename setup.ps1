@@ -6,31 +6,6 @@ docker-compose up
 Write-Host "Waiting for databases to start (30 sec)..." -ForegroundColor Yellow
 Start-Sleep -Seconds 30
 
-# 5. Create table in PostgreSQL
-Write-Host "Creating users table in PostgreSQL..." -ForegroundColor Yellow
-docker-compose exec postgres psql -U postgres -d postgres -c "
-CREATE TABLE IF NOT EXISTS public.users (
-    id int NOT NULL,
-    username varchar NULL,
-    name varchar DEFAULT 'Default_user_name' NOT NULL,
-    surname varchar NULL,
-    age int DEFAULT 18 NULL,
-    gender int DEFAULT 0 NOT NULL,
-    preferred_gender int DEFAULT 2 NOT NULL,
-    career_type varchar NULL,
-    personality_type varchar NULL,
-    relationship_goal varchar NULL,
-    important_values varchar NULL,
-    city varchar NULL,
-    career_place varchar NULL,
-    music varchar NULL,
-    films varchar NULL,
-    hobbies varchar NULL,
-    event_preferences varchar NULL,
-    photo varchar NULL,
-    CONSTRAINT users_pk PRIMARY KEY (id)
-);"
-
 # 6. Fill Memgraph with test data
 Write-Host "Filling Memgraph with test data..." -ForegroundColor Yellow
 
@@ -62,11 +37,11 @@ Get-Content "init-scripts/12-export-to-postgres.cql" | docker-compose exec -T me
 Write-Host "Cleaning exported data..." -ForegroundColor Yellow
 $content = Get-Content "exported-data.sql" | Where-Object { $_ -ne "" -and $_ -ne "sql_statement" }
 $content = $content -replace "^\| ", ""
-$content | Out-File -FilePath "exported-data.sql" -Encoding UTF8
+$content | Out-File -FilePath "exported-data-clean.sql" -Encoding UTF8
 
 # 9. Import to PostgreSQL
 Write-Host "Importing data to PostgreSQL..." -ForegroundColor Yellow
-Get-Content "exported-data.sql" | docker-compose exec -T postgres psql -U postgres -d postgres
+Get-Content "exported-data-clean.sql" | docker-compose exec -T postgres psql -U postgres -d postgres
 
 # 10. Start main service
 Write-Host "Starting main service..." -ForegroundColor Yellow
@@ -80,8 +55,8 @@ Write-Host ""
 Write-Host "Done! ISKRA is running!" -ForegroundColor Green
 Write-Host ""
 Write-Host "Services access:" -ForegroundColor White
-Write-Host "   • Application: http://localhost:8080" -ForegroundColor White
-Write-Host "   • Memgraph: localhost:7687" -ForegroundColor White
-Write-Host "   • PostgreSQL: localhost:5433" -ForegroundColor White
+Write-Host "   Application: http://localhost:8080" -ForegroundColor White
+Write-Host "   Memgraph: localhost:7687" -ForegroundColor White
+Write-Host "   PostgreSQL: localhost:5433" -ForegroundColor White
 Write-Host ""
 Write-Host "Created 1000 test users!" -ForegroundColor Green
