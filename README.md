@@ -77,6 +77,8 @@
    Выполните:
    ```bash
    git clone https://github.com/Ijne/ISKRA.git
+   cd ISKRA
+   git checkout dev
    chmod +x setup.sh
    ./setup.sh
    ```
@@ -84,6 +86,8 @@
    Выполните:
    ```powershell
    git clone https://github.com/Ijne/ISKRA.git
+   cd ISKRA
+   git checkout dev
    # В PowerShell (от имени администратора если нужно)
    .\setup.ps1
 

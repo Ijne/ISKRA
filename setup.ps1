@@ -1,11 +1,5 @@
 Write-Host "🚀 Запуск ISKRA проекта (Windows версия)" -ForegroundColor Green
 
-# 1. Клонируем репозиторий
-cd ISKRA
-
-# 2. Переключаемся на ветку dev
-git checkout dev
-
 # 3. Запускаем базы данных
 Write-Host "📦 Запускаем базы данных..." -ForegroundColor Yellow
 docker-compose up
