@@ -91,7 +91,13 @@
    # В PowerShell (от имени администратора если нужно)
    .\setup.ps1
 
-   # Или если выполнение скриптов запрещено:
-   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-   .\setup.ps1
+3. **Или попросту.**
+   Выполните:
+   ```powershell
+   git clone https://github.com/Ijne/ISKRA.git
+   cd ISKRA
+   git checkout dev
+   docker-compose up
    ```
+## Послесловие
+Запустив проект можно переходить в мессенджер MAX и проверять работоспособность @t21_hakaton_bot. Скрипты для заполнения тестовыми пользователями лежат в папке init-scripts (если вам вдруг захочется повыполнять вручную).
