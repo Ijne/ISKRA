@@ -1,0 +1,52 @@
+package models
+
+type FlameDB struct {
+	EventID     int64  `json:"event_id"`
+	UserID      int64  `json:"user_id"`
+	Description string `json:"description"`
+}
+
+type FlameWithUserDB struct {
+	EventID     int64  `json:"event_id"`
+	UserID      int64  `json:"user_id"`
+	Description string `json:"description"`
+
+	Username         string  `json:"username" db:"username"`
+	Name             string  `json:"name" db:"name"`
+	Surname          *string `json:"surname,omitempty" db:"surname"`
+	Age              int     `json:"age" db:"age"`
+	Gender           int     `json:"gender" db:"gender"`
+	PreferredGender  int     `json:"preferred_gender,omitempty" db:"preferred_gender"`
+	CareerType       string  `json:"career_type,omitempty" db:"career_ty"`
+	PersonalityType  string  `json:"personality_type,omitempty" db:"personality_type"`
+	RelationshipGoal string  `json:"relationship_goal,omitempty" db:"relationship_goal"`
+	ImportantValues  string  `json:"important_values,omitempty" db:"important_values"`
+	City             string  `json:"city,omitempty" db:"city"`
+	CareerPlace      string  `json:"career_place,omitempty" db:"career_place"`
+	Music            string  `json:"music,omitempty" db:"music"`
+	Films            string  `json:"films,omitempty" db:"films"`
+	Hobbies          string  `json:"hobbies,omitempty" db:"hobbies"`
+	EventPreferences string  `json:"event_preferences,omitempty" db:"event_preferences"`
+}
+
+type FlamesRequest struct {
+	EventID int64 `json:"event_id"`
+}
+
+type ManyFlamesResponse struct {
+	Flames []FlameWithUserDB `json:"flames"`
+}
+
+type FlameCreate struct {
+	EventID     int64  `json:"event_id"`
+	Description string `json:"description"`
+}
+
+type FlameUpdate struct {
+	EventID     int64  `json:"event_id"`
+	Description string `json:"description"`
+}
+
+type FlameDelete struct {
+	EventID int64 `json:"event_id"`
+}

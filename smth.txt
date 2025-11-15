@@ -1,0 +1,4 @@
+git clone https://github.com/Ijne/ISKRA.git
+cd ISKRA
+git checkout dev
+docker-compose up

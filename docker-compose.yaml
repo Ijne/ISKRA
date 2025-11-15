@@ -1,0 +1,31 @@
+services:
+
+  server:
+    restart: unless-stopped
+    build: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      memgraph:
+        condition: service_started
+    env_file:
+      - "./config/.env"
+
+  postgres:
+    image: "postgres:13.22-alpine3.22"
+    ports:
+      - "5433:5432"
+    env_file:
+      - "./postgres.env"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+  
+  memgraph:
+    image: "memgraph/memgraph:latest"
+
