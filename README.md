@@ -64,7 +64,7 @@
     - **Memgraph:** хранит граф интересов для построения рекомендаций.
 4.  **Внешние сервисы:**
     - **MAX Platform:** предоставляет инфраструктуру для бота и мини-аппа.
-    - **Timepad API:** источник данных о мероприятиях.
+    - **Timepad API:** [источник](https://dev.timepad.ru/) данных о мероприятиях.
 
 ## Запуск проекта
 Проект настроен для деплоя с использованием Docker и Docker Compose.
@@ -73,7 +73,7 @@
 - Установленные [Docker](https://docs.docker.com/get-docker/) и [Docker Compose](https://docs.docker.com/compose/install/).
 
 ### Инструкция:
-1. **Версия для Linux/macOS (не проверял).**
+1. **Версия для Linux/macOS.**
    Выполните:
    ```bash
    git clone https://github.com/Ijne/ISKRA.git
@@ -88,7 +88,7 @@
    git clone https://github.com/Ijne/ISKRA.git
    cd ISKRA
    git checkout master
-   # В PowerShell (от имени администратора если нужно)
+   # В PowerShell (от имени администратора, если нужно)
    .\setup.ps1
 
 3. **Или попросту.**
@@ -99,6 +99,7 @@
    git checkout master
    docker-compose up -d
    ```
+- Расшифровка: склонируйте репозиторий, убедитесь, что находитесь на ветке master, запустите `docker compose`.
 ## Послесловие
 Запустив проект можно переходить в мессенджер MAX и проверять работоспособность @t21_hakaton_bot. Скрипты для заполнения тестовыми пользователями лежат в папке init-scripts (если вам вдруг захочется повыполнять вручную).
 
