@@ -65,7 +65,6 @@ func InteractionHandler(cfg *config.Config, s *postgres.Storage, g *memgraph.Sto
 						b.SendNick(user2.ID, user1.Username)
 					}
 					render.JSON(w, r, response.Ok())
-					return
 				}
 			}
 

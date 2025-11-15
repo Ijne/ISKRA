@@ -11,8 +11,6 @@ import (
 )
 
 func main() {
-	// time.Sleep(time.Second * 10)
-
 	configPath := os.Getenv("CONFIG_PATH")
 	if configPath == "" {
 		configPath = "./config/local.yaml"
@@ -33,7 +31,6 @@ func main() {
 	g, err := memgraph.NewStorage(cfg)
 	if err != nil {
 		fmt.Println("Memgraph is not started")
-		// panic(err)
 	}
 
 	// bot

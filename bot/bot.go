@@ -236,12 +236,9 @@ func (b *Bot) ListenUpdates() chan bool {
 		for {
 			upds, err := b.GetUpdates(30)
 			if err != nil {
-				//log.Printf("err bot updates: %v\n", err)
 				continue
 			}
 			for _, upd := range upds.Updates {
-				// log.Printf("*** %v\n", upd.UpdateType)
-				// log.Printf("--- %v\n", upd.Message.Recipient.ChatID)
 				if upd.Message != nil && *upd.Message.Body.Text == "/start" && upd.Message.Recipient.ChatID != nil {
 					err := b.SendMiniappButton(*upd.Message.Recipient.ChatID)
 					if err != nil {

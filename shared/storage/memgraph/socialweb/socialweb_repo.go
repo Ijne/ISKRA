@@ -6,6 +6,7 @@ import (
 	"iskra/shared/models"
 	"iskra/shared/storage/repos"
 	"iskra/shared/tools/image"
+	"log"
 	"strings"
 
 	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
@@ -499,7 +500,7 @@ func (r *SocialWebRepo) GetRecommendations(id int64) ([]models.UserResponse, err
 					(COUNT(DISTINCT film) + COUNT(DISTINCT music)) * 2 AS taste_score,
 					-(abs(me.age - candidate.age) * 0.5) AS age_penalty,
 					CASE
-						WHEN candidate.name ENDS WITH "_t" THEN -200
+						WHEN candidate.name ENDS WITH "_t" THEN -50
 						ELSE 0
 					END AS test_user_penalty
 
@@ -661,6 +662,8 @@ func (r *SocialWebRepo) SetSwipe(id1, id2 int64, interaction_type string) error 
 			"id2":              id2,
 			"interaction_type": interaction_type,
 		}
+
+		log.Println(id1, id2, interaction_type)
 
 		query := `
 			MATCH (u1:Person {id: $id1})

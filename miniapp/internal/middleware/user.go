@@ -13,7 +13,6 @@ func UserMiddleware() func(http.Handler) http.Handler {
 			id, err := strconv.ParseInt(r.URL.Query().Get("id"), 10, 64)
 			if err != nil {
 				log.Println(err)
-				// return
 			}
 
 			ctx := context.WithValue(r.Context(), UserIDKey, id)

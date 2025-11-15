@@ -34,11 +34,9 @@ func (t *TimepadPoller) GetEvents() ([]Event, error) {
 
 	params.Add("starts_at_min", time.Now().Format("2006-01-02T15:04:05-0700"))
 	params.Add("starts_at_max", time.Now().Add(time.Duration(30)*time.Hour*24).Format("2006-01-02T15:04:05-0700"))
-	// params.Add("cities", "Москва")
 	params.Add("limit", "10")
 
 	fullURL := baseURL + "?" + params.Encode()
-	// log.Println("Full url: " + fullURL)
 	req, err := http.NewRequest("GET", fullURL, nil)
 	if err != nil {
 		return nil, err
@@ -79,7 +77,6 @@ func (t *TimepadPoller) GetFilteredEvents(filter EventsFilter) ([]Event, error) 
 	// категории
 	for _, cat := range filter.Categories {
 		newCat, ok := Categories[cat]
-		// log.Printf("- %v\n", newCat)
 
 		if !ok {
 			catIds = append(catIds, strconv.Itoa(463))
@@ -93,7 +90,6 @@ func (t *TimepadPoller) GetFilteredEvents(filter EventsFilter) ([]Event, error) 
 	}
 
 	fullURL := baseURL + "?" + params.Encode()
-	// log.Println("Full url: " + fullURL)
 	req, err := http.NewRequest("GET", fullURL, nil)
 	if err != nil {
 		return nil, err
@@ -117,7 +113,6 @@ func (t *TimepadPoller) GetFilteredEvents(filter EventsFilter) ([]Event, error) 
 func (t *TimepadPoller) GetEventByID(eventID int64) (Event, error) {
 	fullURL := t.timepadUrl + "events/" + strconv.Itoa(int(eventID))
 
-	// fmt.Println("Full url: " + fullURL)
 	req, err := http.NewRequest("GET", fullURL, nil)
 	if err != nil {
 		return Event{}, err

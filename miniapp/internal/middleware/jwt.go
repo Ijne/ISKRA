@@ -49,12 +49,6 @@ func JWTAuthMiddleware(cfg *config.Config) func(http.Handler) http.Handler {
 	}
 }
 
-// заглушка
-// func GetUserIDFromContext(ctx context.Context) (int64, bool) {
-// 	return 1, true
-// }
-
-// реальный код
 func GetUserIDFromContext(ctx context.Context) (int64, bool) {
 	userID, ok := ctx.Value(UserIDKey).(int64)
 	return userID, ok

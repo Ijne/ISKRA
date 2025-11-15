@@ -73,29 +73,21 @@
 - Установленные [Docker](https://docs.docker.com/get-docker/) и [Docker Compose](https://docs.docker.com/compose/install/).
 
 ### Инструкция:
-1. **Настройте переменные окружения.**
-    - В папке `./config` скопируйте файл `.env-template` в `.env`.
-    - Заполните переменные в `.env` файле:
-        ```conf
-        POSTGRES_USER=your_user
-        POSTGRES_PASSWORD=your_strong_password
-        TIMEPAD_TOKEN=your_timepad_token_here # Получите на https://dev.timepad.ru/
-        # для тестов можете использовать: fa11bbde3eabc4f74253f090a8c12b69f4648154
-        JWT_TOKEN=your_super_secret_jwt_key
-        BOT_TOKEN=your_max_bot_token
-
-        # Настройки для связи Frontend и Backend
-        MINIAPP_PROTO=http
-        MINIAPP_HOST=localhost
-        MINIAPP_PORT=8080
-
-        # Адрес, на котором запускается бэкенд
-        SERVER_ADDRESS=0.0.0.0:8080
-        ```
-    - Можете отредактировать файл `postgres.env`, содержащий имя пользователя и пароль, которые будут использоваться при запуске контейнера Postgres.
-
-2. **Запустите сервисы.**
-   Из корневой папки проекта выполните:
+1. **Версия для Linux/macOS (не проверял).**
+   Выполните:
    ```bash
-   docker compose up
+   git clone https://github.com/Ijne/ISKRA.git
+   chmod +x setup.sh
+   ./setup.sh
+   ```
+2. **Версия для Windows.**
+   Выполните:
+   ```powershell
+   git clone https://github.com/Ijne/ISKRA.git
+   # В PowerShell (от имени администратора если нужно)
+   .\setup.ps1
+
+   # Или если выполнение скриптов запрещено:
+   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+   .\setup.ps1
    ```
