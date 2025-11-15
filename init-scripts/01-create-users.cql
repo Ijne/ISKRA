@@ -2,10 +2,10 @@ WITH range(1, 1000) AS ids
 UNWIND ids AS id
 
 WITH id,
-     ['IT и технологии', 'Дизайн и UX', 'Медицина', 'Образование', 'Бизнес', 'Финансы', 'Маркетинг', 'Искусство', 'Музыка', 'Кино', 'Фотография', 'Архитектура', 'Инженерия', 'Недвижимость', 'Юриспруденция', 'Психология'] AS careers,
-     ['Экстраверт', 'Интроверт', 'Амбиверт', 'Аналитик', 'Творец', 'Прагматик', 'Романтик', 'Реалист', 'Оптимист', 'Философ', 'Новатор', 'Лидер', 'Целеустремленный', 'Гибкий', 'Настойчивый', 'Командный'] AS personalities,
-     ['Серьезные отношения', 'Дружба', 'Несерьезные отношения', 'Создание семьи', 'Поиск партнера', 'Романтика', 'Деловое партнерство', 'Творчество', 'Путешествия', 'Совместные проекты', 'Духовность', 'Карьера'] AS relationships,
-     ['Любовь и забота', 'Семья', 'Карьера', 'Финансы', 'Духовность', 'Здоровье', 'Образование', 'Творчество', 'Свобода', 'Приключения', 'Безопасность', 'Экология'] AS values_list
+     ['IT and Technology', 'Design and UX', 'Medicine', 'Education', 'Business', 'Finance', 'Marketing', 'Art', 'Music', 'Cinema', 'Photography', 'Architecture', 'Engineering', 'Real Estate', 'Jurisprudence', 'Psychology'] AS careers,
+     ['Extrovert', 'Introvert', 'Ambivert', 'Analyst', 'Creator', 'Pragmatist', 'Romantic', 'Realist', 'Optimist', 'Philosopher', 'Innovator', 'Leader', 'Purposeful', 'Flexible', 'Persistent', 'Team Player'] AS personalities,
+     ['Serious Relationships', 'Friendship', 'Casual Relationships', 'Family Creation', 'Partner Search', 'Romance', 'Business Partnership', 'Creativity', 'Travel', 'Joint Projects', 'Spirituality', 'Career'] AS relationships,
+     ['Love and Care', 'Family', 'Career', 'Finance', 'Spirituality', 'Health', 'Education', 'Creativity', 'Freedom', 'Adventure', 'Security', 'Ecology'] AS values_list
 
 CREATE (p:Person {
     id: id,

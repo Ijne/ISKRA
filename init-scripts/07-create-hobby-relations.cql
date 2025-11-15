@@ -1,8 +1,7 @@
-// Создание связей пользователей с хобби
 MATCH (p:Person)
 WITH p, p.id AS id
 WITH p, id,
-     ['Спорт', 'Путешествия', 'Кулинария', 'Фотография', 'Рисование', 'Танцы', 'Йога', 'Велоспорт', 'Гейминг', 'Чтение', 'Садоводство', 'Рукоделие', 'Музыка', 'Театр', 'Кино', 'Настолки', 'Рыбалка', 'Охота', 'Авто', 'Технологии'] AS hobby_list
+     ['Sports', 'Travel', 'Cooking', 'Photography', 'Drawing', 'Dancing', 'Yoga', 'Cycling', 'Gaming', 'Reading', 'Gardening', 'Handicrafts', 'Music', 'Theater', 'Cinema', 'Board Games', 'Fishing', 'Hunting', 'Cars', 'Technology'] AS hobby_list
 WITH p, [hobby IN hobby_list WHERE rand() < 0.5 | hobby] AS selected_hobbies
 WITH p, selected_hobbies[0..3] AS final_hobbies
 UNWIND final_hobbies AS hobby_name

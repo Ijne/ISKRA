@@ -1,8 +1,7 @@
-// Создание связей пользователей с фильмами
 MATCH (p:Person)
 WITH p, p.id AS id
 WITH p, id,
-     ['Комедия', 'Драма', 'Боевик', 'Триллер', 'Ужасы', 'Фантастика', 'Фэнтези', 'Мелодрама', 'Детектив', 'Приключения', 'Аниме', 'Документальный', 'Артхаус', 'Исторический', 'Криминал', 'Мюзикл'] AS film_genres
+     ['Comedy', 'Drama', 'Action', 'Thriller', 'Horror', 'Sci-Fi', 'Fantasy', 'Romance', 'Detective', 'Adventure', 'Anime', 'Documentary', 'Art House', 'Historical', 'Crime', 'Musical'] AS film_genres
 WITH p, [genre IN film_genres WHERE rand() < 0.5 | genre] AS selected_genres
 WITH p, selected_genres[0..3] AS final_genres
 UNWIND final_genres AS film_name

@@ -1,3 +1,2 @@
-// Создание узлов хобби
-UNWIND ['Спорт', 'Путешествия', 'Кулинария', 'Фотография', 'Рисование', 'Танцы', 'Йога', 'Велоспорт', 'Гейминг', 'Чтение', 'Садоводство', 'Рукоделие', 'Музыка', 'Театр', 'Кино', 'Настолки', 'Рыбалка', 'Охота', 'Авто', 'Технологии'] AS hobby_name
+UNWIND ['Sports', 'Travel', 'Cooking', 'Photography', 'Drawing', 'Dancing', 'Yoga', 'Cycling', 'Gaming', 'Reading', 'Gardening', 'Handicrafts', 'Music', 'Theater', 'Cinema', 'Board Games', 'Fishing', 'Hunting', 'Cars', 'Technology'] AS hobby_name
 MERGE (h:Hobby {name: hobby_name});

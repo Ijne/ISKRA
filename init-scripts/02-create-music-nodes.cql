@@ -1,3 +1,2 @@
-// Создание узлов музыки
-UNWIND ['Поп', 'Рок', 'Хип-хоп', 'Электроника', 'Джаз', 'Классика', 'R&B', 'Метал', 'Инди', 'Фолк', 'Кантри', 'Регги', 'Блюз', 'Соул', 'Диско', 'Альтернатива', 'Рэп'] AS music_name
+UNWIND ['Pop', 'Rock', 'Hip-hop', 'Electronic', 'Jazz', 'Classical', 'R&B', 'Metal', 'Indie', 'Folk', 'Country', 'Reggae', 'Blues', 'Soul', 'Disco', 'Alternative', 'Rap'] AS music_name
 MERGE (m:Music {name: music_name});

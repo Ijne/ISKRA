@@ -1,8 +1,7 @@
-// Создание связей пользователей с событиями
 MATCH (p:Person)
 WITH p, p.id AS id
 WITH p, id,
-     ['Концерты', 'Кино', 'Выставки', 'Театры', 'Фестивали', 'Спортивные события', 'Вечеринки', 'Клубы', 'Рестораны', 'Кафе', 'Пикники', 'Походы', 'Мастер-классы', 'Лекции', 'Йога-сессии', 'Танцы', 'Настольные игры', 'Караоке', 'Боулинг', 'Картинг'] AS event_list
+     ['Concerts', 'Cinema', 'Exhibitions', 'Theaters', 'Festivals', 'Sports Events', 'Parties', 'Clubs', 'Restaurants', 'Cafes', 'Picnics', 'Hiking', 'Master Classes', 'Lectures', 'Yoga Sessions', 'Dancing', 'Board Games', 'Karaoke', 'Bowling', 'Karting'] AS event_list
 WITH p, [event IN event_list WHERE rand() < 0.5 | event] AS selected_events
 WITH p, selected_events[0..3] AS final_events
 UNWIND final_events AS event_name

@@ -1,3 +1,2 @@
-// Создание узлов фильмов
-UNWIND ['Комедия', 'Драма', 'Боевик', 'Триллер', 'Ужасы', 'Фантастика', 'Фэнтези', 'Мелодрама', 'Детектив', 'Приключения', 'Аниме', 'Документальный', 'Артхаус', 'Исторический', 'Криминал', 'Мюзикл'] AS film_name
+UNWIND ['Comedy', 'Drama', 'Action', 'Thriller', 'Horror', 'Sci-Fi', 'Fantasy', 'Romance', 'Detective', 'Adventure', 'Anime', 'Documentary', 'Art House', 'Historical', 'Crime', 'Musical'] AS film_name
 MERGE (f:Film {name: film_name});

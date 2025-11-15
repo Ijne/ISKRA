@@ -1,3 +1,2 @@
-// Создание узлов событий
-UNWIND ['Концерты', 'Кино', 'Выставки', 'Театры', 'Фестивали', 'Спортивные события', 'Вечеринки', 'Клубы', 'Рестораны', 'Кафе', 'Пикники', 'Походы', 'Мастер-классы', 'Лекции', 'Йога-сессии', 'Танцы', 'Настольные игры', 'Караоке', 'Боулинг', 'Картинг'] AS event_name
+UNWIND ['Concerts', 'Cinema', 'Exhibitions', 'Theaters', 'Festivals', 'Sports Events', 'Parties', 'Clubs', 'Restaurants', 'Cafes', 'Picnics', 'Hiking', 'Master Classes', 'Lectures', 'Yoga Sessions', 'Dancing', 'Board Games', 'Karaoke', 'Bowling', 'Karting'] AS event_name
 MERGE (e:Event {name: event_name});

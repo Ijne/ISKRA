@@ -1,8 +1,7 @@
-// Создание связей пользователей с музыкой
 MATCH (p:Person)
 WITH p, p.id AS id
 WITH p, id,
-     ['Поп', 'Рок', 'Хип-хоп', 'Электроника', 'Джаз', 'Классика', 'R&B', 'Метал', 'Инди', 'Фолк', 'Кантри', 'Регги', 'Блюз', 'Соул', 'Диско', 'Альтернатива', 'Рэп'] AS music_genres
+     ['Pop', 'Rock', 'Hip-hop', 'Electronic', 'Jazz', 'Classical', 'R&B', 'Metal', 'Indie', 'Folk', 'Country', 'Reggae', 'Blues', 'Soul', 'Disco', 'Alternative', 'Rap'] AS music_genres
 WITH p, [genre IN music_genres WHERE rand() < 0.5 | genre] AS selected_genres
 WITH p, selected_genres[0..3] AS final_genres
 UNWIND final_genres AS music_name
