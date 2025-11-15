@@ -2,7 +2,7 @@ Write-Host "Starting ISKRA project (Windows version)" -ForegroundColor Green
 
 # 2. Start databases in background
 Write-Host "Starting databases in background..." -ForegroundColor Yellow
-docker-compose up
+docker-compose up -d
 
 # 3. Wait for databases to start
 Write-Host "Waiting for databases to start (5 sec)..." -ForegroundColor Yellow
