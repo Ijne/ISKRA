@@ -1,12 +1,14 @@
 Write-Host "Starting ISKRA project (Windows version)" -ForegroundColor Green
 
+# 2. Start databases in background
+Write-Host "Starting databases in background..." -ForegroundColor Yellow
 docker-compose up
 
-# 4. Wait for databases to start
+# 3. Wait for databases to start
 Write-Host "Waiting for databases to start (5 sec)..." -ForegroundColor Yellow
 Start-Sleep -Seconds 5
 
-# 6. Fill Memgraph with test data
+# 5. Fill Memgraph with test data
 Write-Host "Filling Memgraph with test data..." -ForegroundColor Yellow
 
 $scripts = @(
@@ -29,25 +31,25 @@ foreach ($script in $scripts) {
     Start-Sleep -Seconds 1
 }
 
-# 7. Export data to PostgreSQL
+# 6. Export data to PostgreSQL
 Write-Host "Exporting data to PostgreSQL..." -ForegroundColor Yellow
 Get-Content "init-scripts/12-export-to-postgres.cql" | docker-compose exec -T memgraph mgconsole | Out-File -FilePath "exported-data.sql" -Encoding UTF8
 
-# 8. Clean exported file
+# 7. Clean exported file
 Write-Host "Cleaning exported data..." -ForegroundColor Yellow
 $content = Get-Content "exported-data.sql" | Where-Object { $_ -ne "" -and $_ -ne "sql_statement" }
 $content = $content -replace "^\| ", ""
 $content | Out-File -FilePath "exported-data-clean.sql" -Encoding UTF8
 
-# 9. Import to PostgreSQL
+# 8. Import to PostgreSQL
 Write-Host "Importing data to PostgreSQL..." -ForegroundColor Yellow
 Get-Content "exported-data-clean.sql" | docker-compose exec -T postgres psql -U postgres -d postgres
 
-# 10. Start main service
+# 9. Start main service
 Write-Host "Starting main service..." -ForegroundColor Yellow
 docker-compose up server -d
 
-# 11. Check services
+# 10. Check services
 Write-Host "Checking running services..." -ForegroundColor Yellow
 docker-compose ps
 
